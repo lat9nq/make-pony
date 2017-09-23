@@ -1,0 +1,19 @@
+CC=gcc
+CCFLAGS=-Wall -O2# -g
+LIBFLAGS=-lm
+
+.c.o:
+	$(CC) $(CCFLAGS) -c $< $(LIBFLAGS)
+
+OFILES=color.o make-pony.o
+make-pony:$(OFILES)
+	$(CC) $(CCFLAGS) -o make-pony $(OFILES) $(LIBFLAGS)
+
+%.strip:%.exe
+	strip -Xxwg $<
+	
+clean:
+	rm -vf *.o *.txt *.exe .*.swp
+	
+color.o:color.c color.h
+make-pony.o:make-pony.c color.h
