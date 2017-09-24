@@ -277,7 +277,7 @@ int main(int argc, char * argv[]) {
 	strcpy(UMANE(styles[3]), "BOOKWORM");
 	strcpy(LMANE(styles[3]), "BOOKWORM");
 	strcpy(TAIL(styles[3]), "BOOKWORM");
-	COLOR(styles[3]) = 6;
+	COLOR(styles[3]) = 5;
 	
 	strcpy(UMANE(styles[4]), "SPEEDSTER");
 	strcpy(LMANE(styles[4]), "SPEEDSTER");
@@ -302,7 +302,7 @@ int main(int argc, char * argv[]) {
 	strcpy(UMANE(styles[8]), "BOOKWORM");
 	strcpy(LMANE(styles[8]), "TIMID");
 	strcpy(TAIL(styles[8]), "SHOWBOAT");
-	COLOR(styles[8]) = 6;
+	COLOR(styles[8]) = 5;
 	
 	strcpy(UMANE(styles[9]), "ADVENTUROUS");
 	strcpy(LMANE(styles[9]), "ADVENTUROUS");
