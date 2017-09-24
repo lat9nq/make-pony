@@ -504,7 +504,7 @@ int main(int argc, char * argv[]) {
 		}
 		else {
 			hsvcolor.v = (!desaturated) ? sqrtf((rand() % 12 + 4) / 15.0f) : sqrtf((rand() & 15) / 15.0f);
-			any_saturation = 1 & (hsvcolor.v > 0.0f);
+			any_saturation = (1 & (hsvcolor.v > 0.0f)) | any_saturation;
 		}
 		
 		avg_sat += (!desaturated) * hsvcolor.s + (desaturated) * hsvcolor.v;
@@ -679,9 +679,9 @@ int main(int argc, char * argv[]) {
 					if (key == BOOKWORM || key == ASSERTIVE || key == BUMPKIN) {
 						c = colors[0];
 					}
-					else if (key == TIMID) {
-						c = colors[4];
-					}
+				}
+				if (strstr(cur+1, "_color_2") && (key == TIMID) && !strstr(cur+1, "detail")) {
+					c = colors[4];
 				}
 			}
 			else if (strstr(cur+1, "eye_") == cur + 1) {
