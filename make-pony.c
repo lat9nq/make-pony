@@ -24,7 +24,7 @@
 #define VAL 	3
 #define BOOL	4
 
-#define STYLECOUNT  	10
+#define STYLECOUNT  	16
 
 #define ADVENTUROUS	0
 #define SHOWBOAT	1
@@ -36,6 +36,12 @@
 #define ASSERTIVE	7
 #define TIMID	8
 #define BIGMAC	9
+#define BOLD	10
+#define BUMPKIN	11
+#define FLOOFEH	12
+#define MECHANIC	13
+#define SHOWBOAT2	14
+#define INSTRUCTOR	15
 
 #define RACES	3
 #define EARTH	0
@@ -295,6 +301,36 @@ int main(int argc, char * argv[]) {
 	strcpy(TAIL(styles[9]), "RADICAL");
 	COLOR(styles[9]) = 2;
 	
+	strcpy(UMANE(styles[10]), "BOLD");
+	strcpy(LMANE(styles[10]), "BOLD");
+	strcpy(TAIL(styles[10]), "RADICAL");
+	COLOR(styles[10]) = 3;
+	
+	strcpy(UMANE(styles[11]), "BUMPKIN");
+	strcpy(LMANE(styles[11]), "BUMPKIN");
+	strcpy(TAIL(styles[11]), "BUMPKIN");
+	COLOR(styles[11]) = 3;
+	
+	strcpy(UMANE(styles[12]), "FLOOFEH");
+	strcpy(LMANE(styles[12]), "FLOOFEH");
+	strcpy(TAIL(styles[12]), "FLOOFEH");
+	COLOR(styles[12]) = 2;
+	
+	strcpy(UMANE(styles[13]), "MECHANIC");
+	strcpy(LMANE(styles[13]), "MOON");
+	strcpy(TAIL(styles[13]), "SPEEDSTER");
+	COLOR(styles[13]) = 7;
+	
+	strcpy(UMANE(styles[14]), "SHOWBOAT");
+	strcpy(LMANE(styles[14]), "BOOKWORM");
+	strcpy(TAIL(styles[14]), "SHOWBOAT");
+	COLOR(styles[14]) = 6;
+	
+	strcpy(UMANE(styles[15]), "INSTRUCTOR");
+	strcpy(LMANE(styles[15]), "NONE");
+	strcpy(TAIL(styles[15]), "RADICAL");
+	COLOR(styles[15]) = 2;
+	
 	srand(seed);
 	
 	int clrcount;
@@ -430,6 +466,7 @@ int main(int argc, char * argv[]) {
 		rand();
 		rand();
 	}
+	int any_saturation = !desaturated;
 	
 	if (verbose) {
 		fprintf(stderr, "body is %ssaturated\n", (desaturated) ? "de" : "");
@@ -456,6 +493,7 @@ int main(int argc, char * argv[]) {
 				}
 			}
 			else {
+				any_saturation = 1;
 				hsvcolor.v = (!desaturated) ? sqrtf((rand() % 12 + 4) / 15.0f) : sqrtf((rand() & 15) / 15.0f);
 			}
 		// }
@@ -605,14 +643,20 @@ int main(int argc, char * argv[]) {
 				int num = 2 * (strstr(cur+1, "detail_") != NULL);
 				num += atoi(RIGHT(cur,1));
 				
-				if (key == BIGMAC && (!strcmp(cur+1, "tail_detail_color_1"))) {
-					num = 2;
+				// if ((key == BIGMAC) && (!strcmp(cur+1, "tail_detail_color_1"))) {
+					// num = 2;
+				// }
+				if ((key == BIGMAC || key == BUMPKIN || key == INSTRUCTOR) && (strstr(cur+1, "_detail_color_"))) {
+					num -= 1;
+				}
+				else if (key == INSTRUCTOR && strstr(cur+1, "mane_color_2")) {
+					num -= 1;
 				}
 				
 				c = colors[num-1];
 				
 				if (!strcmp(cur+1, "mane_color_2")) {
-					if (key == BOOKWORM || key == ASSERTIVE) {
+					if (key == BOOKWORM || key == ASSERTIVE || key == BUMPKIN) {
 						c = colors[0];
 					}
 					else if (key == TIMID) {
@@ -632,24 +676,27 @@ int main(int argc, char * argv[]) {
 					c.b = 255;
 				}
 				else if (strstr(cur+1, "iris2")) {
-					// c = color1;
-					// hsvcolor.h = hue(&c);
-					// hsvcolor.s = 0.2f;
-					// hsvcolor.v = 1.0f;
-					// hsvToRGB(&hsvcolor, &c);
-					c = bodycolor;
+					if (any_saturation) {
+						c = bodycolor;
+					}
+					else {
+						hsvcolor.h = 0;
+						hsvcolor.s = 0.0f;
+						hsvcolor.v = 0.5f * value(&bodycolor);
+						hsvToRGB(&hsvcolor, &c);
+					}
 				}
 				else if (strstr(cur+1, "irisline2")) {
 					c = color1;
 					hsvcolor.h = hue(&c);
-					hsvcolor.s = 0.1f;
+					hsvcolor.s = 0.1f * any_saturation;
 					hsvcolor.v = 1.0f;
 					hsvToRGB(&hsvcolor, &c);
 				}
 				else if (strstr(cur+1, "irisline1")) {
 					c = color1;
 					hsvcolor.h = hue(&c);
-					hsvcolor.s = 0.5f;
+					hsvcolor.s = 0.5f * any_saturation;
 					hsvcolor.v = 1.0f;
 					hsvToRGB(&hsvcolor, &c);
 				}
