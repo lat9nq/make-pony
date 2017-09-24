@@ -289,7 +289,7 @@ int main(int argc, char * argv[]) {
 	strcpy(UMANE(styles[7]), "ASSERTIVE");
 	strcpy(LMANE(styles[7]), "ASSERTIVE");
 	strcpy(TAIL(styles[7]), "ASSERTIVE");
-	COLOR(styles[7]) = 3;
+	COLOR(styles[7]) = 2;
 	
 	strcpy(UMANE(styles[8]), "BOOKWORM");
 	strcpy(LMANE(styles[8]), "TIMID");
@@ -501,7 +501,7 @@ int main(int argc, char * argv[]) {
 		hsvToRGB(&hsvcolor,&colors[i]);
 		
 		if (verbose) {
-			fprintf(stderr, "\tcolors[%d]: 0x%02X%02X%02X\n", i, colors[i].r, colors[i].g, colors[i].b); 
+			fprintf(stderr, "\tcolors[%d]: 0x%02X%02X%02X\t HSV(%d,%g,%g)\n", i, colors[i].r, colors[i].g, colors[i].b, hsvcolor.h, hsvcolor.s, hsvcolor.v); 
 		}
     }
 	
@@ -523,7 +523,9 @@ int main(int argc, char * argv[]) {
 	
 	color bodycolor;
 	if (!white) {
+		#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 		hsvcolor.h = static_hue; // * (0.7 + 0.3 * lightness(&color1)))
+		#pragma GCC diagnostic warning "-Wmaybe-uninitialized"
 		// hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + 0.6f * fmodf(fabs(-std_dev*1.5f + 1.25f), 1.0f))) : 0.0f;// * !(!(rand()&7));
 		hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + std_dev * 0.6f)) : 0.0f;// * !(!(rand()&7));
 		hsvcolor.v = (desaturated) ? (avg_sat * sqrtf(0.3f + std_dev*0.7f)) : 1.0f;//((rand() % 12) + 4) / 15.0f : 1.0f;
@@ -578,10 +580,15 @@ int main(int argc, char * argv[]) {
 	int use_floofers = !(rand() % 6);
 	if (use_floofers) {
 		strcpy(details[details_in_use], "GRADIENT");
-		detail_color[details_in_use] = color1;
+		if (any_saturation) {
+			detail_color[details_in_use] = color1;
+		}
+		else {
+			detail_color[details_in_use] = colors[0];
+		}
 		details_in_use += 1;
 		strcpy(details[details_in_use], "HOOF_SMALL");
-		detail_color[details_in_use] = colors[1 + (key == BOOKWORM || key == SPEEDSTER || key == ASSERTIVE)];
+		detail_color[details_in_use] = colors[1 + (key == BOOKWORM || key == SPEEDSTER)];
 		details_in_use += 1;
 	}
 	
@@ -638,6 +645,9 @@ int main(int argc, char * argv[]) {
 				c.g = 1;
 				c.b = 1;
 			}
+			else if (strstr(cur+1, "horn") && !any_saturation) {
+				c = colors[0];
+			}
 			else if (strstr(cur+1, "mane_") == cur + 1 || strstr(cur+1, "tail_") == cur + 1) {
 				//printf("%s\n", RIGHT(cur+1,1));
 				int num = 2 * (strstr(cur+1, "detail_") != NULL);
@@ -646,7 +656,7 @@ int main(int argc, char * argv[]) {
 				// if ((key == BIGMAC) && (!strcmp(cur+1, "tail_detail_color_1"))) {
 					// num = 2;
 				// }
-				if ((key == BIGMAC || key == BUMPKIN || key == INSTRUCTOR) && (strstr(cur+1, "_detail_color_"))) {
+				if ((key == BIGMAC || key == BUMPKIN || key == INSTRUCTOR || key == ASSERTIVE) && (strstr(cur+1, "_detail_color_"))) {
 					num -= 1;
 				}
 				else if (key == INSTRUCTOR && strstr(cur+1, "mane_color_2")) {
@@ -675,29 +685,27 @@ int main(int argc, char * argv[]) {
 					c.g = 255;
 					c.b = 255;
 				}
+				else if (strstr(cur+1, "iris1") && !any_saturation) {
+					hsvcolor.h = 0;
+					hsvcolor.s = 0.0f;
+					hsvcolor.v = 0.5f * (1.0f-value(&bodycolor));
+					hsvToRGB(&hsvcolor, &c);
+				}
 				else if (strstr(cur+1, "iris2")) {
-					if (any_saturation) {
-						c = bodycolor;
-					}
-					else {
-						hsvcolor.h = 0;
-						hsvcolor.s = 0.0f;
-						hsvcolor.v = 0.5f * value(&bodycolor);
-						hsvToRGB(&hsvcolor, &c);
-					}
+					c = bodycolor;
 				}
 				else if (strstr(cur+1, "irisline2")) {
 					c = color1;
 					hsvcolor.h = hue(&c);
 					hsvcolor.s = 0.1f * any_saturation;
-					hsvcolor.v = 1.0f;
+					hsvcolor.v = 0.9f + 0.1 * any_saturation;
 					hsvToRGB(&hsvcolor, &c);
 				}
 				else if (strstr(cur+1, "irisline1")) {
 					c = color1;
 					hsvcolor.h = hue(&c);
 					hsvcolor.s = 0.5f * any_saturation;
-					hsvcolor.v = 1.0f;
+					hsvcolor.v = 0.5f + 0.5f * any_saturation;
 					hsvToRGB(&hsvcolor, &c);
 				}
 			}
