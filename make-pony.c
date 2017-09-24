@@ -72,6 +72,8 @@ int main(int argc, char * argv[]) {
 	int white = -1;//desaturated && !(rand() & 3);
 	// desaturated = desaturated ^ white;
 	
+	int male = 0;
+	
 	filename = malloc(sizeof(*filename)*256);
 	
 	if (argc != 1) {
@@ -150,6 +152,9 @@ int main(int argc, char * argv[]) {
 					case 'v':
 						verbose = 1;
 					break;
+					case 'g':
+						male = 1;
+					break;
 					case 'h':
 						help = 1;
 					break;
@@ -197,10 +202,14 @@ int main(int argc, char * argv[]) {
 			cmd[0] = 0;
 			temp[0] = 0;
 			if (colorgiven) {
-				sprintf(temp, " -c%02X%02X%02X", color1.r, color1.g, color1.b);
+				//putchar('%');
+				sprintf(temp, " -x%02X%02X%02X", color1.r, color1.g, color1.b);
 			}
 			if (desaturated != -1) {
 				sprintf(temp, "%s -d%d", temp, desaturated + (white<<1));
+			}
+			if (male) {
+				sprintf(temp, "%s -g", temp);
 			}
 			sprintf(cmd, "%s -s%ld %s %s" , argv[0], seed+i, (verbose) ? "-v" : "", temp);
 			if (verbose) {
@@ -211,6 +220,9 @@ int main(int argc, char * argv[]) {
 			cmd[strlen(cmd)-1] = 0;
 			if (!verbose) {
 				printf("%ld: %s\n", seed + i, cmd);
+			}
+			else {
+				putchar('\n');
 			}
 			pclose(p);
 		}
@@ -388,8 +400,11 @@ int main(int argc, char * argv[]) {
 		rand();
 	}
 	
+	male = ((static_hue % 180 < 60) * ((key == BIGMAC) || ((key == ADVENTUROUS) && (rand() & 3)))) || male;
+	
 	if (verbose) {
 		fprintf(stderr, "color1: 0x%02X%02X%02X\n", color1.r, color1.g, color1.b);
+		fprintf(stderr, "gender: %s\n", (male) ? "male" : "female");
 	}
 	
 	// if (!(rand() & 7)) {
@@ -468,8 +483,9 @@ int main(int argc, char * argv[]) {
 	
 	color bodycolor;
 	if (!white) {
-		hsvcolor.h = static_hue;
-		hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * sqrtf(0.4f + std_dev*0.6f) * (0.7 + 0.3 * lightness(&color1))) : 0.0f;// * !(!(rand()&7));
+		hsvcolor.h = static_hue; // * (0.7 + 0.3 * lightness(&color1)))
+		// hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + 0.6f * fmodf(fabs(-std_dev*1.5f + 1.25f), 1.0f))) : 0.0f;// * !(!(rand()&7));
+		hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + std_dev * 0.6f)) : 0.0f;// * !(!(rand()&7));
 		hsvcolor.v = (desaturated) ? (avg_sat * sqrtf(0.3f + std_dev*0.7f)) : 1.0f;//((rand() % 12) + 4) / 15.0f : 1.0f;
 		// c = color1;
 	}
@@ -593,13 +609,13 @@ int main(int argc, char * argv[]) {
 				
 				c = colors[num-1];
 				
-				if (!strcmp(cur+1, "mane_color_2") && (key == BOOKWORM || key == ASSERTIVE)) {
-					c = colors[0];
-				}
-				else if (!strcmp(cur+1, "mane_color_2") && key == SPEEDSTER) {
-					// int x = ;
-					// putchar(x+45);
-					c = colors[rand() % 6];
+				if (!strcmp(cur+1, "mane_color_2")) {
+					if (key == BOOKWORM || key == ASSERTIVE) {
+						c = colors[0];
+					}
+					else if (key == TIMID) {
+						c = colors[4];
+					}
 				}
 			}
 			else if (strstr(cur+1, "eye_") == cur + 1) {
@@ -659,9 +675,9 @@ int main(int argc, char * argv[]) {
 				strcpy(temp, details[num-1]);
 			}
 			else if (!strcmp(cur+1, "gender")) {
-				strcpy(temp, "FILLY");
+				strcpy(temp, (male) ? "ADULT" : "FILLY");
 			}
-			else if (!strcmp(cur+1, "eyelash")) {
+			else if (!strcmp(cur+1, "eyelash") && !male) {
 				strcpy(temp, "DEFAULT");
 			}
 			else if (strstr(cur+1, "lightwarp")) {

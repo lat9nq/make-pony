@@ -1,5 +1,5 @@
 CC=gcc
-CCFLAGS=-Wall -O2# -g
+CCFLAGS=-Wall -g
 LIBFLAGS=-lm
 
 .c.o:
@@ -11,9 +11,6 @@ make-pony:$(OFILES)
 
 %.strip:%.exe
 	strip -Xxwg $<
-	
-clean:
-	rm -vf *.o *.txt *.exe .*.swp
-	
+
 color.o:color.c color.h
 make-pony.o:make-pony.c color.h
