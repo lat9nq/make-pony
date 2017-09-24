@@ -332,7 +332,7 @@ int main(int argc, char * argv[]) {
 	strcpy(UMANE(styles[14]), "SHOWBOAT");
 	strcpy(LMANE(styles[14]), "BOOKWORM");
 	strcpy(TAIL(styles[14]), "SHOWBOAT");
-	COLOR(styles[14]) = 6;
+	COLOR(styles[14]) = 4;
 	
 	strcpy(UMANE(styles[15]), "INSTRUCTOR");
 	strcpy(LMANE(styles[15]), "NONE");
