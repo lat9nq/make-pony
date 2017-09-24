@@ -503,8 +503,8 @@ int main(int argc, char * argv[]) {
 			}
 		}
 		else {
-			any_saturation = 1;
 			hsvcolor.v = (!desaturated) ? sqrtf((rand() % 12 + 4) / 15.0f) : sqrtf((rand() & 15) / 15.0f);
+			any_saturation = 1 & (hsvcolor.v > 0.0f);
 		}
 		
 		avg_sat += (!desaturated) * hsvcolor.s + (desaturated) * hsvcolor.v;
