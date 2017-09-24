@@ -5,6 +5,10 @@ LIBFLAGS=-lm
 .c.o:
 	$(CC) $(CCFLAGS) -c $< $(LIBFLAGS)
 
+all:
+	make make-pony
+	git commit -a
+	
 OFILES=color.o make-pony.o
 make-pony:$(OFILES)
 	$(CC) $(CCFLAGS) -o make-pony $(OFILES) $(LIBFLAGS)

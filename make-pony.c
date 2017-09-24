@@ -1,3 +1,11 @@
+/* make-pony.c
+ * C
+ *
+ * Toast Unlimited
+ * 24 September 2017
+ *
+ * -s1506233186 -d1 is a known issue (completely black)
+ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
