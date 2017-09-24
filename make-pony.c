@@ -485,26 +485,28 @@ int main(int argc, char * argv[]) {
 		hsvcolor.s = 1;//saturation(&colors[0]);
 		hsvcolor.v = 1;//value(&colors[0]);
 		
-		// if (i) {
-			if (!(rand() & 15)) {
-				if (rand() & 1) {//(WARM(static_hue)) {
-					hsvcolor.h = (hsvcolor.h + 15) % 360;
-				}
-				else {
-					hsvcolor.h = (hsvcolor.h + 345) % 360;
-				}
-			}
-			if (rand() & 1) {
-				hsvcolor.s = (!desaturated) ? (rand() & 15) / 15.0f : 0.0f;
-				if (desaturated) {
-					hsvcolor.v = (!desaturated) ? sqrtf((rand() % 12 + 4) / 15.0f) : sqrtf((rand() & 15) / 15.0f);
-				}
+		if (!(rand() & 15)) {
+			if (rand() & 1) {//(WARM(static_hue)) {
+				hsvcolor.h = (hsvcolor.h + 15) % 360;
 			}
 			else {
-				any_saturation = 1;
+				hsvcolor.h = (hsvcolor.h + 345) % 360;
+			}
+		}
+		if (key == BOOKWORM && i == 1) {
+			colors[i] = colors[0];
+		}
+		else if (rand() & 1) {
+			hsvcolor.s = (!desaturated) ? (rand() & 15) / 15.0f : 0.0f;
+			if (desaturated) {
 				hsvcolor.v = (!desaturated) ? sqrtf((rand() % 12 + 4) / 15.0f) : sqrtf((rand() & 15) / 15.0f);
 			}
-		// }
+		}
+		else {
+			any_saturation = 1;
+			hsvcolor.v = (!desaturated) ? sqrtf((rand() % 12 + 4) / 15.0f) : sqrtf((rand() & 15) / 15.0f);
+		}
+		
 		avg_sat += (!desaturated) * hsvcolor.s + (desaturated) * hsvcolor.v;
 		hsvToRGB(&hsvcolor,&colors[i]);
 		
