@@ -179,13 +179,15 @@ int main(int argc, char * argv[]) {
 		fprintf(stderr, "By default, the output files take the format \"[SEED]_makepony.txt\",\n");
 		fprintf(stderr, "and the default seed is the time since the UNIX epoch.\n");
 		fprintf(stderr, "\t-o<file>\toutput to a specific file (incompatible with -m)\n");
-		fprintf(stderr, "\t-m<n>\t\tgenerate n files\n");
+		fprintf(stderr, "\t-m<n>\t\tgenerate n files\n\n");
 		fprintf(stderr, "\t-d[0-2]\t\tdesaturate\n");
 		fprintf(stderr, "\t\t\t0 -- use saturation\n");
 		fprintf(stderr, "\t\t\t1 -- disallow saturation\n");
 		fprintf(stderr, "\t\t\t2 -- use only white body colors\n");
-		fprintf(stderr, "\t-x<XXXXXX>\tspecify a base color to use in HEXADECIMAL\n");
+		fprintf(stderr, "\t-g\t\tforce generate a male\n");
+		fprintf(stderr, "\t-x<XXXXXX>\tspecify a base color to use in HEXADECIMAL\n\n");
 		fprintf(stderr, "\t-s<n>\t\tspecify a seed for the random generator\n");
+		fprintf(stderr, "\t-c\t\toutput to STDOUT\n\n");
 		fprintf(stderr, "\t-v\t\tverbose output\n");
 		fprintf(stderr, "\t-h, --help\tthis help text\n");
 		fprintf(stderr, "written by Toast Unlimited<http://steamcommunity.com/id/toastunlimited/>\n");

@@ -1,5 +1,5 @@
 CC=gcc
-CCFLAGS=-Wall -g
+CCFLAGS=-Wall -O2#-g
 LIBFLAGS=-lm
 
 .c.o:
