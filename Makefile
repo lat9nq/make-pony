@@ -13,7 +13,7 @@ make-pony:$(OFILES)
 	strip -Xxwg $<
 	
 clean:
-	rm -vf *.o *.txt *.exe .*.swp
+	rm -vf *.o *.txt .*.swp make-pony make-pony.exe
 	
 color.o:color.c color.h
 make-pony.o:make-pony.c color.h
