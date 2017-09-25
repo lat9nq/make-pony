@@ -255,6 +255,9 @@ int main(int argc, char * argv[]) {
 			if (male) {
 				sprintf(temp, "%s -g", temp);
 			}
+			if (key != -1) {
+				sprintf(temp, "%s -d%d", temp, key);
+			}
 			sprintf(cmd, "%s -s%ld %s %s" , argv[0], seed+i, (verbose) ? "-v" : "", temp);
 			if (verbose) {
 				fprintf(stderr, "%s\n", cmd);
