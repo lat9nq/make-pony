@@ -370,7 +370,11 @@ int main(int argc, char * argv[]) {
 	srand(seed);
 	
 	int clrcount;
-	key = rand() % STYLECOUNT;
+	if (key == -1) {
+		key = rand() % STYLECOUNT;
+	} else {
+		rand();
+	}
 	clrcount = COLOR(styles[key]);
 	
 	if (!verbose && !stdo) {
