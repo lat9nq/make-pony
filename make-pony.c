@@ -210,8 +210,6 @@ int main(int argc, char * argv[]) {
 		fprintf(stderr, "\t\t\t1 -- disallow saturation\n");
 		fprintf(stderr, "\t\t\t2 -- use only white body colors\n");
 		fprintf(stderr, "\t-g\t\tforce generate a male\n");
-		fprintf(stderr, "\t-x<XXXXXX>\tspecify a base color to use in HEXADECIMAL\n\n");
-		fprintf(stderr, "\t-s<n>\t\tspecify a seed for the random generator\n");
 		fprintf(stderr, "\t-k<n>\t\tset a style to generate with (UMane, LMane, Tail)\n");
 		fprintf(stderr, "\t\t\t0  -- ADVENTUROUS, ADVENTUROUS, ADVENTUROUS\n");
 		fprintf(stderr, "\t\t\t1  -- SHOWBOAT, SHOWBOAT, SHOWBOAT\n");
@@ -229,6 +227,8 @@ int main(int argc, char * argv[]) {
 		fprintf(stderr, "\t\t\t13 -- MECHANIC, MOON, SPEEDSTER\n");
 		fprintf(stderr, "\t\t\t14 -- SHOWBOAT, BOOKWORM, SHOWBOAT\n");
 		fprintf(stderr, "\t\t\t15 -- INSTRUCTOR, NONE, RADICAL\n");
+		fprintf(stderr, "\t-x<XXXXXX>\tspecify a base color to use in HEXADECIMAL\n\n");
+		fprintf(stderr, "\t-s<n>\t\tspecify a seed for the random generator\n");
 		fprintf(stderr, "\t-c\t\toutput to STDOUT\n\n");
 		fprintf(stderr, "\t-v\t\tverbose output\n");
 		fprintf(stderr, "\t-h, --help\tthis help text\n");
