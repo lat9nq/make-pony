@@ -82,6 +82,7 @@ int main(int argc, char * argv[]) {
 	color color1;
 	int static_hue;
 	hsv hsvcolor;
+	int key = -1;
 	int desaturated = -1;//!(rand() & 15);
 	int white = -1;//desaturated && !(rand() & 3);
 	// desaturated = desaturated ^ white;
@@ -103,6 +104,16 @@ int main(int argc, char * argv[]) {
 							seed = atoi(argv[i]);
 						}
 						// printf("%ld", seed);
+					break;
+					case 'k': //style _Key specify
+						if (argv[i][2] != 0) {
+							key = atoi(argv[i]+2);
+						}
+						else {
+							i++;
+							key = atoi(argv[i]);
+						}
+						key %= STYLECOUNT;
 					break;
 					case 'o': //output file
 						if (argv[i][2] != 0) {
@@ -201,6 +212,23 @@ int main(int argc, char * argv[]) {
 		fprintf(stderr, "\t-g\t\tforce generate a male\n");
 		fprintf(stderr, "\t-x<XXXXXX>\tspecify a base color to use in HEXADECIMAL\n\n");
 		fprintf(stderr, "\t-s<n>\t\tspecify a seed for the random generator\n");
+		fprintf(stderr, "\t-k<n>\t\tset a style to generate with (UMane, LMane, Tail)\n");
+		fprintf(stderr, "\t\t\t0  -- ADVENTUROUS, ADVENTUROUS, ADVENTUROUS\n");
+		fprintf(stderr, "\t\t\t1  -- SHOWBOAT, SHOWBOAT, SHOWBOAT\n");
+		fprintf(stderr, "\t\t\t2  -- FILLY, ADVENTUROUS, SHOWBOAT\n");
+		fprintf(stderr, "\t\t\t3  -- BOOKWORM, BOOKWORM, BOOKWORM\n");
+		fprintf(stderr, "\t\t\t4  -- SPEEDSTER, SPEEDSTER, SPEEDSTER\n");
+		fprintf(stderr, "\t\t\t5  -- RADICAL, NONE, RADICAL\n");
+		fprintf(stderr, "\t\t\t6  -- ADVENTUROUS, MOON, SHOWBOAT\n");
+		fprintf(stderr, "\t\t\t7  -- ASSERTIVE, ASSERTIVE, ASSERTIVE\n");
+		fprintf(stderr, "\t\t\t8  -- BOOKWORM, TIMID, SHOWBOAT\n");
+		fprintf(stderr, "\t\t\t9  -- ADVENTUROUS, ADVENTUROUS, RADICAL\n");
+		fprintf(stderr, "\t\t\t10 -- BOLD, BOLD, RADICAL\n");
+		fprintf(stderr, "\t\t\t11 -- BUMPKIN, BUMPKIN, BUMPKIN\n");
+		fprintf(stderr, "\t\t\t12 -- FLOOFEH, FLOOFEH, FLOOFEH\n");
+		fprintf(stderr, "\t\t\t13 -- MECHANIC, MOON, SPEEDSTER\n");
+		fprintf(stderr, "\t\t\t14 -- SHOWBOAT, BOOKWORM, SHOWBOAT\n");
+		fprintf(stderr, "\t\t\t15 -- INSTRUCTOR, NONE, RADICAL\n");
 		fprintf(stderr, "\t-c\t\toutput to STDOUT\n\n");
 		fprintf(stderr, "\t-v\t\tverbose output\n");
 		fprintf(stderr, "\t-h, --help\tthis help text\n");
@@ -342,7 +370,6 @@ int main(int argc, char * argv[]) {
 	srand(seed);
 	
 	int clrcount;
-	int key;
 	key = rand() % STYLECOUNT;
 	clrcount = COLOR(styles[key]);
 	
