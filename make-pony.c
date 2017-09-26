@@ -55,6 +55,11 @@
 int at;
 // #define PUSHTARGET(R,X,T)	sprintf((R)[at], "%c%s", (T), (X)); at++
 #define PUSHSTRING(R,X)	strcpy((R)[at], (X)); at++
+#define ADDSTYLE(R, I, S, T, U, C)	strcpy(UMANE((R)[(I)]), (S)); strcpy(LMANE((R)[(I)]), (S)); strcpy(TAIL((R)[(I)]), (S)); COLOR((R)[(I)]) = (C)
+	// strcpy(UMANE(styles[0]), "ADVENTUROUS");
+	// strcpy(LMANE(styles[0]), "ADVENTUROUS");
+	// strcpy(TAIL(styles[0]), "ADVENTUROUS");
+	// COLOR(styles[0]) = 2;
 #define RIGHT(X,C)	((X)+strlen(X)-(C))
 #define WARM(H)	((H) <= 120.0f || (H) > 300.0f)
 
@@ -74,6 +79,7 @@ int main(int argc, char * argv[]) {
 	int colorgiven = 0;
 	int help = 0;
 	int stdo = 0;
+	int traditional = 0;
 	
 	color color1;
 	int static_hue;
@@ -176,6 +182,9 @@ int main(int argc, char * argv[]) {
 					case 'g':
 						male = 1;
 					break;
+					case 't':
+						traditional = 1;
+					break;
 					case 'h':
 						help = 1;
 					break;
@@ -275,9 +284,27 @@ int main(int argc, char * argv[]) {
 		return 0;
 	}
 	
+	char * s;
+	s = malloc(sizeof(*s)*256);
+	
 	if (!fname_specified) {
 		sprintf(filename, "%ld_makepony.txt", seed);
 	}
+	#ifdef _WIN64
+	strcpy(s, filename);
+	strcpy(filename, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
+	strcat(filename, s);
+	#else
+	#ifdef _WIN32
+	strcpy(s, filename);
+	// strcpy(filename, "C:\\Program Files\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
+	strcpy(filename, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
+	strcat(filename, s);
+	#endif
+	#endif
+	
+	s[0] = 0;
+	
 	
 	char ** styles;
 	styles = malloc(sizeof(*styles)*STYLECOUNT);
@@ -296,11 +323,6 @@ int main(int argc, char * argv[]) {
 	strcpy(TAIL(styles[1]), "SHOWBOAT");
 	COLOR(styles[1]) = 2;
 	
-	strcpy(UMANE(styles[2]), "FILLY");
-	strcpy(LMANE(styles[2]), "ADVENTUROUS");
-	strcpy(TAIL(styles[2]), "SHOWBOAT");
-	COLOR(styles[2]) = 2;
-	
 	strcpy(UMANE(styles[3]), "BOOKWORM");
 	strcpy(LMANE(styles[3]), "BOOKWORM");
 	strcpy(TAIL(styles[3]), "BOOKWORM");
@@ -311,20 +333,40 @@ int main(int argc, char * argv[]) {
 	strcpy(TAIL(styles[4]), "SPEEDSTER");
 	COLOR(styles[4]) = 7;
 	
+	strcpy(UMANE(styles[7]), "ASSERTIVE");
+	strcpy(LMANE(styles[7]), "ASSERTIVE");
+	strcpy(TAIL(styles[7]), "ASSERTIVE");
+	COLOR(styles[7]) = 2;
+	
 	strcpy(UMANE(styles[5]), "RADICAL");
 	strcpy(LMANE(styles[5]), "NONE");
 	strcpy(TAIL(styles[5]), "RADICAL");
 	COLOR(styles[5]) = 7;
 	
+	strcpy(UMANE(styles[11]), "BUMPKIN");
+	strcpy(LMANE(styles[11]), "BUMPKIN");
+	strcpy(TAIL(styles[11]), "BUMPKIN");
+	COLOR(styles[11]) = 3;
+	
+	strcpy(UMANE(styles[12]), "FLOOFEH");
+	strcpy(LMANE(styles[12]), "FLOOFEH");
+	strcpy(TAIL(styles[12]), "FLOOFEH");
+	COLOR(styles[12]) = 2;
+	
+	strcpy(UMANE(styles[15]), "INSTRUCTOR");
+	strcpy(LMANE(styles[15]), "NONE");
+	strcpy(TAIL(styles[15]), "RADICAL");
+	COLOR(styles[15]) = 2;
+	
+	strcpy(UMANE(styles[2]), "FILLY");
+	strcpy(LMANE(styles[2]), "ADVENTUROUS");
+	strcpy(TAIL(styles[2]), "SHOWBOAT");
+	COLOR(styles[2]) = 2;
+	
 	strcpy(UMANE(styles[6]), "ADVENTUROUS");
 	strcpy(LMANE(styles[6]), "MOON");
 	strcpy(TAIL(styles[6]), "SHOWBOAT");
 	COLOR(styles[6]) = 2;
-	
-	strcpy(UMANE(styles[7]), "ASSERTIVE");
-	strcpy(LMANE(styles[7]), "ASSERTIVE");
-	strcpy(TAIL(styles[7]), "ASSERTIVE");
-	COLOR(styles[7]) = 2;
 	
 	strcpy(UMANE(styles[8]), "BOOKWORM");
 	strcpy(LMANE(styles[8]), "TIMID");
@@ -341,16 +383,6 @@ int main(int argc, char * argv[]) {
 	strcpy(TAIL(styles[10]), "RADICAL");
 	COLOR(styles[10]) = 3;
 	
-	strcpy(UMANE(styles[11]), "BUMPKIN");
-	strcpy(LMANE(styles[11]), "BUMPKIN");
-	strcpy(TAIL(styles[11]), "BUMPKIN");
-	COLOR(styles[11]) = 3;
-	
-	strcpy(UMANE(styles[12]), "FLOOFEH");
-	strcpy(LMANE(styles[12]), "FLOOFEH");
-	strcpy(TAIL(styles[12]), "FLOOFEH");
-	COLOR(styles[12]) = 2;
-	
 	strcpy(UMANE(styles[13]), "MECHANIC");
 	strcpy(LMANE(styles[13]), "MOON");
 	strcpy(TAIL(styles[13]), "SPEEDSTER");
@@ -360,11 +392,6 @@ int main(int argc, char * argv[]) {
 	strcpy(LMANE(styles[14]), "BOOKWORM");
 	strcpy(TAIL(styles[14]), "SHOWBOAT");
 	COLOR(styles[14]) = 5;
-	
-	strcpy(UMANE(styles[15]), "INSTRUCTOR");
-	strcpy(LMANE(styles[15]), "NONE");
-	strcpy(TAIL(styles[15]), "RADICAL");
-	COLOR(styles[15]) = 2;
 	
 	srand(seed);
 	
@@ -582,9 +609,6 @@ int main(int argc, char * argv[]) {
 		return 0;
 	}
 	
-	char * s;
-	s = malloc(sizeof(*s)*256);
-	
 	char * temp;
 	temp = malloc(sizeof(*temp)*256);
 	
@@ -797,7 +821,15 @@ int main(int argc, char * argv[]) {
 	strcat(data, "\n}\n");
 	
 	if (!stdo) {
+		char * oldfilename = filename;
 		FILE * f = fopen(filename, "wb");
+		#ifdef _WIN32
+		if (!f) {
+			filename = strrchr(filename, '\\')+1;
+			fprintf(stderr, "warning: could not write to %s, trying %s\n", oldfilename, filename);
+			f = fopen(filename, "wb");
+		}
+		#endif
 		if (!f) {
 			fprintf(stderr, "error: output file not accessible\n");
 			return 0;
