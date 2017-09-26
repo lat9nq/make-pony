@@ -58,4 +58,5 @@ void new_line() {
 	else if (!type && (dpth & 1) && key[0]) {
 		//printf("\terror: %s with no type\n", key);
 	}
+	type = 0;
 }
