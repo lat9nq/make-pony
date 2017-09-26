@@ -242,24 +242,35 @@ int main(int argc, char * argv[]) {
 		FILE * p;
 		char * cmd = malloc(sizeof(*cmd)*256);
 		char * temp = malloc(sizeof(*temp) * 128);
+		temp[0] = 0;
+		for (int i = 2; i < argc; i++) {
+			if (argv[i][1] != 's') {
+				strcat(temp, " ");
+				strcat(temp, argv[i]);
+			}
+			else {
+				if (argv[i][2] == 0) {
+					i++;
+				}
+			}
+		}
 		
 		for (int i = 0; i < times; i++) {
 			cmd[0] = 0;
-			temp[0] = 0;
-			if (colorgiven) {
-				//putchar('%');
-				sprintf(temp, " -x%02X%02X%02X", color1.r, color1.g, color1.b);
-			}
-			if (desaturated != -1) {
-				sprintf(temp, "%s -d%d", temp, desaturated + (white<<1));
-			}
-			if (male) {
-				sprintf(temp, "%s -g", temp);
-			}
-			if (key != -1) {
-				sprintf(temp, "%s -k%d", temp, key);
-			}
-			sprintf(cmd, "%s -s%ld %s %s" , argv[0], seed+i, (verbose) ? "-v" : "", temp);
+			// if (colorgiven) {
+				// //putchar('%');
+				// sprintf(temp, " -x%02X%02X%02X", color1.r, color1.g, color1.b);
+			// }
+			// if (desaturated != -1) {
+				// sprintf(temp, "%s -d%d", temp, desaturated + (white<<1));
+			// }
+			// if (male) {
+				// sprintf(temp, "%s -g", temp);
+			// }
+			// if (key != -1) {
+				// sprintf(temp, "%s -k%d", temp, key);
+			// }
+			sprintf(cmd, "%s -s%ld%s" , argv[0], seed+i, temp); // (verbose) ? "-v" : "", temp);
 			if (verbose) {
 				fprintf(stderr, "%s\n", cmd);
 			}
