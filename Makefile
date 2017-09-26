@@ -1,6 +1,11 @@
+LEX=flex
+
 CC=gcc
 CCFLAGS=-Wall -O2#-g
 LIBFLAGS=-lm
+
+.l.c:
+	$(LEX) -o$@ $<
 
 .c.o:
 	$(CC) $(CCFLAGS) -c $< $(LIBFLAGS)
@@ -19,6 +24,9 @@ make-pony:$(OFILES)
 %.strip:%.exe
 	strip -Xxwg $<
 
+%:%.o
+	$(CC) $(CCFLAGS) $< -o$@ -LC:\Program\ Files\ \(x86\)\GnuWin32\lib -lfl
+	
 clean:
 	rm -vf *.o *.txt .*.swp make-pony make-pony.exe
 
