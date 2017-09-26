@@ -32,20 +32,20 @@
 
 #define ADVENTUROUS	0
 #define SHOWBOAT	1
-#define FILLY	2
-#define BOOKWORM	3
-#define SPEEDSTER	4
+#define BOOKWORM	2
+#define SPEEDSTER	3
+#define ASSERTIVE	4
 #define RADICAL	5
-#define MOON	6
-#define ASSERTIVE	7
-#define TIMID	8
-#define BIGMAC	9
-#define BOLD	10
-#define BUMPKIN	11
-#define FLOOFEH	12
-#define MECHANIC	13
-#define SHOWBOAT2	14
-#define INSTRUCTOR	15
+#define BUMPKIN	6
+#define FLOOFEH	7
+#define INSTRUCTOR	8
+#define FILLY	9
+#define MOON	10
+#define TIMID	11
+#define BIGMAC	12
+#define BOLD	13
+#define MECHANIC	14
+#define SHOWBOAT2	15
 
 #define RACES	3
 #define EARTH	0
@@ -55,11 +55,7 @@
 int at;
 // #define PUSHTARGET(R,X,T)	sprintf((R)[at], "%c%s", (T), (X)); at++
 #define PUSHSTRING(R,X)	strcpy((R)[at], (X)); at++
-#define ADDSTYLE(R, I, S, T, U, C)	strcpy(UMANE((R)[(I)]), (S)); strcpy(LMANE((R)[(I)]), (S)); strcpy(TAIL((R)[(I)]), (S)); COLOR((R)[(I)]) = (C)
-	// strcpy(UMANE(styles[0]), "ADVENTUROUS");
-	// strcpy(LMANE(styles[0]), "ADVENTUROUS");
-	// strcpy(TAIL(styles[0]), "ADVENTUROUS");
-	// COLOR(styles[0]) = 2;
+#define ADDSTYLE(R, I, S, T, U, C)	strcpy(UMANE((R)[(I)]), (S)); strcpy(LMANE((R)[(I)]), (T)); strcpy(TAIL((R)[(I)]), (U)); COLOR((R)[(I)]) = (C)
 #define RIGHT(X,C)	((X)+strlen(X)-(C))
 #define WARM(H)	((H) <= 120.0f || (H) > 300.0f)
 
@@ -313,91 +309,32 @@ int main(int argc, char * argv[]) {
 		styles[i] = calloc(STYLECHARLEN*3+1,sizeof(**styles));
 	}
 	
-	strcpy(UMANE(styles[0]), "ADVENTUROUS");
-	strcpy(LMANE(styles[0]), "ADVENTUROUS");
-	strcpy(TAIL(styles[0]), "ADVENTUROUS");
-	COLOR(styles[0]) = 2;
-	
-	strcpy(UMANE(styles[1]), "SHOWBOAT");
-	strcpy(LMANE(styles[1]), "SHOWBOAT");
-	strcpy(TAIL(styles[1]), "SHOWBOAT");
-	COLOR(styles[1]) = 2;
-	
-	strcpy(UMANE(styles[3]), "BOOKWORM");
-	strcpy(LMANE(styles[3]), "BOOKWORM");
-	strcpy(TAIL(styles[3]), "BOOKWORM");
-	COLOR(styles[3]) = 5;
-	
-	strcpy(UMANE(styles[4]), "SPEEDSTER");
-	strcpy(LMANE(styles[4]), "SPEEDSTER");
-	strcpy(TAIL(styles[4]), "SPEEDSTER");
-	COLOR(styles[4]) = 7;
-	
-	strcpy(UMANE(styles[7]), "ASSERTIVE");
-	strcpy(LMANE(styles[7]), "ASSERTIVE");
-	strcpy(TAIL(styles[7]), "ASSERTIVE");
-	COLOR(styles[7]) = 2;
-	
-	strcpy(UMANE(styles[5]), "RADICAL");
-	strcpy(LMANE(styles[5]), "NONE");
-	strcpy(TAIL(styles[5]), "RADICAL");
-	COLOR(styles[5]) = 7;
-	
-	strcpy(UMANE(styles[11]), "BUMPKIN");
-	strcpy(LMANE(styles[11]), "BUMPKIN");
-	strcpy(TAIL(styles[11]), "BUMPKIN");
-	COLOR(styles[11]) = 3;
-	
-	strcpy(UMANE(styles[12]), "FLOOFEH");
-	strcpy(LMANE(styles[12]), "FLOOFEH");
-	strcpy(TAIL(styles[12]), "FLOOFEH");
-	COLOR(styles[12]) = 2;
-	
-	strcpy(UMANE(styles[15]), "INSTRUCTOR");
-	strcpy(LMANE(styles[15]), "NONE");
-	strcpy(TAIL(styles[15]), "RADICAL");
-	COLOR(styles[15]) = 2;
-	
-	strcpy(UMANE(styles[2]), "FILLY");
-	strcpy(LMANE(styles[2]), "ADVENTUROUS");
-	strcpy(TAIL(styles[2]), "SHOWBOAT");
-	COLOR(styles[2]) = 2;
-	
-	strcpy(UMANE(styles[6]), "ADVENTUROUS");
-	strcpy(LMANE(styles[6]), "MOON");
-	strcpy(TAIL(styles[6]), "SHOWBOAT");
-	COLOR(styles[6]) = 2;
-	
-	strcpy(UMANE(styles[8]), "BOOKWORM");
-	strcpy(LMANE(styles[8]), "TIMID");
-	strcpy(TAIL(styles[8]), "SHOWBOAT");
-	COLOR(styles[8]) = 5;
-	
-	strcpy(UMANE(styles[9]), "ADVENTUROUS");
-	strcpy(LMANE(styles[9]), "ADVENTUROUS");
-	strcpy(TAIL(styles[9]), "RADICAL");
-	COLOR(styles[9]) = 2;
-	
-	strcpy(UMANE(styles[10]), "BOLD");
-	strcpy(LMANE(styles[10]), "BOLD");
-	strcpy(TAIL(styles[10]), "RADICAL");
-	COLOR(styles[10]) = 3;
-	
-	strcpy(UMANE(styles[13]), "MECHANIC");
-	strcpy(LMANE(styles[13]), "MOON");
-	strcpy(TAIL(styles[13]), "SPEEDSTER");
-	COLOR(styles[13]) = 7;
-	
-	strcpy(UMANE(styles[14]), "SHOWBOAT");
-	strcpy(LMANE(styles[14]), "BOOKWORM");
-	strcpy(TAIL(styles[14]), "SHOWBOAT");
-	COLOR(styles[14]) = 5;
+	// #define ADDSTYLE(R, I, S, T, U, C)	strcpy(UMANE((R)[(I)]), (S)); strcpy(LMANE((R)[(I)]), (T)); strcpy(TAIL((R)[(I)]), (U)); COLOR((R)[(I)]) = (C)
+	ADDSTYLE(styles, 0, "ADVENTUROUS", "ADVENTUROUS", "ADVENTUROUS", 2);
+	ADDSTYLE(styles, 1, "SHOWBOAT", "SHOWBOAT", "SHOWBOAT", 2);
+	ADDSTYLE(styles, 2, "BOOKWORM", "BOOKWORM", "BOOKWORM", 5);
+	ADDSTYLE(styles, 3, "SPEEDSTER", "SPEEDSTER", "SPEEDSTER", 7);
+	ADDSTYLE(styles, 4, "ASSERTIVE", "ASSERTIVE", "ASSERTIVE", 2);
+	ADDSTYLE(styles, 5, "RADICAL", "NONE", "RADICAL", 7);
+	ADDSTYLE(styles, 6, "BUMPKIN", "BUMPKIN", "BUMPKIN", 3);
+	ADDSTYLE(styles, 7, "FLOOFEH", "FLOOFEH", "FLOOFEH", 2);
+	ADDSTYLE(styles, 8, "INSTRUCTOR", "NONE", "RADICAL", 2);
+	ADDSTYLE(styles, 9, "FILLY", "ADVENTUROUS", "SHOWBOAT", 2);
+	ADDSTYLE(styles, 10, "ADVENTUROUS", "MOON", "SHOWBOAT", 2);
+	ADDSTYLE(styles, 11, "BOOKWORM", "TIMID", "SHOWBOAT", 5);
+	ADDSTYLE(styles, 12, "ADVENTUROUS", "ADVENTUROUS", "RADICAL", 2);
+	ADDSTYLE(styles, 13, "BOLD", "BOLD", "RADICAL", 3);
+	ADDSTYLE(styles, 14, "MECHANIC", "MOON", "ADVENTUROUS", 2);
+	ADDSTYLE(styles, 15, "SHOWBOAT", "BOOKWORM", "SHOWBOAT", 5);
 	
 	srand(seed);
 	
 	int clrcount;
 	if (key == -1) {
 		key = rand() % STYLECOUNT;
+		if (traditional) {
+			key %= 9;
+		}
 	} else {
 		rand();
 	}
@@ -452,9 +389,12 @@ int main(int argc, char * argv[]) {
 	float std_dev = 0.0f;
 	
 	if (desaturated == -1) {
-		desaturated = !(rand() & 15);
+		desaturated = !(rand() & 15) ;
 		white = desaturated && !(rand() & 3);
 		desaturated = desaturated ^ white;
+		if (traditional) {
+			desaturated = 0;
+		}
 	}
 	else {
 		rand();
@@ -558,44 +498,46 @@ int main(int argc, char * argv[]) {
 		available_details[i] = malloc(sizeof(**available_details)*16);
 		available_details[i][0] = 0;
 	}
-	
-	int at = 0;
-	PUSHSTRING(available_details, "GRADIENT");
-	PUSHSTRING(available_details, "HOOF_SMALL");
-	PUSHSTRING(available_details, "STRIPES");
-	PUSHSTRING(available_details, "LINES");
-	PUSHSTRING(available_details, "FRECKLES");
-	
+		
 	color * detail_color = malloc(sizeof(*detail_color)*8);
 	for (int i = 0; i < 8; i++) {
 		detail_color[i].r = 255;
 		detail_color[i].g = 255;
 		detail_color[i].b = 255;
 	}
-	
 	int use_floofers = !(rand() % 6);
-	if (use_floofers) {
-		strcpy(details[details_in_use], "GRADIENT");
-		if (any_saturation) {
-			detail_color[details_in_use] = color1;
-		}
-		else {
-			detail_color[details_in_use] = colors[0];
-		}
-		details_in_use += 1;
-		strcpy(details[details_in_use], "HOOF_SMALL");
-		detail_color[details_in_use] = colors[1 + (key == BOOKWORM || key == SPEEDSTER)];
-		details_in_use += 1;
-	}
 	
-	for (int i = 0 + 2 * use_floofers; i < DETAILCOUNT; i++) {
-		if (!(rand() % DETAILCHANCE)) {
-			strcpy(details[details_in_use], available_details[i]);
-			detail_color[details_in_use] = colors[rand() % clrcount];
-			if (verbose) {
-				fprintf(stderr, "detail_color[%d]: 0x%02X%02X%02X\tdetails[%d]: %s\n", details_in_use, detail_color[details_in_use].r, detail_color[details_in_use].g, detail_color[details_in_use].b, details_in_use, details[details_in_use]);
+	if (!traditional) {
+		at = 0;
+		PUSHSTRING(available_details, "GRADIENT");
+		PUSHSTRING(available_details, "HOOF_SMALL");
+		PUSHSTRING(available_details, "STRIPES");
+		PUSHSTRING(available_details, "LINES");
+		PUSHSTRING(available_details, "FRECKLES");
+		
+		if (use_floofers) {
+			strcpy(details[details_in_use], "GRADIENT");
+			if (any_saturation) {
+				detail_color[details_in_use] = color1;
+			}
+			else {
+				detail_color[details_in_use] = colors[0];
 			}
 			details_in_use += 1;
+			strcpy(details[details_in_use], "HOOF_SMALL");
+			detail_color[details_in_use] = colors[1 + (key == BOOKWORM || key == SPEEDSTER)];
+			details_in_use += 1;
+		}
+		
+		for (int i = 0 + 2 * use_floofers; i < DETAILCOUNT; i++) {
+			if (!(rand() % DETAILCHANCE)) {
+				strcpy(details[details_in_use], available_details[i]);
+				detail_color[details_in_use] = colors[rand() % clrcount];
+				if (verbose) {
+					fprintf(stderr, "detail_color[%d]: 0x%02X%02X%02X\tdetails[%d]: %s\n", details_in_use, detail_color[details_in_use].r, detail_color[details_in_use].g, detail_color[details_in_use].b, details_in_use, details[details_in_use]);
+				}
+				details_in_use += 1;
+			}
 		}
 	}
 	
