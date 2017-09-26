@@ -7,14 +7,14 @@ It is best to use this program with the command prompt (Windows) or the terminal
 Use `make-pony -h` for help
 
 To use with Windows:
-Download the executable
-Run from explorer (generates a single file)
-Or run from command prompt for more options (see -h)
+- Download the executable
+- Run from explorer (generates a single file)
+- Or run from command prompt for more options (see -h)
 
 To compile for Linux:
-`tar -xf make-pony-1.0.tar.gz`
-`cd make-pony-1.0`
-`make`
+- `tar -xf make-pony-1.0.tar.gz`
+- `cd make-pony-1.0`
+- `make`
 
 Changelog:
 v1.2
