@@ -26,7 +26,7 @@ make-pony:$(OFILES)
 
 %:%.o
 	$(CC) $(CCFLAGS) $< -o$@ -LC:\Program\ Files\ \(x86\)\GnuWin32\lib -lfl
-	
+
 clean:
 	rm -vf *.o *.txt .*.swp make-pony make-pony.exe
 

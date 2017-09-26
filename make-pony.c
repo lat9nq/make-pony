@@ -688,6 +688,23 @@ int main(int argc, char * argv[]) {
 					c.b = 255;
 				}
 			}
+			else if (strstr(cur+1, "mouth_")) {
+				hsvcolor.h = (static_hue + 278 ) % 360;
+				hsvcolor.s = 0.39f;
+				hsvcolor.v = 1;
+				hsvToRGB(&hsvcolor, &c);
+			}
+			else if (strstr(cur+1, "tongue_")) {
+				hsvcolor.h = (static_hue + 45 ) % 360;
+				hsvcolor.s = 1;
+				hsvcolor.v = 1;
+				hsvToRGB(&hsvcolor, &c);
+			}
+			else if (strstr(cur+1, "teeth")) {
+				c.r = 255;
+				c.g = 255;
+				c.b = 255;
+			}
 			
 			addColor(cur+1, &c, 1, s);
 		}
