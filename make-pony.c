@@ -385,83 +385,11 @@ int main(int argc, char * argv[]) {
 	
 	char ** target;
 	target = malloc(sizeof(*target)*TARGETCOUNT);
-	
 	for (int i = 0; i < TARGETCOUNT; i++) {
 		target[i] = malloc(sizeof(**target)*32);
 	}
-	
-	// at = 0;
 	importTargets(target);
-	// PUSHTARGET(target, "body", COL);
-	// PUSHTARGET(target, "mane_color_1", COL);
-	// PUSHTARGET(target, "mane_color_2", COL);
-	// PUSHTARGET(target, "mane_detail_color_1", COL);
-	// PUSHTARGET(target, "mane_detail_color_2", COL);
-	// PUSHTARGET(target, "mane_detail_color_3", COL);
-	// PUSHTARGET(target, "mane_detail_color_4", COL);
-	// PUSHTARGET(target, "mane_detail_color_5", COL);
-	// PUSHTARGET(target, "tail_color_1", COL);
-	// PUSHTARGET(target, "tail_color_2", COL);
-	// PUSHTARGET(target, "tail_detail_color_1", COL);
-	// PUSHTARGET(target, "tail_detail_color_2", COL);
-	// PUSHTARGET(target, "tail_detail_color_3", COL);
-	// PUSHTARGET(target, "tail_detail_color_4", COL);
-	// PUSHTARGET(target, "tail_detail_color_5", COL);
-	// PUSHTARGET(target, "horn_detail_color", COL);
-	// PUSHTARGET(target, "body_detail_1", STR);
-	// PUSHTARGET(target, "body_detail_2", STR);
-	// PUSHTARGET(target, "body_detail_3", STR);
-	// PUSHTARGET(target, "body_detail_4", STR);
-	// PUSHTARGET(target, "body_detail_5", STR);
-	// PUSHTARGET(target, "body_detail_6", STR);
-	// PUSHTARGET(target, "body_detail_7", STR);
-	// PUSHTARGET(target, "body_detail_8", STR);
-	// PUSHTARGET(target, "body_detail_color_1", COL);
-	// PUSHTARGET(target, "body_detail_color_2", COL);
-	// PUSHTARGET(target, "body_detail_color_3", COL);
-	// PUSHTARGET(target, "body_detail_color_4", COL);
-	// PUSHTARGET(target, "body_detail_color_5", COL);
-	// PUSHTARGET(target, "body_detail_color_6", COL);
-	// PUSHTARGET(target, "body_detail_color_7", COL);
-	// PUSHTARGET(target, "body_detail_color_8", COL);
-	// PUSHTARGET(target, "eye_iris1", COL);
-	// PUSHTARGET(target, "eye_iris2", COL);
-	// PUSHTARGET(target, "eye_irisline1", COL);
-	// PUSHTARGET(target, "eye_irisline2", COL);
-	// PUSHTARGET(target, "eye_reflection", COL);
-	// PUSHTARGET(target, "eye_effect", COL);
-	// PUSHTARGET(target, "eye_type", STR);
-	// PUSHTARGET(target, "eye_derp", BOOL);
-	// PUSHTARGET(target, "eye_lines", BOOL);
-	// PUSHTARGET(target, "cmark", BOOL);
-	// PUSHTARGET(target, "lips_color_inherit", BOOL);
-	// PUSHTARGET(target, "nose_color_inherit", BOOL);
-	// PUSHTARGET(target, "separate_horn", BOOL);
-	// PUSHTARGET(target, "socks_model", BOOL);
-	// PUSHTARGET(target, "socks", BOOL);
-	// PUSHTARGET(target, "socks_model_new", BOOL);
-	// PUSHTARGET(target, "socks_model", BOOL);
-	// PUSHTARGET(target, "gender", STR);
-	// PUSHTARGET(target, "suit", STR);
-	// PUSHTARGET(target, "mane_new", STR);
-	// PUSHTARGET(target, "manelower_new", STR);
-	// PUSHTARGET(target, "tail_new", STR);
-	// PUSHTARGET(target, "race", STR);
-	// PUSHTARGET(target, "eyelash", STR);
-	// PUSHTARGET(target, "body_lightwarp_texture", STR);
-	// PUSHTARGET(target, "weight", VAL);
-	// PUSHTARGET(target, "necksize", VAL);
-	// PUSHTARGET(target, "tailsize", VAL);
-	// PUSHTARGET(target, "legssize", VAL);
-	// PUSHTARGET(target, "ponysize", VAL);
-	// PUSHTARGET(target, "body_phong_boost", VAL); //0.09
-	// PUSHTARGET(target, "body_phong_middle", VAL); //5
-	// PUSHTARGET(target, "body_phong_exponent", VAL); //3
-	// PUSHTARGET(target, "body_phong_front", VAL); //1
-	// PUSHTARGET(target, "body_phong_sliding", VAL); //10
-	// PUSHTARGET(target, "body_phong_tint", COL);
-	// PUSHTARGET(target, "hoof_fluffers", BOOL);
-	// PUSHTARGET(target, "hoof_fluffers_strength", VAL);
+	
 	
 	color * colors;
 	colors = malloc(sizeof(*colors)*7);
@@ -716,21 +644,26 @@ int main(int argc, char * argv[]) {
 				}
 			}
 			else if (strstr(cur+1, "eye_") == cur + 1) {
-				if (strstr(cur+1, "effect")) {
+				if (strstr(cur+1, "effect") || strstr(cur+1, "hole")) {
 					c.r = 0;
 					c.g = 0;
 					c.b = 0;
 				}
-				else if (strstr(cur+1, "reflection")) {
-					c.r = 255;
-					c.g = 255;
-					c.b = 255;
-				}
-				else if (strstr(cur+1, "iris1") && !any_saturation) {
-					hsvcolor.h = 0;
-					hsvcolor.s = 0.0f;
-					hsvcolor.v = 0.5f * (1.0f-value(&bodycolor));
-					hsvToRGB(&hsvcolor, &c);
+				// else if (strstr(cur+1, "reflection")) {
+					// c.r = 255;
+					// c.g = 255;
+					// c.b = 255;
+				// }
+				else if (strstr(cur+1, "iris1")) {
+					if (!any_saturation) {
+						hsvcolor.h = 0;
+						hsvcolor.s = 0.0f;
+						hsvcolor.v = 0.5f * (1.0f-value(&bodycolor));
+						hsvToRGB(&hsvcolor, &c);
+					}
+					else {
+						c = color1;
+					}
 				}
 				else if (strstr(cur+1, "iris2")) {
 					c = bodycolor;
@@ -748,6 +681,11 @@ int main(int argc, char * argv[]) {
 					hsvcolor.s = 0.5f * any_saturation;
 					hsvcolor.v = 0.5f + 0.5f * any_saturation;
 					hsvToRGB(&hsvcolor, &c);
+				}
+				else {
+					c.r = 255;
+					c.g = 255;
+					c.b = 255;
 				}
 			}
 			
@@ -790,6 +728,8 @@ int main(int argc, char * argv[]) {
 			x = (strstr(cur+1, "inherit") != NULL);
 			x = (strstr(cur+1, "lines") != NULL) || x;
 			x = (strstr(cur+1, "hoof_") && use_floofers) || x;
+			x = (strstr(cur+1, "weapon_hide")) || x;
+			x = (strstr(cur+1, "new_male_muzzle")) || x;
 			
 			addBool(cur+1, x, 1, s);
 		}
@@ -814,6 +754,21 @@ int main(int argc, char * argv[]) {
 				}
 				else if (strstr(cur+1,"_sliding")) {
 					x = 10.0f;
+				}
+			}
+			else if (strstr(cur+1, "eye") && !strstr(cur+1, "hole")) {
+				x = 1;
+				if (strstr(cur + 1, "rotation")) {
+					x = 0;
+				}
+			}
+			else if (strstr(cur+1, "hole")) {
+				x = 0.75f;
+				if (strstr(cur+1, "shift")) {
+					x = 0;
+				}
+				else if (strstr(cur+1, "width") || strstr(cur+1, "height")) {
+					x = 1;
 				}
 			}
 			
