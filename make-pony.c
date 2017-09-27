@@ -212,22 +212,22 @@ int main(int argc, char * argv[]) {
 		fprintf(stderr, "\t\t\t2 -- use only white body colors\n");
 		fprintf(stderr, "\t-g\t\tforce generate a male\n");
 		fprintf(stderr, "\t-k<n>\t\tset a style to generate with (UMane, LMane, Tail)\n");
-		fprintf(stderr, "\t\t\t0  -- ADVENTUROUS, ADVENTUROUS, ADVENTUROUS\n");
-		fprintf(stderr, "\t\t\t1  -- SHOWBOAT, SHOWBOAT, SHOWBOAT\n");
-		fprintf(stderr, "\t\t\t2  -- FILLY, ADVENTUROUS, SHOWBOAT\n");
-		fprintf(stderr, "\t\t\t3  -- BOOKWORM, BOOKWORM, BOOKWORM\n");
-		fprintf(stderr, "\t\t\t4  -- SPEEDSTER, SPEEDSTER, SPEEDSTER\n");
-		fprintf(stderr, "\t\t\t5  -- RADICAL, NONE, RADICAL\n");
-		fprintf(stderr, "\t\t\t6  -- ADVENTUROUS, MOON, SHOWBOAT\n");
-		fprintf(stderr, "\t\t\t7  -- ASSERTIVE, ASSERTIVE, ASSERTIVE\n");
-		fprintf(stderr, "\t\t\t8  -- BOOKWORM, TIMID, SHOWBOAT\n");
-		fprintf(stderr, "\t\t\t9  -- ADVENTUROUS, ADVENTUROUS, RADICAL\n");
-		fprintf(stderr, "\t\t\t10 -- BOLD, BOLD, RADICAL\n");
-		fprintf(stderr, "\t\t\t11 -- BUMPKIN, BUMPKIN, BUMPKIN\n");
-		fprintf(stderr, "\t\t\t12 -- FLOOFEH, FLOOFEH, FLOOFEH\n");
-		fprintf(stderr, "\t\t\t13 -- MECHANIC, MOON, SPEEDSTER\n");
-		fprintf(stderr, "\t\t\t14 -- SHOWBOAT, BOOKWORM, SHOWBOAT\n");
-		fprintf(stderr, "\t\t\t15 -- INSTRUCTOR, NONE, RADICAL\n");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 0, "ADVENTUROUS", "ADVENTUROUS", "ADVENTUROUS");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 1, "SHOWBOAT", "SHOWBOAT", "SHOWBOAT");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 2, "BOOKWORM", "BOOKWORM", "BOOKWORM");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 3, "SPEEDSTER", "SPEEDSTER", "SPEEDSTER");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 4, "ASSERTIVE", "ASSERTIVE", "ASSERTIVE");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 5, "RADICAL", "NONE", "RADICAL");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 6, "BUMPKIN", "BUMPKIN", "BUMPKIN");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 7, "FLOOFEH", "FLOOFEH", "FLOOFEH");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 8, "INSTRUCTOR", "NONE", "RADICAL");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 9, "FILLY", "ADVENTUROUS", "SHOWBOAT");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 10, "ADVENTUROUS", "MOON", "SHOWBOAT");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 11, "BOOKWORM", "TIMID", "SHOWBOAT");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 12, "ADVENTUROUS", "ADVENTUROUS", "RADICAL");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 13, "BOLD", "BOLD", "RADICAL");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 14, "MECHANIC", "MOON", "ADVENTUROUS");
+		fprintf(stderr, "\t\t\t%d -- %s, %s, %s\n", 15, "SHOWBOAT", "BOOKWORM", "SHOWBOAT");
 		fprintf(stderr, "\t-x<XXXXXX>\tspecify a base color to use in HEXADECIMAL\n\n");
 		fprintf(stderr, "\t-s<n>\t\tspecify a seed for the random generator\n");
 		fprintf(stderr, "\t-c\t\toutput to STDOUT\n\n");
@@ -257,20 +257,7 @@ int main(int argc, char * argv[]) {
 		
 		for (int i = 0; i < times; i++) {
 			cmd[0] = 0;
-			// if (colorgiven) {
-				// //putchar('%');
-				// sprintf(temp, " -x%02X%02X%02X", color1.r, color1.g, color1.b);
-			// }
-			// if (desaturated != -1) {
-				// sprintf(temp, "%s -d%d", temp, desaturated + (white<<1));
-			// }
-			// if (male) {
-				// sprintf(temp, "%s -g", temp);
-			// }
-			// if (key != -1) {
-				// sprintf(temp, "%s -k%d", temp, key);
-			// }
-			sprintf(cmd, "%s -s%ld%s" , argv[0], seed+i, temp); // (verbose) ? "-v" : "", temp);
+			sprintf(cmd, "%s -s%ld%s" , argv[0], seed+i, temp);
 			if (verbose) {
 				fprintf(stderr, "%s\n", cmd);
 			}
@@ -516,7 +503,7 @@ int main(int argc, char * argv[]) {
 		detail_color[i].g = 255;
 		detail_color[i].b = 255;
 	}
-	int use_floofers = !(rand() % 6);
+	int use_floofers = (!(rand() % 6)) * (!traditional);
 	
 	if (!traditional) {
 		at = 0;
