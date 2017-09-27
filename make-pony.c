@@ -404,23 +404,29 @@ int main(int argc, char * argv[]) {
 		fprintf(stderr, "body is %ssaturated\n", (desaturated) ? "de" : "");
 	}
 	
+	int r;
+	int r2;
+	
     for (int i = 0; i < clrcount; i++) {
 		hsvcolor.h = static_hue;
 		hsvcolor.s = 1;//saturation(&colors[0]);
 		hsvcolor.v = 1;//value(&colors[0]);
 		
-		if (!(rand() & 15)) {
-			if (rand() & 1) {//(WARM(static_hue)) {
-				hsvcolor.h = (hsvcolor.h + 15) % 360;
+		r = rand();
+		r2 = rand();
+		
+		if ((r & 7)) {
+			float del = ((r % 100) + (r2 % 100)) / 200.0f;
+			del = del * 2.0f - 1.0f;
+			if (verbose) {
+				fprintf(stderr, "\t\tdel: %g\n", del);
 			}
-			else {
-				hsvcolor.h = (hsvcolor.h + 345) % 360;
-			}
+			hsvcolor.h = (int)(static_hue + 30 * del + 360) % 360;
 		}
 		if (key == BOOKWORM && i == 1) {
 			colors[i] = colors[0];
 		}
-		else if (rand() & 1) {
+		else if (r2 & (1 + 2 * (hsvcolor.h != static_hue))) {
 			hsvcolor.s = (!desaturated) ? (rand() & 15) / 15.0f : 0.0f;
 			if (desaturated) {
 				hsvcolor.v = (!desaturated) ? sqrtf((rand() % 12 + 4) / 15.0f) : sqrtf((rand() & 15) / 15.0f);
@@ -444,9 +450,9 @@ int main(int argc, char * argv[]) {
 	for (int i = 0; i < clrcount; i++) {
 		float x;
 		x = (desaturated) * value(&colors[i]) + (!desaturated) * saturation(&colors[i]) - avg_sat;
-		// if (verbose) {
-			// fprintf(stderr, "x[%d] = %g\tvalue: %g\tsat: %g\n", i, x, value(&colors[i]), saturation(&colors[i]));
-		// }
+		if (verbose) {
+			fprintf(stderr, "x[%d] = %g\tvalue: %g\tsat: %g\n", i, x, value(&colors[i]), saturation(&colors[i]));
+		}
 		x *= x;
 		std_dev += x;
 	}
