@@ -23,6 +23,8 @@
 #define PI  	3.14159f
 #define RAD(X)	PI * (X) / 180.0f
 
+#define SECONDSPERDAY	86400
+
 #define UMANE(X)	((X) + 0)
 #define LMANE(X)	((X) + STYLECHARLEN)
 #define TAIL(X) 	((X) + STYLECHARLEN*2)
@@ -202,7 +204,7 @@ int main(int argc, char * argv[]) {
 	if (help) {
 		fprintf(stderr, "usage: %s [OPTIONS]\n", argv[0]);
 		fprintf(stderr, "Creates a file compatible with Pony Player Models 2 addon for Garry's Mod 13.\n");
-		fprintf(stderr, "By default, the output files take the format \"[SEED]_makepony.txt\",\n");
+		fprintf(stderr, "By default, the output files take the format \"[TIME]_[SEED]_makepony.txt\",\n");
 		fprintf(stderr, "and the default seed is the time since the UNIX epoch.\n");
 		fprintf(stderr, "\t-o<file>\toutput to a specific file (incompatible with -m)\n");
 		fprintf(stderr, "\t-m<n>\t\tgenerate n files\n\n");
@@ -237,14 +239,17 @@ int main(int argc, char * argv[]) {
 		
 		return 0;
 	}
+	long the_time = time(NULL);
+	
+	srand(seed);
 	
 	if (times) {
 		FILE * p;
 		char * cmd = malloc(sizeof(*cmd)*256);
 		char * temp = malloc(sizeof(*temp) * 128);
 		temp[0] = 0;
-		for (int i = 2; i < argc; i++) {
-			if (argv[i][1] != 's') {
+		for (int i = 1; i < argc; i++) {
+			if (argv[i][1] != 'm' && argv[i][1] != 's' && argv[i][1] != 'o') {
 				strcat(temp, " ");
 				strcat(temp, argv[i]);
 			}
@@ -255,9 +260,12 @@ int main(int argc, char * argv[]) {
 			}
 		}
 		
+		printf("The seed is: %ld\n", seed);
+		
 		for (int i = 0; i < times; i++) {
 			cmd[0] = 0;
-			sprintf(cmd, "%s -s%ld%s" , argv[0], seed+i, temp);
+			seed = rand() * rand();
+			sprintf(cmd, "%s -s%ld%s -o%03d_%09ld_makepony.txt" , argv[0], seed, temp, i, seed);
 			if (verbose) {
 				fprintf(stderr, "%s\n", cmd);
 			}
@@ -265,7 +273,7 @@ int main(int argc, char * argv[]) {
 			fgets(cmd, 256, p);
 			cmd[strlen(cmd)-1] = 0;
 			if (!verbose) {
-				printf("%ld: %s\n", seed + i, cmd);
+				printf("%03d_%09ld: %s\n", i, seed, cmd);
 			}
 			else {
 				putchar('\n');
@@ -282,8 +290,12 @@ int main(int argc, char * argv[]) {
 	s = malloc(sizeof(*s)*256);
 	
 	if (!fname_specified) {
-		sprintf(filename, "%ld_makepony.txt", seed);
+		sprintf(filename, "%ld_%09ld_makepony.txt", the_time, seed);
 	}
+	
+	seed = rand() * rand();
+	srand(seed);
+	
 	#ifdef _WIN64
 	strcpy(s, filename);
 	strcpy(filename, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
@@ -324,8 +336,6 @@ int main(int argc, char * argv[]) {
 	ADDSTYLE(styles, 13, "BOLD", "BOLD", "RADICAL", 3);
 	ADDSTYLE(styles, 14, "MECHANIC", "MOON", "ADVENTUROUS", 2);
 	ADDSTYLE(styles, 15, "SHOWBOAT", "BOOKWORM", "SHOWBOAT", 5);
-	
-	srand(seed);
 	
 	int clrcount;
 	if (key == -1) {
@@ -418,15 +428,15 @@ int main(int argc, char * argv[]) {
 		if ((r & 7)) {
 			float del = ((r % 100) + (r2 % 100)) / 200.0f;
 			del = del * 2.0f - 1.0f;
-			if (verbose) {
+			/* if (verbose) {
 				fprintf(stderr, "\t\tdel: %g\n", del);
-			}
+			} */
 			hsvcolor.h = (int)(static_hue + 30 * del + 360) % 360;
 		}
 		if (key == BOOKWORM && i == 1) {
 			colors[i] = colors[0];
 		}
-		else if (r2 & (1 + 2 * (hsvcolor.h != static_hue))) {
+		else if (r2 & (1/*  + 2 * (hsvcolor.h != static_hue) */)) {
 			hsvcolor.s = (!desaturated) ? (rand() & 15) / 15.0f : 0.0f;
 			if (desaturated) {
 				hsvcolor.v = (!desaturated) ? sqrtf((rand() % 12 + 4) / 15.0f) : sqrtf((rand() & 15) / 15.0f);
@@ -437,7 +447,7 @@ int main(int argc, char * argv[]) {
 			any_saturation = (1 & (hsvcolor.v > 0.0f)) | any_saturation;
 		}
 		
-		avg_sat += (!desaturated) * hsvcolor.s + (desaturated) * hsvcolor.v;
+		avg_sat += ((!desaturated) * hsvcolor.s + (desaturated) * hsvcolor.v) / pow(2,i);
 		hsvToRGB(&hsvcolor,&colors[i]);
 		
 		if (verbose) {
@@ -445,7 +455,8 @@ int main(int argc, char * argv[]) {
 		}
     }
 	
-	avg_sat /= (float)clrcount;
+	// avg_sat /= (float)clrcount;
+	avg_sat /= 2.0f;
 	
 	for (int i = 0; i < clrcount; i++) {
 		float x;
@@ -467,7 +478,9 @@ int main(int argc, char * argv[]) {
 		hsvcolor.h = static_hue; // * (0.7 + 0.3 * lightness(&color1)))
 		#pragma GCC diagnostic warning "-Wmaybe-uninitialized"
 		// hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + 0.6f * fmodf(fabs(-std_dev*1.5f + 1.25f), 1.0f))) : 0.0f;// * !(!(rand()&7));
-		hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + std_dev * 0.6f)) : 0.0f;// * !(!(rand()&7));
+		// hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + std_dev * 0.6f)) : 0.0f;// * !(!(rand()&7));
+		hsvcolor.s = (!desaturated) ? (avg_sat) : 0.0f;// * !(!(rand()&7));
+		if (s < 0) s = 0;
 		hsvcolor.v = (desaturated) ? (avg_sat * sqrtf(0.3f + std_dev*0.7f)) : 1.0f;//((rand() % 12) + 4) / 15.0f : 1.0f;
 		// c = color1;
 	}
