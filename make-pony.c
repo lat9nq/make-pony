@@ -427,14 +427,14 @@ int main(int argc, char * argv[]) {
 		r = rand();
 		r2 = rand();
 		
-		if ((r & 7)) {
-			float del = ((r % 100) + (r2 % 100)) / 200.0f;
-			del = del * 2.0f - 1.0f;
-			/* if (verbose) {
-				fprintf(stderr, "\t\tdel: %g\n", del);
-			} */
-			hsvcolor.h = (int)(static_hue + 30 * del + 360) % 360;
-		}
+		// if ((r & 7)) {
+			// float del = ((r % 100) + (r2 % 100)) / 200.0f;
+			// del = del * 2.0f - 1.0f;
+			// /* if (verbose) {
+				// fprintf(stderr, "\t\tdel: %g\n", del);
+			// } */
+			// hsvcolor.h = (int)(static_hue + 30 * del + 360) % 360;
+		// }
 		if (key == BOOKWORM && i == 1) {
 			colors[i] = colors[0];
 		}
