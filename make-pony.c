@@ -293,8 +293,10 @@ int main(int argc, char * argv[]) {
 		sprintf(filename, "%ld_%09ld_makepony.txt", the_time, seed);
 	}
 	
-	seed = rand() * rand();
-	srand(seed);
+	if (seed == time(NULL)) {
+		seed = rand() * rand();
+		srand(seed);
+	}
 	
 	#ifdef _WIN64
 	strcpy(s, filename);
@@ -480,9 +482,15 @@ int main(int argc, char * argv[]) {
 		// hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + 0.6f * fmodf(fabs(-std_dev*1.5f + 1.25f), 1.0f))) : 0.0f;// * !(!(rand()&7));
 		// hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + std_dev * 0.6f)) : 0.0f;// * !(!(rand()&7));
 		hsvcolor.s = (!desaturated) ? (avg_sat) : 0.0f;// * !(!(rand()&7));
-		if (s < 0) s = 0;
 		hsvcolor.v = (desaturated) ? (avg_sat * sqrtf(0.3f + std_dev*0.7f)) : 1.0f;//((rand() % 12) + 4) / 15.0f : 1.0f;
 		// c = color1;
+		if (!desaturated) {
+			hsvToRGB(&hsvcolor, &bodycolor);
+			float l = (1.0f - lightness(&bodycolor));
+			l *= l;
+			hsvcolor.s = avg_sat - l;
+		}
+		hsvcolor.s = ((float)(hsvcolor.s >= 0)) * hsvcolor.s;
 	}
 	else {
 		hsvcolor.h = 0;
