@@ -298,18 +298,18 @@ int main(int argc, char * argv[]) {
 		srand(seed);
 	}
 	
-	#ifdef _WIN64
-	strcpy(s, filename);
-	strcpy(filename, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
-	strcat(filename, s);
-	#else
-	#ifdef _WIN32
-	strcpy(s, filename);
-	// strcpy(filename, "C:\\Program Files\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
-	strcpy(filename, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
-	strcat(filename, s);
-	#endif
-	#endif
+	// #ifdef _WIN64
+	// strcpy(s, filename);
+	// strcpy(filename, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
+	// strcat(filename, s);
+	// #else
+	// #ifdef _WIN32
+	// strcpy(s, filename);
+	// // strcpy(filename, "C:\\Program Files\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
+	// strcpy(filename, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
+	// strcat(filename, s);
+	// #endif
+	// #endif
 	
 	s[0] = 0;
 	
@@ -424,7 +424,7 @@ int main(int argc, char * argv[]) {
 		hsvcolor.s = 1;//saturation(&colors[0]);
 		hsvcolor.v = 1;//value(&colors[0]);
 		
-		r = rand();
+		// r = rand();
 		r2 = rand();
 		
 		// if ((r & 7)) {
@@ -790,13 +790,13 @@ int main(int argc, char * argv[]) {
 	if (!stdo) {
 		char * oldfilename = filename;
 		FILE * f = fopen(filename, "wb");
-		#ifdef _WIN32
-		if (!f) {
-			filename = strrchr(filename, '\\')+1;
-			fprintf(stderr, "warning: could not write to %s, trying %s\n", oldfilename, filename);
-			f = fopen(filename, "wb");
-		}
-		#endif
+		// #ifdef _WIN32
+		// if (!f) {
+			// filename = strrchr(filename, '\\')+1;
+			// fprintf(stderr, "warning: could not write to %s, trying %s\n", oldfilename, filename);
+			// f = fopen(filename, "wb");
+		// }
+		// #endif
 		if (!f) {
 			fprintf(stderr, "error: output file not accessible\n");
 			return 0;
