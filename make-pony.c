@@ -779,6 +779,12 @@ int main(int argc, char * argv[]) {
 					x = 10.0f;
 				}
 			}
+			else if (strstr(cur+1, "_wing_")) {
+				x = 0.0f;
+				if (strstr(cur+1, "_size")) {
+					x = 1.0f;
+				}
+			}
 			else if (strstr(cur+1, "eye") && !strstr(cur+1, "hole")) {
 				x = 1;
 				if (strstr(cur + 1, "rotation")) {
