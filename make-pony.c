@@ -81,10 +81,12 @@ int main(int argc, char * argv[]) {
 	
 	color color1;
 	int static_hue;
+	int hair_hue;
 	hsv hsvcolor;
 	int key = -1;
 	int desaturated = -1;//!(rand() & 15);
 	int white = -1;//desaturated && !(rand() & 3);
+	int separate_hair = 0;
 	// desaturated = desaturated ^ white;
 	
 	int male = 0;
@@ -179,6 +181,9 @@ int main(int argc, char * argv[]) {
 					break;
 					case 'g':
 						male = 1;
+					break;
+					case 'r':
+						separate_hair = 1;
 					break;
 					case 't':
 						traditional = 1;
@@ -379,6 +384,11 @@ int main(int argc, char * argv[]) {
 		rand();
 	}
 	
+	hair_hue = static_hue;
+	if (separate_hair) {
+		hair_hue = rand() % 360;
+	}
+	
 	male = ((static_hue % 180 < 60) * ((key == BIGMAC) || ((key == ADVENTUROUS) && (rand() & 3)))) || male;
 	
 	if (verbose) {
@@ -419,7 +429,7 @@ int main(int argc, char * argv[]) {
 	int r;
 	int r2;
 	
-    for (int i = 0; i < clrcount; i++) {
+    for (int i = 0; i < clrcount; i++) { //get hair colors
 		hsvcolor.h = static_hue;
 		hsvcolor.s = 1;//saturation(&colors[0]);
 		hsvcolor.v = 1;//value(&colors[0]);
@@ -633,6 +643,11 @@ int main(int argc, char * argv[]) {
 				if (strstr(cur+1, "_color_2") && (key == TIMID) && !strstr(cur+1, "detail")) {
 					c = colors[4];
 				}
+				
+				hsvcolor.h = (static_hue - hue(&c) + hair_hue) % 360;
+				hsvcolor.s = saturation(&c);
+				hsvcolor.v = value(&c);
+				hsvToRGB(&hsvcolor, &c);
 			}
 			else if (strstr(cur+1, "eye_") == cur + 1) {
 				if (strstr(cur+1, "effect") || strstr(cur+1, "hole")) {
