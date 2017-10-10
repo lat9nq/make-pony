@@ -18,7 +18,7 @@
 #define STYLECHARLEN	12
 // #define TARGETCOUNT  	70
 #define DETAILCHANCE  	15
-#define DETAILCOUNT  	5
+#define DETAILCOUNT  	4
 
 #define PI  	3.14159f
 #define RAD(X)	PI * (X) / 180.0f
@@ -472,7 +472,8 @@ int main(int argc, char * argv[]) {
 	
 	for (int i = 0; i < clrcount; i++) {
 		float x;
-		x = (desaturated) * value(&colors[i]) + (!desaturated) * saturation(&colors[i]) - avg_sat;
+		// x = (desaturated) * value(&colors[i]) + (!desaturated) * saturation(&colors[i]) - avg_sat;
+		x = (((!desaturated) * saturation(&colors[i]) + (desaturated) * value(&colors[i])) / pow(2,i)) - avg_sat / pow(2,i);
 		if (verbose) {
 			fprintf(stderr, "x[%d] = %g\tvalue: %g\tsat: %g\n", i, x, value(&colors[i]), saturation(&colors[i]));
 		}
@@ -491,15 +492,15 @@ int main(int argc, char * argv[]) {
 		#pragma GCC diagnostic warning "-Wmaybe-uninitialized"
 		// hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + 0.6f * fmodf(fabs(-std_dev*1.5f + 1.25f), 1.0f))) : 0.0f;// * !(!(rand()&7));
 		// hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + std_dev * 0.6f)) : 0.0f;// * !(!(rand()&7));
-		hsvcolor.s = (!desaturated) ? (avg_sat) : 0.0f;// * !(!(rand()&7));
+		hsvcolor.s = (!desaturated) ? (avg_sat * sqrt(std_dev)) : 0.0f;// * !(!(rand()&7));
 		hsvcolor.v = (desaturated) ? (avg_sat * sqrtf(0.3f + std_dev*0.7f)) : 1.0f;//((rand() % 12) + 4) / 15.0f : 1.0f;
 		// c = color1;
-		if (!desaturated) {
-			hsvToRGB(&hsvcolor, &bodycolor);
-			float l = (1.0f - lightness(&bodycolor));
-			l *= l;
-			hsvcolor.s = avg_sat - l;
-		}
+		// if (!desaturated) {
+			// hsvToRGB(&hsvcolor, &bodycolor);
+			// float l = lightness(&bodycolor);
+			// l *= l;
+			// hsvcolor.s = avg_sat - 0.3f*l;
+		// }
 		hsvcolor.s = ((float)(hsvcolor.s >= 0)) * hsvcolor.s;
 	}
 	else {
@@ -545,7 +546,7 @@ int main(int argc, char * argv[]) {
 	if (!traditional) {
 		at = 0;
 		PUSHSTRING(available_details, "GRADIENT");
-		PUSHSTRING(available_details, "HOOF_SMALL");
+		// PUSHSTRING(available_details, "HOOF_SMALL");
 		PUSHSTRING(available_details, "STRIPES");
 		PUSHSTRING(available_details, "LINES");
 		PUSHSTRING(available_details, "FRECKLES");
