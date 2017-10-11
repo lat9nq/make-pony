@@ -1,7 +1,7 @@
 LEX=flex
 
 CC=gcc
-CCFLAGS=-Wall -O2#-g
+CCFLAGS=-Wall -O2# -O3 -fuse-ld=gold#-g
 LIBFLAGS=-lm
 
 .l.c:
