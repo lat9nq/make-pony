@@ -1,6 +1,6 @@
 LEX=flex
 
-CC=gcc
+CC=i686-w64-mingw32-gcc
 CCFLAGS=-Wall -O3 -fuse-ld=gold#-g
 LIBFLAGS=-lm
 
@@ -19,10 +19,7 @@ commit:
 
 OFILES=color.o make-pony.o target.o
 make-pony:$(OFILES)
-	$(CC) $(CCFLAGS) -o make-pony $(OFILES) $(LIBFLAGS)
-
-make-pony.exe:
-	make --file Makefile.win make-pony
+	$(CC) $(CCFLAGS) -omake-pony.exe $(OFILES) $(LIBFLAGS)
 
 %.strip:%.exe
 	strip -Xxwg $<
