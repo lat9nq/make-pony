@@ -269,8 +269,8 @@ int main(int argc, char * argv[]) {
 		
 		for (int i = 0; i < times; i++) {
 			cmd[0] = 0;
-			seed = rand() * rand();
-			sprintf(cmd, "%s -s%ld%s -o%03d_%09ld_makepony.txt" , argv[0], seed, temp, i, seed);
+			seed = rand() * rand() & 2147483647;
+			sprintf(cmd, "%s -s%ld%s -o%03d_%010lu_makepony.txt" , argv[0], seed, temp, i, seed);
 			if (verbose) {
 				fprintf(stderr, "%s\n", cmd);
 			}
@@ -278,7 +278,7 @@ int main(int argc, char * argv[]) {
 			fgets(cmd, 256, p);
 			cmd[strlen(cmd)-1] = 0;
 			if (!verbose) {
-				printf("%03d_%09ld: %s\n", i, seed, cmd);
+				printf("%03d_%010lu: %s\n", i, seed, cmd);
 			}
 			else {
 				putchar('\n');
