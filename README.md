@@ -17,6 +17,13 @@ To compile for Linux:
 - `make`
 
 Changelog:
+v1.3
+- Added a simplified mode that reduces detail usage and styles outputted
+- Updated `-m` to work more efficiently
+- `-r` tells it to generate a random color on the mane
+- Body color generation is updated
+- Bug fixes
+
 v1.2
 - Added support for generated ponies that have completely desaturated hair
 - Added new switch
