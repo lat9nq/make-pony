@@ -275,7 +275,8 @@ int main(int argc, char * argv[]) {
 				fprintf(stderr, "%s\n", cmd);
 			}
 			p = popen(cmd, "r");
-			fgets(cmd, 256, p);
+			if (!fgets(cmd, 256, p))
+				return;
 			cmd[strlen(cmd)-1] = 0;
 			if (!verbose) {
 				printf("%03d_%010lu: %s\n", i, seed, cmd);
@@ -295,7 +296,7 @@ int main(int argc, char * argv[]) {
 	s = malloc(sizeof(*s)*256);
 	
 	if (!fname_specified) {
-		sprintf(filename, "%ld_%09ld_makepony.txt", the_time, seed);
+		sprintf(filename, "%09ld_makepony.txt", the_time);
 	}
 	
 	if (seed == time(NULL)) {
@@ -303,18 +304,18 @@ int main(int argc, char * argv[]) {
 		srand(seed);
 	}
 	
-	// #ifdef _WIN64
-	// strcpy(s, filename);
+	#ifdef _WIN64
+	strcpy(s, filename);
+	strcpy(filename, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
+	strcat(filename, s);
+	#else
+	#ifdef _WIN32
+	strcpy(s, filename);
+	strcpy(filename, "C:\\Program Files\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
 	// strcpy(filename, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
-	// strcat(filename, s);
-	// #else
-	// #ifdef _WIN32
-	// strcpy(s, filename);
-	// // strcpy(filename, "C:\\Program Files\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
-	// strcpy(filename, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
-	// strcat(filename, s);
-	// #endif
-	// #endif
+	strcat(filename, s);
+	#endif
+	#endif
 	
 	s[0] = 0;
 	
@@ -426,7 +427,7 @@ int main(int argc, char * argv[]) {
 		fprintf(stderr, "body is %ssaturated\n", (desaturated) ? "de" : "");
 	}
 	
-	int r;
+	//int r;
 	int r2;
 	
     for (int i = 0; i < clrcount; i++) { //get hair colors
@@ -718,7 +719,10 @@ int main(int argc, char * argv[]) {
 		else if (target[i][0] == STR) {
 			strcpy(temp, "NONE");
 			
-			if (strstr(cur+1, "mane_") == cur + 1) {
+			if (strstr(cur+1, "url")) {
+				temp[0] = 0;
+			}
+			else if (strstr(cur+1, "mane_") == cur + 1) {
 				strcpy(temp, UMANE(styles[key]));
 			}
 			else if (strstr(cur+1, "manelower_") == cur + 1) {
@@ -810,15 +814,15 @@ int main(int argc, char * argv[]) {
 	strcat(data, "\n}\n");
 	
 	if (!stdo) {
-		char * oldfilename = filename;
+		char *  oldfilename = filename;
 		FILE * f = fopen(filename, "wb");
-		// #ifdef _WIN32
-		// if (!f) {
-			// filename = strrchr(filename, '\\')+1;
-			// fprintf(stderr, "warning: could not write to %s, trying %s\n", oldfilename, filename);
-			// f = fopen(filename, "wb");
-		// }
-		// #endif
+		#ifdef _WIN32
+		if (!f) {
+			filename = strrchr(filename, '\\')+1;
+			fprintf(stderr, "warning: could not write to %s, trying %s\n", oldfilename, filename);
+			f = fopen(filename, "wb");
+		}
+		#endif
 		if (!f) {
 			fprintf(stderr, "error: output file not accessible\n");
 			return 0;

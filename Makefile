@@ -1,38 +1,37 @@
-LEX=flex
+BIN=./bin/
+SRC=./src/
+LIB=./lib/
+BUILD=./build/
+
+MAKE=make
+
+LIBS=color target
 
 CC=gcc
-CCFLAGS=-Wall -O3 -fuse-ld=gold#-g
-LIBFLAGS=-lm
+CCFLAGS=-Wall -O2
 
-.l.c:
-	$(LEX) -o$@ $<
+$(BUILD)%.o.1:$(SRC)%.c
+	$(CC) $(CCFLAGS) -c -fPIC -o$@ $<
 
-.c.o:
-	$(CC) $(CCFLAGS) -c $< $(LIBFLAGS)
+$(BUILD)%.o:$(SRC)%.c
+	$(CC) $(CCFLAGS) -c -o$@ $<
 
-all:
-	make make-pony
+lib%.so:$(BUILD)%.o.1
+	$(CC) $(CCFLAGS) -shared -Wl,-soname,$@ -o$(LIB)$@ $<
 
-commit:
-	make make-pony
-	git commit -a
+%.build:$(BUILD)%.o $(addsuffix .so, $(addprefix lib, $(LIBS)))
+	$(CC) $(CCFLAGS) -o$* $< -Wl,-rpath,$(LIB) -L$(LIB) $(addprefix -l, $(LIBS) m)
 
-OFILES=color.o make-pony.o target.o
-make-pony:$(OFILES)
-	$(CC) $(CCFLAGS) -o make-pony $(OFILES) $(LIBFLAGS)
+%/:
+	mkdir $@
 
-make-pony.exe:
-	make --file Makefile.win make-pony
-
-%.strip:%.exe
-	strip -Xxwg $<
-
-%:%.o
-	$(CC) $(CCFLAGS) $< -o$@ -LC:\Program\ Files\ \(x86\)\GnuWin32\lib -lfl
+make-pony:build/ lib/
+	+$(MAKE) make-pony.build
 
 clean:
-	rm -vf *.o *.txt .*.swp make-pony make-pony.exe
+	-rm -rvf build/ lib/ *.exe make-pony
 
-color.o: color.c color.h
-make-pony.o: make-pony.c color.h target.h
-target.o: target.c target.h
+$(BUILD)color.o.1:$(SRC)color.c $(SRC)color.h
+$(BUILD)target.o.1:$(SRC)target.c $(SRC)target.h
+$(BUILD)make-pony.o:$(SRC)make-pony.c $(SRC)color.h $(SRC)target.h
+
