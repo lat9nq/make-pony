@@ -1,0 +1,20 @@
+CC=x86_64-w64-mingw32-gcc
+CCFLAGS=-Wall -O2
+LIBFLAGS=-lm
+
+SRC=./src/
+BUILD=./build/
+
+%/:
+	mkdir $@
+
+$(BUILD)%.o:$(SRC)%.c
+	$(CC) $(CCFLAGS) -c $< -o$@
+
+MKOFILES=$(BUILD)make-pony.o $(BUILD)target.o $(BUILD)color.o
+make-pony.x86_64.exe:$(MKOFILES) build/
+	$(CC) $(CCFLAGS) $(MKOFILES) -o$@ $(LIBFLAGS)
+
+$(BUILD)color.o: $(SRC)color.c $(SRC)color.h
+$(BUILD)make-pony.o: $(SRC)make-pony.c $(SRC)color.h $(SRC)target.h
+$(BUILD)target.o: $(SRC)target.c $(SRC)target.h

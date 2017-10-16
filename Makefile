@@ -28,6 +28,14 @@ lib%.so:$(BUILD)%.o.1
 make-pony:build/ lib/
 	+$(MAKE) make-pony.build
 
+make-pony.exe:build/
+	+$(MAKE) -f Makefile.win32 make-pony.exe
+	strip $@
+
+make-pony.x86_64.exe:build/
+	+$(MAKE) -f Makefile.win64 make-pony.x86_64.exe
+	strip $@
+
 clean:
 	-rm -rvf build/ lib/ *.exe make-pony
 
