@@ -418,9 +418,9 @@ int main(int argc, char * argv[]) {
 	}
 	
 	hair_hue = static_hue;
-	if (separate_hair) {
+/* 	if (separate_hair) {
 		hair_hue = rand() % 360;
-	}
+	} */
 	
 	male = ((static_hue % 180 < 60) * ((key == BIGMAC) || ((key == ADVENTUROUS) && (rand() & 3)))) || male;
 	
@@ -459,7 +459,7 @@ int main(int argc, char * argv[]) {
 		fprintf(stderr, "body is %ssaturated\n", (desaturated) ? "de" : "");
 	}
 	
-	//int r;
+	int r;
 	int r2;
 	
     for (int i = 0; i < clrcount; i++) { //get hair colors
@@ -467,17 +467,17 @@ int main(int argc, char * argv[]) {
 		hsvcolor.s = 1;//saturation(&colors[0]);
 		hsvcolor.v = 1;//value(&colors[0]);
 		
-		// r = rand();
+		r = rand();
 		r2 = rand();
 		
-		// if ((r & 7)) {
-			// float del = ((r % 100) + (r2 % 100)) / 200.0f;
-			// del = del * 2.0f - 1.0f;
-			// /* if (verbose) {
-				// fprintf(stderr, "\t\tdel: %g\n", del);
-			// } */
-			// hsvcolor.h = (int)(static_hue + 30 * del + 360) % 360;
-		// }
+		if (separate_hair && (r & 7)) {
+			float del = ((r % 100) + (r2 % 100)) / 200.0f;
+			del = del * 2.0f - 1.0f;
+			if (verbose) {
+				fprintf(stderr, "\t\tdel: %g\n", del);
+			}
+			hsvcolor.h = (int)(static_hue + 30 * del + 360) % 360;
+		}
 		if (key == BOOKWORM && i == 1) {
 			colors[i] = colors[0];
 		}
