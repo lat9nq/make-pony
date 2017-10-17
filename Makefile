@@ -8,7 +8,7 @@ MAKE=make
 LIBS=color target
 
 CC=gcc
-CCFLAGS=-Wall -O2
+CCFLAGS=-Wall -g
 
 $(BUILD)%.o.1:$(SRC)%.c
 	$(CC) $(CCFLAGS) -c -fPIC -o$@ $<

@@ -78,6 +78,10 @@ int main(int argc, char * argv[]) {
 	int help = 0;
 	int stdo = 0;
 	int traditional = 0;
+
+	char * farg = NULL;
+	FILE * arg_in = NULL;
+	char ** fargv = NULL;
 	
 	color color1;
 	int static_hue;
@@ -93,48 +97,54 @@ int main(int argc, char * argv[]) {
 	
 	filename = malloc(sizeof(*filename)*256);
 	
-	if (argc != 1) {
-		for (int i = 1; i < argc; i++) {
-			if (argv[i][0] == '-') {
-				switch (argv[i][1]) {
+	char * s;
+	s = malloc(sizeof(*s)*256);
+	
+	char ** args = argv;
+	int argsc = argc;
+
+	if (argsc != 1) {
+		for (int i = 1; i < argsc; i++) {
+			if (args[i][0] == '-') {
+				switch (args[i][1]) {
 					case 's': //seed specify
-						if (argv[i][2] != 0) {
-							seed = atoi(argv[i]+2);
+						if (args[i][2] != 0) {
+							seed = atoi(args[i]+2);
 						}
 						else {
 							i++;
-							seed = atoi(argv[i]);
+							seed = atoi(args[i]);
 						}
 						// printf("%ld", seed);
 					break;
 					case 'k': //style _Key specify
-						if (argv[i][2] != 0) {
-							key = atoi(argv[i]+2);
+						if (args[i][2] != 0) {
+							key = atoi(args[i]+2);
 						}
 						else {
 							i++;
-							key = atoi(argv[i]);
+							key = atoi(args[i]);
 						}
 						key %= STYLECOUNT;
 					break;
 					case 'o': //output file
-						if (argv[i][2] != 0) {
-							strcpy(filename, argv[i]+2);
+						if (args[i][2] != 0) {
+							strcpy(filename, args[i]+2);
 						}
 						else {
 							i++;
-							strcpy(filename, argv[i]);
+							strcpy(filename, args[i]);
 						}
 						fname_specified = 1;
 					break;
 					case 'm': //how many?
 						times = 1;
-						if (argv[i][2] != 0) {
-							times = atoi(argv[i]+2);
+						if (args[i][2] != 0) {
+							times = atoi(args[i]+2);
 						}
 						else {
 							i++;
-							times = atoi(argv[i]);
+							times = atoi(args[i]);
 						}
 					break;
 					case 'c': 
@@ -143,12 +153,12 @@ int main(int argc, char * argv[]) {
 					case 'x': { //color specify
 						char * arg;
 						colorgiven = 1;
-						if (argv[i][2] != 0) {
-							arg = argv[i] + 2;
+						if (args[i][2] != 0) {
+							arg = args[i] + 2;
 						}
 						else {
 							i++;
-							arg = argv[i];
+							arg = args[i];
 						}
 						#pragma GCC diagnostic ignored "-Wformat"
 						sscanf(arg, "%02X%02X%02X", &(color1.r), &(color1.g), &(color1.b));
@@ -161,13 +171,13 @@ int main(int argc, char * argv[]) {
 					}
 					break;
 					case 'd': //desaturate? 0 - no; 1 - yes; 2 - white
-						if (argv[i][2]) {
-							desaturated = atoi(argv[i]+2);
+						if (args[i][2]) {
+							desaturated = atoi(args[i]+2);
 						}
 						else {
 							i++;
-							if (i < argc && isdigit(argv[i][0])) {
-								desaturated = atoi(argv[i]);
+							if (i < argsc && isdigit(args[i][0])) {
+								desaturated = atoi(args[i]);
 							}
 							else {
 								desaturated = 1;
@@ -192,7 +202,7 @@ int main(int argc, char * argv[]) {
 						help = 1;
 					break;
 					case '-': {
-						if (strstr(argv[i], "--help")) {
+						if (strstr(args[i], "--help")) {
 							help = 1;
 						}
 					}
@@ -202,8 +212,33 @@ int main(int argc, char * argv[]) {
 					break;
 				}
 			}
+			else {
+				if (!farg) {
+					farg = args[i];
+					arg_in = fopen(farg, "r");
+					fargv = malloc(sizeof(*fargv)*32);
+					int j;
+					for (j = 0; j < 32; j++) {
+						fargv[j] = NULL;
+					}
+					j = 0;
+					while (fgets(s,256,arg_in)) {
+						fargv[j] = malloc(sizeof(**fargv)*256);
+						strcpy(fargv[j], s);
+						printf(fargv[j]);
+						j++;
+					}
+					args = fargv;
+					i = -1;
+					argsc = j;
+				}
+				else {
+					fprintf(stderr, "error: specified too many input files\n");
+					return 0;
+				}
+			}
 		}
-		//strcpy(filename, argv[1]);
+		//strcpy(filename, args[1]);
 	}
 	
 	if (help) {
@@ -253,13 +288,13 @@ int main(int argc, char * argv[]) {
 		char * cmd = malloc(sizeof(*cmd)*256);
 		char * temp = malloc(sizeof(*temp) * 128);
 		temp[0] = 0;
-		for (int i = 1; i < argc; i++) {
-			if (argv[i][1] != 'm' && argv[i][1] != 's' && argv[i][1] != 'o') {
+		for (int i = 1 - (argv != args); i < argsc; i++) {
+			if (args[i][1] != 'm' && args[i][1] != 's' && args[i][1] != 'o') {
 				strcat(temp, " ");
-				strcat(temp, argv[i]);
+				strcat(temp, args[i]);
 			}
 			else {
-				if (argv[i][2] == 0) {
+				if (args[i][2] == 0) {
 					i++;
 				}
 			}
@@ -291,9 +326,6 @@ int main(int argc, char * argv[]) {
 		free(cmd);
 		return 0;
 	}
-	
-	char * s;
-	s = malloc(sizeof(*s)*256);
 	
 	if (!fname_specified) {
 		sprintf(filename, "%09ld_makepony.txt", the_time);
