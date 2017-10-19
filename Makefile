@@ -8,7 +8,7 @@ MAKE=make
 LIBS=color target
 
 CC=gcc
-CCFLAGS=-Wall -O2
+CCFLAGS=-Wall -g
 
 MKPNY_REQ=$(SRC)make-pony.c $(SRC)color.h $(SRC)target.h
 
