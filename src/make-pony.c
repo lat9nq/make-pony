@@ -30,7 +30,7 @@
 #define TAIL(X) 	((X) + STYLECHARLEN*2)
 #define COLOR(X)	*((X) + STYLECHARLEN*3)
 
-#define STYLECOUNT  	16
+#define STYLECOUNT  	16 
 
 #define ADVENTUROUS	0
 #define SHOWBOAT	1
@@ -80,7 +80,7 @@ int main(int argc, char * argv[]) {
 	int traditional = 0;
 	
 	color color1;
-	int static_hue;
+	int static_hue = 0;
 	int hair_hue;
 	hsv hsvcolor;
 	int key = -1;
@@ -276,7 +276,7 @@ int main(int argc, char * argv[]) {
 			}
 			p = popen(cmd, "r");
 			if (!fgets(cmd, 256, p))
-				return;
+				break;
 			cmd[strlen(cmd)-1] = 0;
 			if (!verbose) {
 				printf("%03d_%010lu: %s\n", i, seed, cmd);
