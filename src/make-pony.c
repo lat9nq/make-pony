@@ -14,57 +14,7 @@
 #include <ctype.h>
 #include "color.h"
 #include "target.h"
-
-#define STYLECHARLEN	12
-// #define TARGETCOUNT  	70
-#define DETAILCHANCE  	15
-#define DETAILCOUNT  	4
-
-#define PI  	3.14159f
-#define RAD(X)	PI * (X) / 180.0f
-
-#define SECONDSPERDAY	86400
-
-#define UMANE(X)	((X) + 0)
-#define LMANE(X)	((X) + STYLECHARLEN)
-#define TAIL(X) 	((X) + STYLECHARLEN*2)
-#define COLOR(X)	*((X) + STYLECHARLEN*3)
-
-#define STYLECOUNT  	16 
-
-#define ADVENTUROUS	0
-#define SHOWBOAT	1
-#define BOOKWORM	2
-#define SPEEDSTER	3
-#define ASSERTIVE	4
-#define RADICAL	5
-#define BUMPKIN	6
-#define FLOOFEH	7
-#define INSTRUCTOR	8
-#define FILLY	9
-#define MOON	10
-#define TIMID	11
-#define BIGMAC	12
-#define BOLD	13
-#define MECHANIC	14
-#define SHOWBOAT2	15
-
-#define RACES	3
-#define EARTH	0
-#define PEGASUS	1
-#define UNICORN	2
-
-int at;
-// #define PUSHTARGET(R,X,T)	sprintf((R)[at], "%c%s", (T), (X)); at++
-#define PUSHSTRING(R,X)	strcpy((R)[at], (X)); at++
-#define ADDSTYLE(R, I, S, T, U, C)	strcpy(UMANE((R)[(I)]), (S)); strcpy(LMANE((R)[(I)]), (T)); strcpy(TAIL((R)[(I)]), (U)); COLOR((R)[(I)]) = (C)
-#define RIGHT(X,C)	((X)+strlen(X)-(C))
-#define WARM(H)	((H) <= 120.0f || (H) > 300.0f)
-
-void addString(char * key, char * data, int t, char * buffer);
-void addValue(char * key, float data, int t, char * buffer);
-void addColor(char * key, color * data, int t, char * buffer);
-void addBool(char * key, int data, int t, char * buffer);
+#include "make-pony.h"
 
 int main(int argc, char * argv[]) {
 	
@@ -98,7 +48,10 @@ int main(int argc, char * argv[]) {
 	filename = malloc(sizeof(*filename)*256);
 	
 	char * s;
+	int s_len;
+	s_len = 0;
 	s = malloc(sizeof(*s)*256);
+	s[0] = 0;
 	
 	char ** args = argv;
 	int argsc = argc;
@@ -244,7 +197,7 @@ int main(int argc, char * argv[]) {
 	if (help) {
 		fprintf(stderr, "usage: %s [OPTIONS]\n", argv[0]);
 		fprintf(stderr, "Creates a file compatible with Pony Player Models 2 addon for Garry's Mod 13.\n");
-		fprintf(stderr, "By default, the output files take the format \"[TIME]_[SEED]_makepony.txt\",\n");
+		fprintf(stderr, "By default, the output files take the format \"[TIME]_[SEED]_makepony.dat\",\n");
 		fprintf(stderr, "and the default seed is the time since the UNIX epoch.\n");
 		fprintf(stderr, "\t-o<file>\toutput to a specific file (incompatible with -m)\n");
 		fprintf(stderr, "\t-m<n>\t\tgenerate n files\n\n");
@@ -305,7 +258,7 @@ int main(int argc, char * argv[]) {
 		for (int i = 0; i < times; i++) {
 			cmd[0] = 0;
 			seed = rand() * rand() & 2147483647;
-			sprintf(cmd, "%s -s%ld%s -o%03d_%010lu_makepony.txt" , argv[0], seed, temp, i, seed);
+			sprintf(cmd, "%s -s%ld%s -o%03d_%010lu_makepony.dat" , argv[0], seed, temp, i, seed);
 			if (verbose) {
 				fprintf(stderr, "%s\n", cmd);
 			}
@@ -328,7 +281,7 @@ int main(int argc, char * argv[]) {
 	}
 	
 	if (!fname_specified) {
-		sprintf(filename, "%09ld_makepony.txt", the_time);
+		sprintf(filename, "%09ld_makepony.dat", the_time);
 	}
 	
 	if (seed == time(NULL)) {
@@ -613,22 +566,36 @@ int main(int argc, char * argv[]) {
 	
 	// -- BEGIN SYNTHESIZNIG DATA --
 	
-	char * data;
+	u_int8_t * data;
 	data = malloc(sizeof(*data)*32768);
 	if (!data) {
 		fprintf(stderr, "error: could not allocate enough memory to store data\n");
 		return 0;
 	}
+	memset(data, 0, sizeof(*data)*32768);
+	int data_len;
+	data_len = 0;
 	
 	char * temp;
 	temp = malloc(sizeof(*temp)*256);
 	
-	strcpy(data, "\n{\n");
+	//strcpy(data, "\n{\n");
+	*(data) = NBT_GROUP;
+	data_len ++;
+	*(data + data_len) = 0x00;
+	data_len++;
+	*(data + data_len) = 0x04;
+	data_len++;
+	strcpy(data+data_len, "data");
+	data_len += strlen("data");
 	
 	for (int i = 0; i < TARGETCOUNT; i++) {
 		char * cur = target[i];
 		s[0] = 0;
-		if (cur[0] == COL) {
+		if (cur[0] == SEP) {
+			s_len = addSeparator(cur+1, s);
+		}
+		else if (cur[0] == COL) {
 			color c;
 			c = color1;
 			
@@ -746,7 +713,7 @@ int main(int argc, char * argv[]) {
 				c.b = 255;
 			}
 			
-			addColor(cur+1, &c, 1, s);
+			s_len = addColor(cur+1, &c, 1, s);
 		}
 		else if (target[i][0] == STR) {
 			strcpy(temp, "NONE");
@@ -780,7 +747,7 @@ int main(int argc, char * argv[]) {
 				strcpy(temp, "SFM_PONY");
 			}
 			
-			addString(cur+1, temp, 1, s);
+			s_len = addString(cur+1, temp, 1, s);
 		}
 		else if (target[i][0] == BOOL) {
 			int x = 0;
@@ -791,7 +758,7 @@ int main(int argc, char * argv[]) {
 			x = (strstr(cur+1, "weapon_hide")) || x;
 			x = (strstr(cur+1, "new_male_muzzle")) || x;
 			
-			addBool(cur+1, x, 1, s);
+			s_len = addBool(cur+1, x, 1, s);
 		}
 		else if (target[i][0] == VAL) {
 			float x = 1.0f;
@@ -838,12 +805,17 @@ int main(int argc, char * argv[]) {
 				}
 			}
 			
-			addValue(cur+1, x, 1, s);
+			s_len = addValue(cur+1, x, 1, s);
 		}
-		strcat(data, s);
+		memcpy(data + data_len, s, s_len);
+		data_len += s_len;
 	}
-	data[strlen(data)-2] = 0;
-	strcat(data, "\n}\n");
+	//data[strlen(data)-2] = 0;
+	//strcat(data, "\n}\n");
+	*(data + data_len) = 0x00;
+	data_len++;
+	*(data + data_len) = 0x0a;
+	data_len++;
 	
 	if (!stdo) {
 		char *  oldfilename = filename;
@@ -859,7 +831,7 @@ int main(int argc, char * argv[]) {
 			fprintf(stderr, "error: output file not accessible\n");
 			return 0;
 		}
-		fwrite(data, sizeof(*data), strlen(data), f);
+		fwrite(data, sizeof(*data), data_len, f);
 		printf("Wrote to %s successfully\n", filename);
 		fclose(f);
 	}
@@ -870,50 +842,134 @@ int main(int argc, char * argv[]) {
 	return 0;
 }
 
-void addString(char * key, char * data, int t, char * buffer) {
-	char * tabs;
-	tabs = malloc(sizeof(*tabs)*32);
-	for (int i = 0; i < t; i++) {
-		tabs[i] = '\t';
-	}
-	tabs[t] = 0;
-	
-	sprintf(buffer, "%s\"%s\": \"%s\",\n", tabs, key, data);
-	free(tabs);
+int addString(char * key, char * data, int t, char * buffer) {
+	int i;
+	int length;
+	i = 0;
+	length = strlen(key);
+	t = strlen(data);
+	//printf("%04x (%d) %s\n", t, t, key);
+
+	*(buffer) = NBT_STRING;
+	i++;
+
+	*(buffer + i) = ((u_int8_t *)(&length))[1];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[0];
+	i++;
+	strcpy(buffer + i, key);
+	i += strlen(key);
+
+	*(buffer + i) = ((u_int8_t *)(&t))[1];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&t))[0];
+	i++;
+	strcpy(buffer + i, data);
+	i += strlen(data);
+
+	return i;
 }
 
-void addValue(char * key, float data, int t, char * buffer) {
-	char * tabs;
-	tabs = malloc(sizeof(*tabs)*32);
-	for (int i = 0; i < t; i++) {
-		tabs[i] = '\t';
+int addValue(char * key, float data, int t, char * buffer) {
+	int i, length;
+	i = 0;
+	length = strlen(key);
+
+	*(buffer) = NBT_FLOAT;
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[1];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[0];
+	i++;
+	strcpy(buffer + i, key);
+	i += strlen(key);
+
+	int j;
+	for (j = 0; j < 4; j++) {
+		*(buffer + i) = ((u_int8_t *)(&data))[3 - j];
+		i++;
 	}
-	tabs[t] = 0;
-	
-	sprintf(buffer, "%s\"%s\": %g,\n", tabs, key, data);
-	free(tabs);
+
+	return i;
 }
 
-void addBool(char * key, int data, int t, char * buffer) {
-	char * tabs;
-	tabs = malloc(sizeof(*tabs)*32);
-	for (int i = 0; i < t; i++) {
-		tabs[i] = '\t';
-	}
-	tabs[t] = 0;
-	
-	sprintf(buffer, "%s\"%s\": %s,\n", tabs, key, (data ? "true" : "false"));
-	free(tabs);
+int addBool(char * key, int data, int t, char * buffer) {
+	int i, length;
+	i = 0;
+	length = strlen(key);
+
+	*(buffer) = NBT_BOOLEAN;
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[1];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[0];
+	i++;
+	strcpy(buffer + i, key);
+	i += strlen(key);
+
+	if (data)
+		*(buffer + i) = 1;
+	else
+		*(buffer + i) = 0;
+	i++;
+
+	return i;
 }
 
-void addColor(char * key, color * data, int t, char * buffer) {
-	char * tabs;
-	tabs = malloc(sizeof(*tabs)*32);
-	for (int i = 0; i < t; i++) {
-		tabs[i] = '\t';
-	}
-	tabs[t] = 0;
-	
-	sprintf(buffer, "%s\"%s\": {\n%s\t\"r\": %d,\n%s\t\"g\": %d,\n%s\t\"b\": %d,\n%s\t\"a\": 255\n%s},\n", tabs, key, tabs, (*data).r, tabs, (*data).g, tabs, (*data).b, tabs, tabs);
-	free(tabs);
+int addColor(char * key, color * data, int t, char * buffer) {
+	int i, length;
+	i = 0;
+	length = strlen(key);
+
+	*(buffer) = NBT_COLOR;
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[1];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[0];
+	i++;
+	strcpy(buffer + i, key);
+	i += strlen(key);
+
+	*(buffer + i) = 0;
+	i++;
+	*(buffer + i) = 0;
+	i++;
+	*(buffer + i) = 0;
+	i++;
+	*(buffer + i) = 0x04;
+	i++;
+
+	*(buffer + i) = data->r - 128;
+	i++;
+	*(buffer + i) = data->g - 128;
+	i++;
+	*(buffer + i) = data->b - 128;
+	i++;
+	*(buffer + i) = 255-128;
+	i++;
+
+	return i;
 }
+
+int addSeparator(char * key, char * buffer) {
+	int i;
+	i = 0;
+
+	u_int32_t sep;
+	sscanf(key + 2, "%08x", &sep);
+
+	*(buffer) = NBT_SEPARATOR;
+	i ++;
+	*(buffer + i) = ((u_int8_t *)(&sep))[3];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&sep))[2];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&sep))[1];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&sep))[0];
+	i++;
+
+	return i;
+}
+
+
