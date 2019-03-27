@@ -1,7 +1,10 @@
 #ifndef NBT_H
 #define NBT_H
 
+#include "color.h"
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define NBT_BOOLEAN	0x01
 #define NBT_SEPARATOR	0x04
@@ -23,5 +26,11 @@ typedef struct {
 	char name[256];
 	void * payload;
 } nbt_t;
+
+int addString(char * key, char * data, int t, char * buffer);
+int addValue(char * key, float data, int t, char * buffer);
+int addColor(char * key, color * data, int t, char * buffer);
+int addBool(char * key, int data, int t, char * buffer);
+int addSeparator(char * key, char * buffer);
 
 #endif

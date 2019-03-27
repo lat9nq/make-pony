@@ -1,0 +1,131 @@
+#include "nbt.h"
+
+int addString(char * key, char * data, int t, char * buffer) {
+	int i;
+	int length;
+	i = 0;
+	length = strlen(key);
+	t = strlen(data);
+	//printf("%04x (%d) %s\n", t, t, key);
+
+	*(buffer) = NBT_STRING;
+	i++;
+
+	*(buffer + i) = ((u_int8_t *)(&length))[1];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[0];
+	i++;
+	strcpy(buffer + i, key);
+	i += strlen(key);
+
+	*(buffer + i) = ((u_int8_t *)(&t))[1];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&t))[0];
+	i++;
+	strcpy(buffer + i, data);
+	i += strlen(data);
+
+	return i;
+}
+
+int addValue(char * key, float data, int t, char * buffer) {
+	int i, length;
+	i = 0;
+	length = strlen(key);
+
+	*(buffer) = NBT_FLOAT;
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[1];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[0];
+	i++;
+	strcpy(buffer + i, key);
+	i += strlen(key);
+
+	int j;
+	for (j = 0; j < 4; j++) {
+		*(buffer + i) = ((u_int8_t *)(&data))[3 - j];
+		i++;
+	}
+
+	return i;
+}
+
+int addBool(char * key, int data, int t, char * buffer) {
+	int i, length;
+	i = 0;
+	length = strlen(key);
+
+	*(buffer) = NBT_BOOLEAN;
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[1];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[0];
+	i++;
+	strcpy(buffer + i, key);
+	i += strlen(key);
+
+	if (data)
+		*(buffer + i) = 1;
+	else
+		*(buffer + i) = 0;
+	i++;
+
+	return i;
+}
+
+int addColor(char * key, color * data, int t, char * buffer) {
+	int i, length;
+	i = 0;
+	length = strlen(key);
+
+	*(buffer) = NBT_COLOR;
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[1];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&length))[0];
+	i++;
+	strcpy(buffer + i, key);
+	i += strlen(key);
+
+	*(buffer + i) = 0;
+	i++;
+	*(buffer + i) = 0;
+	i++;
+	*(buffer + i) = 0;
+	i++;
+	*(buffer + i) = 0x04;
+	i++;
+
+	*(buffer + i) = data->r - 128;
+	i++;
+	*(buffer + i) = data->g - 128;
+	i++;
+	*(buffer + i) = data->b - 128;
+	i++;
+	*(buffer + i) = 255-128;
+	i++;
+
+	return i;
+}
+
+int addSeparator(char * key, char * buffer) {
+	int i;
+	i = 0;
+
+	u_int32_t sep;
+	sscanf(key + 2, "%08x", &sep);
+
+	*(buffer) = NBT_SEPARATOR;
+	i ++;
+	*(buffer + i) = ((u_int8_t *)(&sep))[3];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&sep))[2];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&sep))[1];
+	i++;
+	*(buffer + i) = ((u_int8_t *)(&sep))[0];
+	i++;
+
+	return i;
+}

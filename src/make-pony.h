@@ -50,10 +50,4 @@ int at;
 #define RIGHT(X,C)	((X)+strlen(X)-(C))
 #define WARM(H)	((H) <= 120.0f || (H) > 300.0f)
 
-int addString(char * key, char * data, int t, char * buffer);
-int addValue(char * key, float data, int t, char * buffer);
-int addColor(char * key, color * data, int t, char * buffer);
-int addBool(char * key, int data, int t, char * buffer);
-int addSeparator(char * key, char * buffer);
-
 #endif

@@ -5,12 +5,12 @@ BUILD=./build/
 
 MAKE=make
 
-LIBS=color target
+LIBS=color target nbt
 
 CC=gcc
 CCFLAGS=-Wall -g
 
-MKPNY_REQ=$(SRC)make-pony.c $(SRC)color.h $(SRC)target.h $(SRC)make-pony.h
+MKPNY_REQ=$(SRC)make-pony.c $(SRC)color.h $(SRC)target.h $(SRC)make-pony.h $(SRC)nbt.h
 
 $(BUILD)%.o.1:$(SRC)%.c
 	$(CC) $(CCFLAGS) -c -fPIC -o$@ $<
@@ -41,6 +41,7 @@ make-pony.x86_64.exe:build/ $(MKPNY_REQ)
 clean:
 	-rm -rvf build/ lib/ *.exe make-pony
 
+$(BUILD)nbt.o.1:$(SRC)nbt.c $(SRC)nbt.h
 $(BUILD)color.o.1:$(SRC)color.c $(SRC)color.h
 $(BUILD)target.o.1:$(SRC)target.c $(SRC)target.h
 $(BUILD)make-pony.o:$(MKPNY_REQ)
