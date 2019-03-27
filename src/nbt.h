@@ -1,6 +1,8 @@
 #ifndef NBT_H
 #define NBT_H
 
+#include <stdlib.h>
+
 #define NBT_BOOLEAN	0x01
 #define NBT_SEPARATOR	0x04
 #define NBT_FLOAT	0x05
@@ -10,14 +12,14 @@
 
 typedef union {
 	float f;
-	u_int8_t u[4];
-	u_int32_t u32;
-	u_int16_t u16[2];
+	unsigned char u[4];
+	unsigned int u32;
+	unsigned short u16[2];
 } nbt_payload_t;
 
 typedef struct {
-	u_int8_t code;
-	u_int16_t name_length;
+	unsigned char code;
+	unsigned short name_length;
 	char name[256];
 	void * payload;
 } nbt_t;

@@ -16,5 +16,5 @@ make-pony.x86_64.exe:$(MKOFILES) build/
 	$(CC) $(CCFLAGS) $(MKOFILES) -o$@ $(LIBFLAGS)
 
 $(BUILD)color.o: $(SRC)color.c $(SRC)color.h
-$(BUILD)make-pony.o: $(SRC)make-pony.c $(SRC)color.h $(SRC)target.h
+$(BUILD)make-pony.o: $(SRC)make-pony.c $(SRC)color.h $(SRC)target.h $(SRC)make-pony.h
 $(BUILD)target.o: $(SRC)target.c $(SRC)target.h

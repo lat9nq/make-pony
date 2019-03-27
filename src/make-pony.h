@@ -18,7 +18,7 @@
 #define TAIL(X) 	((X) + STYLECHARLEN*2)
 #define COLOR(X)	*((X) + STYLECHARLEN*3)
 
-#define STYLECOUNT  	16 
+#define STYLECOUNT  	17
 
 #define ADVENTUROUS	0
 #define SHOWBOAT	1
@@ -36,6 +36,7 @@
 #define BOLD	13
 #define MECHANIC	14
 #define SHOWBOAT2	15
+#define MAILCALL	16
 
 #define RACES	3
 #define EARTH	0
