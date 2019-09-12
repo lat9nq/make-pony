@@ -648,6 +648,7 @@ int main(int argc, char * argv[]) {
 		s[0] = 0;
 		if (cur[0] == SEP) {
 			s_len = addSeparator(cur+1, s);
+			putchar('x');
 		}
 		else if (cur[0] == COL) {
 			color c;

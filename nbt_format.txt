@@ -1,0 +1,17 @@
+NBT Format
+
+BYTES	Offest	Mapping
+1	0	Code
+2	1	Length of name
+##	2	Name
+---String---
+2	2+Name	Length of string
+##	4+Name	String
+---Value----
+4	2+Name	32-bit integer value
+---Bool-----
+1	2+Name	The boolean (1 is true, 0 is false)
+---Color----
+4	2+Name	0x00000004
+4	6+Name	<R,G,B,A> - <128,128,128,128>
+

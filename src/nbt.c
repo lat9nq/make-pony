@@ -1,5 +1,15 @@
 #include "nbt.h"
 
+nbt_t * nbt_read(int fd) {
+	nbt_t * nbt;
+	int nbt_len;
+
+	nbt_len = 64;
+	nbt = (nbt_t *)malloc(sizeof(*nbt)*nbt_len);
+
+	return;
+}
+
 int addString(char * key, char * data, int t, char * buffer) {
 	int i;
 	int length;
