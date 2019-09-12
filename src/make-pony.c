@@ -382,6 +382,9 @@ int main(int argc, char * argv[]) {
 
 	if (!colorgiven) {
 		static_hue = rand() % 360;
+		for (int i = 0; i < 7 || (static_hue >= 60 && static_hue <=180); i++) {
+			static_hue = rand() % 360;
+		}
 		hsvcolor.h = static_hue;
 		hsvcolor.s = 1.0f;
 		hsvcolor.v = 1.0f;
