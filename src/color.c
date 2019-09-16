@@ -1,9 +1,16 @@
 #include "color.h"
 #include <math.h>
+#include <stdlib.h>
 
 #define max(X, Y)	((X) > (Y) ? (X) : (Y))
 #define min(X, Y)	((X) < (Y) ? (X) : (Y))
-#define NULL	0x0
+
+void color_init(color * c) {
+	c->r = 0;
+	c->g = 0;
+	c->b = 0;
+	c->a = 0;
+}
 
 void hsvToRGB(const hsv * hclr, color * clr) {
 	float h = (*hclr).h;

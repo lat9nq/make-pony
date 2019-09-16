@@ -4,9 +4,11 @@
 #include "color.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 #define NBT_BOOLEAN	0x01
+#define NBT_INT		0x03
 #define NBT_SEPARATOR	0x04
 #define NBT_FLOAT	0x05
 #define NBT_COLOR	0x07

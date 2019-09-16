@@ -1,4 +1,4 @@
-CC=gcc
+CC=x86_64-w64-mingw32-gcc
 CCFLAGS=-Wall -g
 
 %.o:%.c
@@ -10,7 +10,7 @@ convert_old_oc:$(COOC_OFILES)
 
 .PHONY:clean
 clean:
-	rm -vf *.o convert_old_oc
+	rm -vf *.o convert_old_oc test_pngimg thumbnailer
 
 test_pngimg:test_pngimg.o pngimg.o pixel.o
 	$(CC) $(CCFLAGS) -o$@ test_pngimg.o pngimg.o pixel.o -lpng

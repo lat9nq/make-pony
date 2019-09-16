@@ -7,6 +7,7 @@ MAKE=make
 CC=gcc
 CCFLAGS=-Wall -g
 CLIBS=
+LIBS=
 
 $(BUILD)%.o.1:$(SRC)%.c
 	$(CC) $(CCFLAGS) -c -fPIC -o$@ $< $(CLIBS)
@@ -22,14 +23,18 @@ lib%.so:$(BUILD)%.o.1
 MKPNY_LIBS=color target nbt
 MKPNY_REQ=$(SRC)make-pony.c $(SRC)color.h $(SRC)target.h $(SRC)make-pony.h $(SRC)nbt.h
 
-%.build:$(BUILD)%.o $(addsuffix .so, $(addprefix lib, $(MKPNY_LIBS)))
-	$(CC) $(CCFLAGS) -o$* $< -Wl,-rpath,$(LIB) -L$(LIB) $(addprefix -l, $(MKPNY_LIBS) m) $(CLIBS)
+%.build:$(BUILD)%.o $(addsuffix .so, $(addprefix lib, $(LIBS)))
+	$(CC) $(CCFLAGS) -o$* $< -Wl,-rpath,$(LIB) -L$(LIB) $(addprefix -l, $(LIBS) m) $(CLIBS)
 
 %/:
 	mkdir $@
 
-make-pony:build/ lib/ $(MKPNY_REQ)
-	+$(MAKE) make-pony.build
+all:
+	+$(MAKE) make-pony
+	+$(MAKE) thumbnailer
+
+make-pony:build/ lib/ $(MKPNY_REQ) $(addsuffix .so, $(addprefix lib, $(MKPNY_LIBS))) $(BUILD)make-pony.o
+	$(CC) $(CCFLAGS) -o$@ $(BUILD)$@.o -Wl,-rpath,$(LIB) -L$(LIB) $(addprefix -l, $(MKPNY_LIBS) m) $(CLIBS)
 
 make-pony.exe:build/ $(MKPNY_REQ)
 	+$(MAKE) -f Makefile.win32 make-pony.exe
@@ -40,7 +45,7 @@ make-pony.x86_64.exe:build/ $(MKPNY_REQ)
 	strip $@
 
 clean:
-	-rm -rvf build/ lib/ *.exe make-pony
+	-rm -rvf build/ lib/ *.exe make-pony thumbnailer
 
 $(BUILD)nbt.o.1:$(SRC)nbt.c $(SRC)nbt.h
 $(BUILD)color.o.1:$(SRC)color.c $(SRC)color.h
@@ -48,8 +53,13 @@ $(BUILD)target.o.1:$(SRC)target.c $(SRC)target.h
 $(BUILD)make-pony.o:$(MKPNY_REQ)
 
 
-CLIBS +=-lpng
-THUMB_LIBS=pngimg pixel
+THUMB_LIBS=pngimg pixel color nbt
+THUMB_REQ=$(SRC)thumbnailer.c $(SRC)color.h $(SRC)pngimg.h $(SRC)pixel.h $(SRC)nbt.h
+thumbnailer:build/ lib/ $(THUMB_REQ) $(addsuffix .so, $(addprefix lib, $(THUMB_LIBS))) $(BUILD)thumbnailer.o
+	$(eval CLIBS += -lpng)
+	$(CC) $(CCFLAGS) -o$@ $(BUILD)$@.o -Wl,-rpath,$(LIB) -L$(LIB) $(addprefix -l, $(THUMB_LIBS) m) $(CLIBS)
 
 $(BUILD)pngimg.o.1:$(SRC)pngimg.c $(SRC)pngimg.h $(SRC)pixel.h
 $(BUILD)pixel.o.1:$(SRC)pixel.c $(SRC)pixel.h
+$(BUILD)thumbnailer.o:$(SRC)thumbnailer.c $(SRC)color.h $(SRC)pngimg.h $(SRC)pixel.h \
+ $(SRC)nbt.h

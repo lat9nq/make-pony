@@ -39,10 +39,10 @@ png_byte ** pngimg_getData(PNGIMG * img) {
 	for (int i = 0; i < img->height; i++) {
 		data[i] = (png_byte*)malloc(sizeof(*data[i])*img->width*4);
 		for (int j = 0; j < img->width; j++) {
-			data[i][4*j+0] = (u_int8_t)img->pixels[i][j].r;
-			data[i][4*j+1] = (u_int8_t)img->pixels[i][j].g;
-			data[i][4*j+2] = (u_int8_t)img->pixels[i][j].b;
-			data[i][4*j+3] = (u_int8_t)img->pixels[i][j].a;
+			data[i][4*j+0] = (uint8_t)img->pixels[i][j].r;
+			data[i][4*j+1] = (uint8_t)img->pixels[i][j].g;
+			data[i][4*j+2] = (uint8_t)img->pixels[i][j].b;
+			data[i][4*j+3] = (uint8_t)img->pixels[i][j].a;
 		}
 	}
 	return data;
@@ -175,3 +175,63 @@ int pngimg_read(PNGIMG * img, char * filename) {
 	
 	return 0;
 }
+
+int pngimg_merge(PNGIMG *img1, PNGIMG *img2) {
+	if (img1->width != img2->width || img1->height != img2 -> height) {
+		return -1;
+	}
+	for (int i = 0; i < img1->width; i++) {
+		for (int j = 0; j < img1->height; j++) {
+			Pixel * p2 = pngimg_at(img1, j, i);
+			Pixel * p1 = pngimg_at(img2, j, i);
+			if (p1->a == 0)
+				continue;
+			p2->r = (p1->r * p1->a + p2->r * p2->a * (255.0f - p1->a) / 255.0f)
+				/(p1->a + p2->a * (255.0f - p1->a) / 255.0f);
+			p2->g = (p1->g * p1->a + p2->g * p2->a * (255.0f - p1->a) / 255.0f)
+				/(p1->a + p2->a * (255.0f - p1->a) / 255.0f);
+			p2->b = (p1->b * p1->a + p2->b * p2->a * (255.0f - p1->a) / 255.0f)
+				/(p1->a + p2->a * (255.0f - p1->a) / 255.0f);
+			p2->a = p1->a + p2->a * (255.0f - p1->a) / 255.0f;
+
+			if (p2->r > 255.0f)
+				p2->r = 255.0f;
+			if (p2->g > 255.0f)
+				p2->g = 255.0f;
+			if (p2->b > 255.0f)
+				p2->b = 255.0f;
+
+			if (p2->r < 0)
+				p2->r = 0;
+			if (p2->g < 0)
+				p2->g = 0;
+			if (p2->b < 0)
+				p2->b = 0;
+			if (p2->a > 255.0f)
+				p2->a = 255.0f;
+		}
+	}
+	return 0;
+}
+
+void pngimg_colorify(PNGIMG *img, const color * c, float val) {
+	color col;
+	col.r = c->r * val;
+	col.g = c->g * val;
+	col.b = c->b * val;
+	col.a = c->a;
+	float alpha = c->a / 255.0f;
+	Pixel * p;
+	for (int i = 0; i < img->height; i++) {
+		for (int j = 0; j < img->width; j++) {
+			p = &img->pixels[j][i];
+			if (p->a == 0)
+				continue;
+			p->r = col.r;
+			p->g = col.g;
+			p->b = col.b;
+			p->a *= alpha;
+		}
+	}
+}
+

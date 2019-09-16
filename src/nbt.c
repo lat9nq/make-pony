@@ -7,7 +7,7 @@ nbt_t * nbt_read(int fd) {
 	nbt_len = 64;
 	nbt = (nbt_t *)malloc(sizeof(*nbt)*nbt_len);
 
-	return;
+	return NULL;
 }
 
 int addString(char * key, char * data, int t, char * buffer) {
@@ -21,16 +21,16 @@ int addString(char * key, char * data, int t, char * buffer) {
 	*(buffer) = NBT_STRING;
 	i++;
 
-	*(buffer + i) = ((u_int8_t *)(&length))[1];
+	*(buffer + i) = ((uint8_t *)(&length))[1];
 	i++;
-	*(buffer + i) = ((u_int8_t *)(&length))[0];
+	*(buffer + i) = ((uint8_t *)(&length))[0];
 	i++;
 	strcpy(buffer + i, key);
 	i += strlen(key);
 
-	*(buffer + i) = ((u_int8_t *)(&t))[1];
+	*(buffer + i) = ((uint8_t *)(&t))[1];
 	i++;
-	*(buffer + i) = ((u_int8_t *)(&t))[0];
+	*(buffer + i) = ((uint8_t *)(&t))[0];
 	i++;
 	strcpy(buffer + i, data);
 	i += strlen(data);
@@ -45,16 +45,16 @@ int addValue(char * key, float data, int t, char * buffer) {
 
 	*(buffer) = NBT_FLOAT;
 	i++;
-	*(buffer + i) = ((u_int8_t *)(&length))[1];
+	*(buffer + i) = ((uint8_t *)(&length))[1];
 	i++;
-	*(buffer + i) = ((u_int8_t *)(&length))[0];
+	*(buffer + i) = ((uint8_t *)(&length))[0];
 	i++;
 	strcpy(buffer + i, key);
 	i += strlen(key);
 
 	int j;
 	for (j = 0; j < 4; j++) {
-		*(buffer + i) = ((u_int8_t *)(&data))[3 - j];
+		*(buffer + i) = ((uint8_t *)(&data))[3 - j];
 		i++;
 	}
 
@@ -68,9 +68,9 @@ int addBool(char * key, int data, int t, char * buffer) {
 
 	*(buffer) = NBT_BOOLEAN;
 	i++;
-	*(buffer + i) = ((u_int8_t *)(&length))[1];
+	*(buffer + i) = ((uint8_t *)(&length))[1];
 	i++;
-	*(buffer + i) = ((u_int8_t *)(&length))[0];
+	*(buffer + i) = ((uint8_t *)(&length))[0];
 	i++;
 	strcpy(buffer + i, key);
 	i += strlen(key);
@@ -91,9 +91,9 @@ int addColor(char * key, color * data, int t, char * buffer) {
 
 	*(buffer) = NBT_COLOR;
 	i++;
-	*(buffer + i) = ((u_int8_t *)(&length))[1];
+	*(buffer + i) = ((uint8_t *)(&length))[1];
 	i++;
-	*(buffer + i) = ((u_int8_t *)(&length))[0];
+	*(buffer + i) = ((uint8_t *)(&length))[0];
 	i++;
 	strcpy(buffer + i, key);
 	i += strlen(key);
@@ -123,18 +123,18 @@ int addSeparator(char * key, char * buffer) {
 	int i;
 	i = 0;
 
-	u_int32_t sep;
+	uint32_t sep;
 	sscanf(key + 2, "%08x", &sep);
 
 	*(buffer) = NBT_SEPARATOR;
 	i ++;
-	*(buffer + i) = ((u_int8_t *)(&sep))[3];
+	*(buffer + i) = ((uint8_t *)(&sep))[3];
 	i++;
-	*(buffer + i) = ((u_int8_t *)(&sep))[2];
+	*(buffer + i) = ((uint8_t *)(&sep))[2];
 	i++;
-	*(buffer + i) = ((u_int8_t *)(&sep))[1];
+	*(buffer + i) = ((uint8_t *)(&sep))[1];
 	i++;
-	*(buffer + i) = ((u_int8_t *)(&sep))[0];
+	*(buffer + i) = ((uint8_t *)(&sep))[0];
 	i++;
 
 	return i;

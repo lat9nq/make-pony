@@ -8,7 +8,7 @@ BYTES	Offest	Mapping
 2	2+Name	Length of string
 ##	4+Name	String
 ---Value----
-4	2+Name	32-bit integer value
+4	2+Name	32-bit floating-point value in big-endian
 ---Bool-----
 1	2+Name	The boolean (1 is true, 0 is false)
 ---Color----

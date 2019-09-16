@@ -1,10 +1,13 @@
 #ifndef COLOR_H
 #define COLOR_H
+#include <stdlib.h>
+#include <stdint.h>
 
 typedef struct color_t {
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	uint8_t a;
 } color;
 
 typedef struct hsv_t {
@@ -13,6 +16,7 @@ typedef struct hsv_t {
 	float v;
 } hsv;
 
+void color_init(color * c);
 void hsvToRGB(const hsv * h, color * c);
 int hue(const color * c);
 float saturation(const color * c);
