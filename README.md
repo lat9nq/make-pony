@@ -16,7 +16,15 @@ To compile for Linux:
 - `cd make-pony-1.0`
 - `make`
 
+The thumbnailer isn't possible without:
+- [libpng](http://www.libpng.org/pub/png/libpng.html) and
+- [zlib](https://www.zlib.net/)
+
 Changelog:
+v1.4
+- Added the thumbnailer, which is not complete but for many OC's is compatible and produces colorful results.
+- The main program is compatible with changes to PPM/2 from over a year ago, namely the conversion from .txt, JSON-like formats to a proprietary "NBT" format.
+
 v1.3
 - Added a simplified mode that reduces detail usage and styles outputted
 - Updated `-m` to work more efficiently
