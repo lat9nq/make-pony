@@ -1,10 +1,11 @@
 # Custom
 *_makepony.txt
 *.dat
-*.png
+./*.png
 *.zip
 dat/*
 dat
+ppm2
 
 # Prerequisites
 *.d
