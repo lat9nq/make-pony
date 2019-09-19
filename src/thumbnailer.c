@@ -57,7 +57,11 @@ int main(int argc, char * argv[]) {
 	char * filename;
 	filename = argv[1];
 	int fd;
+#ifdef _WIN64
 	fd = open(filename, O_RDONLY | O_BINARY);
+#else
+	fd = open(filename, O_RDONLY);
+#endif
 	if (fd == -1) {
 		printf("error: %s isn't accessible\n", filename);
 		return 0;
