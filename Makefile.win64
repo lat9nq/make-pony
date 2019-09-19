@@ -1,5 +1,5 @@
 CC=x86_64-w64-mingw32-gcc
-CCFLAGS=-Wall -O2
+CCFLAGS=-Wall -O3
 LIBFLAGS=-lm -lpng
 
 SRC=./src/
@@ -21,9 +21,14 @@ make-pony.exe:build/ $(MKOFILES)
 	$(CC) $(CCFLAGS) $(MKOFILES) -o$@ $(LIBFLAGS)
 
 THUMB_OFILES=$(BUILD)color.o $(BUILD)nbt.o $(BUILD)pixel.o $(BUILD)pngimg.o $(BUILD)thumbnailer.o 
-THUMB_ARS=$(SRC)libpng.a $(SRC)libz.a
-thumbnailer.exe:build/ $(THUMB_OFILES)
+THUMB_ARS=libpng/libpng.a zlib/libz.a
+thumbnailer.exe:build/ $(THUMB_OFILES) $(THUMB_ARS)
 	$(CC) $(CCFLAGS) $(THUMB_OFILES) -o$@ $(THUMB_ARS) $(LIBFLAGS)
+
+libpng/libpng.a:libpng/.git
+	cd libpng; sed -e 's/ gcc/ x86_64-w64-mingw32-gcc/g' scripts/makefile.gcc > ./Makefile.win; $(MAKE) -f Makefile.win libpng.a
+zlib/libz.a:zlib/.git
+	cd zlib; ./configure; sed -e 's/=gcc/=x86_64-w64-mingw32-gcc/g' Makefile > Makefile.win; $(MAKE) -f Makefile.win libz.a
 
 $(BUILD)color.o: $(SRC)color.c $(SRC)color.h
 $(BUILD)make-pony.o: $(SRC)make-pony.c $(SRC)color.h $(SRC)target.h $(SRC)make-pony.h $(SRC)nbt.h

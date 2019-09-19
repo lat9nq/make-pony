@@ -46,6 +46,8 @@ make-pony.x86_64.exe:build/ $(MKPNY_REQ)
 
 clean:
 	-rm -rvf build/ lib/ *.exe make-pony thumbnailer
+	cd libpng; $(MAKE) -f Makefile.win clean
+	cd zlib; $(MAKE) -f Makefile.win clean
 
 $(BUILD)nbt.o.1:$(SRC)nbt.c $(SRC)nbt.h
 $(BUILD)color.o.1:$(SRC)color.c $(SRC)color.h
