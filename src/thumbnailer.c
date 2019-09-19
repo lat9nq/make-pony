@@ -57,7 +57,7 @@ int main(int argc, char * argv[]) {
 	char * filename;
 	filename = argv[1];
 	int fd;
-	fd = open(filename, O_RDONLY);
+	fd = open(filename, O_RDONLY | O_BINARY);
 	if (fd == -1) {
 		printf("error: %s isn't accessible\n", filename);
 		return 0;
