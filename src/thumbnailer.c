@@ -17,6 +17,10 @@
 #define COLOR_MAX	6
 #define BODY_DETAIL_MAX	8
 
+#define SOCKS_NEW_MODEL	1
+#define SOCKS_MODEL	2
+#define SOCKS_TEXTURE	4
+
 typedef enum {
 	BOTH = 0,
 	LEFT = 1,
@@ -42,16 +46,20 @@ typedef union {
 } float_bin;
 
 int main(int argc, char * argv[]) {
-	if (argc != 2) {
+	if (argc < 2) {
 		printf("expected 2 arguments, found %d\n", argc);
 		printf("usage: %s <filename.dat>\n", argv[0]);
 		return 0;
 	}
+	else {
+	}
 
+	char * filename;
+	filename = argv[1];
 	int fd;
-	fd = open(argv[1], O_RDONLY);
+	fd = open(filename, O_RDONLY);
 	if (fd == -1) {
-		printf("error: %s isn't accessible\n", argv[1]);
+		printf("error: %s isn't accessible\n", filename);
 		return 0;
 	}
 
@@ -81,8 +89,14 @@ int main(int argc, char * argv[]) {
 	color eye_pupil[3];
 	color eye_brows;
 	color eye_lashes;
+	color socks_new[3];
+	color socks_model;
+	color_init(&eye_brows);
+	color_init(&eye_lashes);
+	eye_lashes.a = 255;
+	eye_brows.a = 255;
 	which_eye_t which_eye = BOTH;
-	int use_eyelashes = 1;
+	uint8_t use_eyelashes = 1, use_socks = 0;
 	char uppermane[32];
 	char lowermane[32];
 	char tail[32];
@@ -106,9 +120,6 @@ int main(int argc, char * argv[]) {
 	}
 
 	while (read(fd, &c, 1)) {
-		/*if (print_c)
-			printf("%02x\n", c);
-		print_c = 0;*/
 		l = 0;
 		s[0] = 0;
 		switch (c) {
@@ -145,7 +156,7 @@ int main(int argc, char * argv[]) {
 					save = 5;
 				else if (strstr(s, "body_detail") && !strstr(s, "url")) {
 					save = 6;
-					puts(s);
+					//puts(s);
 					n = sgetnum(s) - 1;
 				}
 			/*	else if (!strcmp("eye_url_right",s)) {
@@ -187,7 +198,7 @@ int main(int argc, char * argv[]) {
 							body_detail_s[n] = (char *)malloc(sizeof(char) * 32);
 							strtolower(s);
 							strcpy(body_detail_s[n], s);
-							puts(s);
+							//puts(s);
 						}
 					break;
 				}
@@ -195,10 +206,16 @@ int main(int argc, char * argv[]) {
 			case NBT_BOOLEAN:
 				read_nbt_string(s, fd);
 				//printf("\tPUSHTARGET(target, \"%s\", BOOL);\n");
-				if (!strcmp(s, "separate_eyes")) {
-					use_separated_eyes = 1;
-				}
 				read(fd, &c, 1);
+				if (!strcmp(s, "separate_eyes")) {
+					use_separated_eyes = c;
+				}
+				else if (!strcmp(s, "socks_model_new") && !use_socks) {
+					use_socks = c * SOCKS_NEW_MODEL;
+				}
+				else if (!strcmp(s, "socks_model") && !use_socks) {
+					use_socks = c * SOCKS_MODEL;
+				}
 			break;
 			case NBT_COLOR:
 				read_nbt_string(s, fd);
@@ -308,6 +325,21 @@ int main(int argc, char * argv[]) {
 						tail_detail[sgetnum(s)-1].b = f.a[2]+ 128;
 						tail_detail[sgetnum(s)-1].a = f.a[3]+ 128;
 						//printf("%s %02x %02x %02x\n", s, tail_detail[sgetnum(s)-1].r, tail_detail[sgetnum(s)-1].g, tail_detail[sgetnum(s)-1].b);
+					}
+				}
+				else if (strstr(s, "socks")) {
+					if (strstr(s, "socks_new_model")) {
+						socks_new[sgetnum(s)-1].r = f.a[0] + 128;
+						socks_new[sgetnum(s)-1].g = f.a[1] + 128;
+						socks_new[sgetnum(s)-1].b = f.a[2] + 128;
+						socks_new[sgetnum(s)-1].a = 255;
+						//printf("%s %d %02x %02x %02x\n", s, sgetnum(s), f.a[0], f.a[1], f.a[2]);
+					}
+					else if (strstr(s, "socks_model")) {
+						socks_model.r = f.a[0] + 128;
+						socks_model.g = f.a[1] + 128;
+						socks_model.b = f.a[2] + 128;
+						socks_model.a = 255;
 					}
 				}
 				else if (strstr(s,"color")) {
@@ -447,6 +479,11 @@ int main(int argc, char * argv[]) {
 	canvas_tail_outline = pngimg_init();
 	canvas_tail_fill = pngimg_init();
 
+	PNGIMG * canvas_socks_outline = pngimg_init();
+	PNGIMG * canvas_socks_fill = pngimg_init();
+	PNGIMG * canvas_socks_color1 = pngimg_init();
+	PNGIMG * canvas_socks_color2 = pngimg_init();
+
 	int skip = 0;
 	if (pngimg_read(canvas_body_outline, "templates/body_outline.png") < 0) 
 		skip = 1;
@@ -495,6 +532,16 @@ int main(int argc, char * argv[]) {
 			skip = 1;
 		if (pngimg_read(canvas_wing_outline, "templates/wing_outline.png") < 0)
 			skip = 1;
+	}
+	if (use_socks) {
+		if (pngimg_read(canvas_socks_outline, "templates/socks_outline.png") < 0)
+			use_socks = 0;
+		if (pngimg_read(canvas_socks_color1, "templates/socks_color1.png") < 0)
+			use_socks = 0;
+		if (pngimg_read(canvas_socks_color2, "templates/socks_color2.png") < 0)
+			use_socks = 0;
+		if (pngimg_read(canvas_socks_fill, "templates/socks_fill.png") < 0)
+			use_socks = 0;
 	}
 
 	strtolower(uppermane);
@@ -701,6 +748,31 @@ int main(int argc, char * argv[]) {
 			pngimg_colorify(canvas_body_detail[i], &body_detail[i], 1.0);
 		}
 
+		color black;
+		color_init(&black);
+		black.a = 255;
+		switch (use_socks) {
+			case SOCKS_NEW_MODEL:
+				pngimg_colorify(canvas_socks_outline, &socks_new[0], 0.8);
+				pngimg_colorify(canvas_socks_color1, &socks_new[1], 1.0);
+				pngimg_colorify(canvas_socks_color2, &socks_new[2], 1.0);
+				pngimg_colorify(canvas_socks_fill, &socks_new[0], 1.0);
+				break;
+			case SOCKS_MODEL:
+				pngimg_colorify(canvas_socks_outline, &socks_model, 0.8);
+				pngimg_colorify(canvas_socks_color1, &black, 1.0);
+				pngimg_colorify(canvas_socks_color2, &socks_model, 0.8);
+				pngimg_colorify(canvas_socks_fill, &socks_model, 1.0);
+				break;
+		}
+		if (use_socks) {
+			//puts("Colored socks");
+			if (use_socks == SOCKS_NEW_MODEL) {
+			}
+			else if (use_socks == SOCKS_MODEL) {
+			}
+		}
+
 
 		pngimg_merge(canvas, canvas_tail_fill);
 		for (int i = 0; i < style_detail_count(tail); i++) {
@@ -737,6 +809,13 @@ int main(int argc, char * argv[]) {
 		}
 		pngimg_merge(canvas, canvas_eye_brows);
 		pngimg_merge(canvas, canvas_body_outline);
+		if (use_socks) {
+			//puts("Merged socks");
+			pngimg_merge(canvas, canvas_socks_fill);
+			pngimg_merge(canvas, canvas_socks_color1);
+			pngimg_merge(canvas, canvas_socks_outline);
+			pngimg_merge(canvas, canvas_socks_color2);
+		}
 		if (race & (PEGASUS | ALICORN)) {
 			pngimg_merge(canvas, canvas_wing_fill);
 			pngimg_merge(canvas, canvas_wing_outline);
@@ -767,8 +846,6 @@ int main(int argc, char * argv[]) {
 		pngimg_merge(canvas, canvas_ear_outline);//*/
 	}
 
-	char filename[255];
-	strcpy(filename, argv[1]);
 	strrchr(filename, '.')[0] = '\0';
 	strcat(filename, ".png");
 	//pngimg_merge(canvas_body_fill, canvas_body_outline);

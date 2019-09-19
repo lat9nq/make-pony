@@ -1,5 +1,8 @@
 # Custom
 *_makepony.txt
+*.dat
+*.png
+*.zip
 
 # Prerequisites
 *.d

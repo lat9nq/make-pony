@@ -17,7 +17,7 @@ test_pngimg:test_pngimg.o pngimg.o pixel.o
 
 THUMB_OFILES=thumbnailer.o pngimg.o pixel.o nbt.o color.o
 thumbnailer:$(THUMB_OFILES)
-	$(CC) $(CCFLAGS) -o$@ $(THUMB_OFILES) -lpng -lm
+	$(CC) $(CCFLAGS) -o$@ $(THUMB_OFILES) libpng.a libz.a -lpng -lm
 
 color.o: color.c color.h
 convert_old_oc.o: convert_old_oc.c nbt.h color.h target.h

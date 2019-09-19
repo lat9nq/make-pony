@@ -751,7 +751,7 @@ int main(int argc, char * argv[]) {
 				}
 			}
 			else if (strstr(cur+1, "mouth_")) {
-				hsvcolor.h = (static_hue + 278 ) % 360;
+				hsvcolor.h = 327;
 				hsvcolor.s = 0.39f;
 				hsvcolor.v = 1;
 				hsvToRGB(&hsvcolor, &c);
