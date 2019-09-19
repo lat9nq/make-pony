@@ -3,6 +3,8 @@
 *.dat
 *.png
 *.zip
+dat/*
+dat
 
 # Prerequisites
 *.d
