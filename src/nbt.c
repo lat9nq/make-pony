@@ -139,3 +139,26 @@ int addSeparator(char * key, char * buffer) {
 
 	return i;
 }
+
+int addInt(char * key, int data, int t, char * buffer) {
+	int i, length;
+	i = 0;
+	length = strlen(key);
+
+	*(buffer) = NBT_INT;
+	i++;
+	*(buffer + i) = ((uint8_t *)(&length))[1];
+	i++;
+	*(buffer + i) = ((uint8_t *)(&length))[0];
+	i++;
+	strcpy(buffer + i, key);
+	i += strlen(key);
+
+	int j;
+	for (j = 0; j < 4; j++) {
+		*(buffer + i) = ((uint8_t *)(&data))[3 - j];
+		i++;
+	}
+
+	return i;
+}

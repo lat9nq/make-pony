@@ -305,11 +305,6 @@ int main(int argc, char * argv[]) {
 		sprintf(filename, "%09ld_%ld_makepony.dat", the_time, seed);
 	}
 
-	if (seed == time(NULL)) {
-		seed = rand() * rand();
-		srand(seed);
-	}
-
 #ifdef _WIN64
 	strcpy(s, filename);
 	strcpy(filename, "C:\\Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\garrysmod\\data\\ppm2\\");
@@ -400,7 +395,7 @@ int main(int argc, char * argv[]) {
 		hair_hue = rand() % 360;
 		} */
 
-	male = ((static_hue % 180 < 60) * ((key == BIGMAC) || ((key == ADVENTUROUS) && (rand() & 3)))) || male;
+	male = ((static_hue % 180 < 60) && ((key == BIGMAC) || ((key == ADVENTUROUS) && (rand() & 3)))) || male;
 
 	if (verbose) {
 		fprintf(stderr, "color1: 0x%02X%02X%02X\n", color1.r, color1.g, color1.b);
@@ -567,7 +562,7 @@ int main(int argc, char * argv[]) {
 	char ** details = malloc(sizeof(*details)*8);
 	for (int i = 0; i < 8; i++) {
 		details[i] = malloc(sizeof(**details)*16);
-		details[i][0] = 0;
+		strcpy(details[i], "NONE");
 	}
 
 	char ** available_details = malloc(sizeof(*available_details)*8);
@@ -641,7 +636,7 @@ int main(int argc, char * argv[]) {
 	data_len++;
 	*(data + data_len) = 0x04;
 	data_len++;
-	strcpy(data+data_len, "data");
+	strcpy((char *)(data+data_len), "data");
 	data_len += strlen("data");
 
 	for (int i = 0; i < TARGETCOUNT; i++) {
@@ -824,7 +819,7 @@ int main(int argc, char * argv[]) {
 
 			s_len = addBool(cur+1, x, 1, s);
 		}
-		else if (target[i][0] == VAL) {
+		else if (target[i][0] == VAL || target[i][0] == INT) {
 			float x = 1.0f;
 
 			if (!strcmp(cur+1, "hoof_fluffers_strength")) {
@@ -868,8 +863,14 @@ int main(int argc, char * argv[]) {
 					x = 1;
 				}
 			}
+			else if (strstr(cur+1, "rotat")) {
+				x = 0;
+			}
 
-			s_len = addValue(cur+1, x, 1, s);
+			if (target[i][0] == VAL)
+				s_len = addValue(cur+1, x, 1, s);
+			else
+				s_len = addInt(cur+1, (int)x, 1, s);
 		}
 		memcpy(data + data_len, s, s_len);
 		data_len += s_len;
@@ -882,7 +883,6 @@ int main(int argc, char * argv[]) {
 	data_len++;
 
 	if (!stdo) {
-		char *  oldfilename = filename;
 		FILE * f = fopen(filename, "wb");
 #ifdef _WIN32
 		if (!f) {
@@ -904,134 +904,4 @@ int main(int argc, char * argv[]) {
 	}
 
 	return 0;
-}
-
-int addString(char * key, char * data, int t, char * buffer) {
-	int i;
-	int length;
-	i = 0;
-	length = strlen(key);
-	t = strlen(data);
-	//printf("%04x (%d) %s\n", t, t, key);
-
-	*(buffer) = NBT_STRING;
-	i++;
-
-	*(buffer + i) = ((uint8_t *)(&length))[1];
-	i++;
-	*(buffer + i) = ((uint8_t *)(&length))[0];
-	i++;
-	strcpy(buffer + i, key);
-	i += strlen(key);
-
-	*(buffer + i) = ((uint8_t *)(&t))[1];
-	i++;
-	*(buffer + i) = ((uint8_t *)(&t))[0];
-	i++;
-	strcpy(buffer + i, data);
-	i += strlen(data);
-
-	return i;
-}
-
-int addValue(char * key, float data, int t, char * buffer) {
-	int i, length;
-	i = 0;
-	length = strlen(key);
-
-	*(buffer) = NBT_FLOAT;
-	i++;
-	*(buffer + i) = ((uint8_t *)(&length))[1];
-	i++;
-	*(buffer + i) = ((uint8_t *)(&length))[0];
-	i++;
-	strcpy(buffer + i, key);
-	i += strlen(key);
-
-	int j;
-	for (j = 0; j < 4; j++) {
-		*(buffer + i) = ((uint8_t *)(&data))[3 - j];
-		i++;
-	}
-
-	return i;
-}
-
-int addBool(char * key, int data, int t, char * buffer) {
-	int i, length;
-	i = 0;
-	length = strlen(key);
-
-	*(buffer) = NBT_BOOLEAN;
-	i++;
-	*(buffer + i) = ((uint8_t *)(&length))[1];
-	i++;
-	*(buffer + i) = ((uint8_t *)(&length))[0];
-	i++;
-	strcpy(buffer + i, key);
-	i += strlen(key);
-
-	if (data)
-		*(buffer + i) = 1;
-	else
-		*(buffer + i) = 0;
-	i++;
-
-	return i;
-}
-
-int addColor(char * key, color * data, int t, char * buffer) {
-	int i, length;
-	i = 0;
-	length = strlen(key);
-
-	*(buffer) = NBT_COLOR;
-	i++;
-	*(buffer + i) = ((uint8_t *)(&length))[1];
-	i++;
-	*(buffer + i) = ((uint8_t *)(&length))[0];
-	i++;
-	strcpy(buffer + i, key);
-	i += strlen(key);
-
-	*(buffer + i) = 0;
-	i++;
-	*(buffer + i) = 0;
-	i++;
-	*(buffer + i) = 0;
-	i++;
-	*(buffer + i) = 0x04;
-	i++;
-
-	*(buffer + i) = data->r - 128;
-	i++;
-	*(buffer + i) = data->g - 128;
-	i++;
-	*(buffer + i) = data->b - 128;
-	i++;
-	*(buffer + i) = 255-128;
-	i++;
-
-	return i;
-}
-
-int addSeparator(char * key, char * buffer) {
-	int i;
-	i = 0;
-
-	uint32_t sep;
-	sscanf(key + 2, "%08x", &sep);
-
-	*(buffer) = NBT_SEPARATOR;
-	i ++;
-	*(buffer + i) = ((uint8_t *)(&sep))[3];
-	i++;
-	*(buffer + i) = ((uint8_t *)(&sep))[2];
-	i++;
-	*(buffer + i) = ((uint8_t *)(&sep))[1];
-	i++;
-	*(buffer + i) = ((uint8_t *)(&sep))[0];
-	i++;
-
-	return i;
 }

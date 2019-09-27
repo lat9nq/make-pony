@@ -5,7 +5,6 @@ void importTargets(char ** target) {
 	target_at = 0;
 	
 	/* The following was pulled directly out of a PPM/2 file. */
-	//PUSHTARGET(target, "data", GRUP);
 	PUSHTARGET(target, "age", STR);
 	PUSHTARGET(target, "alternative_fangs", BOOL);
 	PUSHTARGET(target, "bat_pony_ears", BOOL);
@@ -43,14 +42,23 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "beyes_phong_sliding", VAL);
 	PUSHTARGET(target, "beyes_phong_tint", COL);
 	PUSHTARGET(target, "body_bumpmap_texture_url", STR);
+	PUSHTARGET(target, "body_bump", VAL);
 	PUSHTARGET(target, "body", COL);
+	PUSHTARGET(target, "body_detail_1_first", BOOL);
 	PUSHTARGET(target, "body_detail_1", STR);
+	PUSHTARGET(target, "body_detail_2_first", BOOL);
 	PUSHTARGET(target, "body_detail_2", STR);
+	PUSHTARGET(target, "body_detail_3_first", BOOL);
 	PUSHTARGET(target, "body_detail_3", STR);
+	PUSHTARGET(target, "body_detail_4_first", BOOL);
 	PUSHTARGET(target, "body_detail_4", STR);
+	PUSHTARGET(target, "body_detail_5_first", BOOL);
 	PUSHTARGET(target, "body_detail_5", STR);
+	PUSHTARGET(target, "body_detail_6_first", BOOL);
 	PUSHTARGET(target, "body_detail_6", STR);
+	PUSHTARGET(target, "body_detail_7_first", BOOL);
 	PUSHTARGET(target, "body_detail_7", STR);
+	PUSHTARGET(target, "body_detail_8_first", BOOL);
 	PUSHTARGET(target, "body_detail_8", STR);
 	PUSHTARGET(target, "body_detail_color_1", COL);
 	PUSHTARGET(target, "body_detail_color_2", COL);
@@ -100,6 +108,15 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "body_phong_middle", VAL);
 	PUSHTARGET(target, "body_phong_sliding", VAL);
 	PUSHTARGET(target, "body_phong_tint", COL);
+	PUSHTARGET(target, "body_url_detail_1_first", BOOL);
+	PUSHTARGET(target, "body_url_detail_2_first", BOOL);
+	PUSHTARGET(target, "body_url_detail_3_first", BOOL);
+	PUSHTARGET(target, "body_url_detail_4_first", BOOL);
+	PUSHTARGET(target, "body_url_detail_5_first", BOOL);
+	PUSHTARGET(target, "body_url_detail_6_first", BOOL);
+	PUSHTARGET(target, "body_url_detail_7_first", BOOL);
+	PUSHTARGET(target, "body_url_detail_8_first", BOOL);
+	PUSHTARGET(target, "call_playerfootstep", BOOL);
 	PUSHTARGET(target, "claw_teeth", BOOL);
 	PUSHTARGET(target, "clawteeth_strength", VAL);
 	PUSHTARGET(target, "cmark", BOOL);
@@ -107,6 +124,12 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "cmark_size", VAL);
 	PUSHTARGET(target, "cmark_type", STR);
 	PUSHTARGET(target, "cmark_url", STR);
+	//PUSHTARGET(target, "data", GRUP);
+	PUSHTARGET(target, "disable_falldown_sound", BOOL);
+	PUSHTARGET(target, "disable_hoofsteps", BOOL);
+	PUSHTARGET(target, "disable_jump_sound", BOOL);
+	PUSHTARGET(target, "disable_new_step_sounds", BOOL);
+	PUSHTARGET(target, "disable_wander_sounds", BOOL);
 	PUSHTARGET(target, "ears_size", VAL);
 	PUSHTARGET(target, "eye_bg", COL);
 	PUSHTARGET(target, "eye_bg_left", COL);
@@ -171,9 +194,12 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "eye_reflection", COL);
 	PUSHTARGET(target, "eye_reflection_left", COL);
 	PUSHTARGET(target, "eye_reflection_right", COL);
-	PUSHTARGET(target, "eye_rotation_left", VAL);
-	PUSHTARGET(target, "eye_rotation_right", VAL);
-	PUSHTARGET(target, "eye_rotation", VAL);
+	PUSHTARGET(target, "eye_reflection_type_left", STR);
+	PUSHTARGET(target, "eye_reflection_type_right", STR);
+	PUSHTARGET(target, "eye_reflection_type", STR);
+	PUSHTARGET(target, "eye_rotation", INT);
+	PUSHTARGET(target, "eye_rotation_left", INT);
+	PUSHTARGET(target, "eye_rotation_right", INT);
 	PUSHTARGET(target, "eye_type_left", STR);
 	PUSHTARGET(target, "eye_type_right", STR);
 	PUSHTARGET(target, "eye_type", STR);
@@ -340,7 +366,16 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "mane_url_color_4", COL);
 	PUSHTARGET(target, "mane_url_color_5", COL);
 	PUSHTARGET(target, "mane_url_color_6", COL);
+	PUSHTARGET(target, "mouth_bumpmap_texture_url", STR);
 	PUSHTARGET(target, "mouth_color", COL);
+	PUSHTARGET(target, "mouth_lightwarp_texture", STR);
+	PUSHTARGET(target, "mouth_lightwarp_texture_url", STR);
+	PUSHTARGET(target, "mouth_phong_boost", VAL);
+	PUSHTARGET(target, "mouth_phong_exponent", VAL);
+	PUSHTARGET(target, "mouth_phong_front", VAL);
+	PUSHTARGET(target, "mouth_phong_middle", VAL);
+	PUSHTARGET(target, "mouth_phong_sliding", VAL);
+	PUSHTARGET(target, "mouth_phong_tint", COL);
 	PUSHTARGET(target, "necksize", VAL);
 	PUSHTARGET(target, "new_male_muzzle", BOOL);
 	PUSHTARGET(target, "noflex", BOOL);
@@ -444,6 +479,7 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "tattoo_color_18", COL);
 	PUSHTARGET(target, "tattoo_color_19", COL);
 	PUSHTARGET(target, "tattoo_color_1", COL);
+	PUSHTARGET(target, "tattoo_color_20", COL);
 	PUSHTARGET(target, "tattoo_color_2", COL);
 	PUSHTARGET(target, "tattoo_color_3", COL);
 	PUSHTARGET(target, "tattoo_color_4", COL);
@@ -463,6 +499,7 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "tattoo_glow_18", BOOL);
 	PUSHTARGET(target, "tattoo_glow_19", BOOL);
 	PUSHTARGET(target, "tattoo_glow_1", BOOL);
+	PUSHTARGET(target, "tattoo_glow_20", BOOL);
 	PUSHTARGET(target, "tattoo_glow_2", BOOL);
 	PUSHTARGET(target, "tattoo_glow_3", BOOL);
 	PUSHTARGET(target, "tattoo_glow_4", BOOL);
@@ -482,6 +519,7 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "tattoo_glow_strength_18", VAL);
 	PUSHTARGET(target, "tattoo_glow_strength_19", VAL);
 	PUSHTARGET(target, "tattoo_glow_strength_1", VAL);
+	PUSHTARGET(target, "tattoo_glow_strength_20", VAL);
 	PUSHTARGET(target, "tattoo_glow_strength_2", VAL);
 	PUSHTARGET(target, "tattoo_glow_strength_3", VAL);
 	PUSHTARGET(target, "tattoo_glow_strength_4", VAL);
@@ -501,6 +539,7 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "tattoo_over_detail_18", BOOL);
 	PUSHTARGET(target, "tattoo_over_detail_19", BOOL);
 	PUSHTARGET(target, "tattoo_over_detail_1", BOOL);
+	PUSHTARGET(target, "tattoo_over_detail_20", BOOL);
 	PUSHTARGET(target, "tattoo_over_detail_2", BOOL);
 	PUSHTARGET(target, "tattoo_over_detail_3", BOOL);
 	PUSHTARGET(target, "tattoo_over_detail_4", BOOL);
@@ -520,6 +559,7 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "tattoo_posx_18", VAL);
 	PUSHTARGET(target, "tattoo_posx_19", VAL);
 	PUSHTARGET(target, "tattoo_posx_1", VAL);
+	PUSHTARGET(target, "tattoo_posx_20", VAL);
 	PUSHTARGET(target, "tattoo_posx_2", VAL);
 	PUSHTARGET(target, "tattoo_posx_3", VAL);
 	PUSHTARGET(target, "tattoo_posx_4", VAL);
@@ -539,6 +579,7 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "tattoo_posy_18", VAL);
 	PUSHTARGET(target, "tattoo_posy_19", VAL);
 	PUSHTARGET(target, "tattoo_posy_1", VAL);
+	PUSHTARGET(target, "tattoo_posy_20", VAL);
 	PUSHTARGET(target, "tattoo_posy_2", VAL);
 	PUSHTARGET(target, "tattoo_posy_3", VAL);
 	PUSHTARGET(target, "tattoo_posy_4", VAL);
@@ -547,25 +588,26 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "tattoo_posy_7", VAL);
 	PUSHTARGET(target, "tattoo_posy_8", VAL);
 	PUSHTARGET(target, "tattoo_posy_9", VAL);
-	PUSHTARGET(target, "tattoo_rotate_10", VAL);
-	PUSHTARGET(target, "tattoo_rotate_11", VAL);
-	PUSHTARGET(target, "tattoo_rotate_12", VAL);
-	PUSHTARGET(target, "tattoo_rotate_13", VAL);
-	PUSHTARGET(target, "tattoo_rotate_14", VAL);
-	PUSHTARGET(target, "tattoo_rotate_15", VAL);
-	PUSHTARGET(target, "tattoo_rotate_16", VAL);
-	PUSHTARGET(target, "tattoo_rotate_17", VAL);
-	PUSHTARGET(target, "tattoo_rotate_18", VAL);
-	PUSHTARGET(target, "tattoo_rotate_19", VAL);
-	PUSHTARGET(target, "tattoo_rotate_1", VAL);
-	PUSHTARGET(target, "tattoo_rotate_2", VAL);
-	PUSHTARGET(target, "tattoo_rotate_3", VAL);
-	PUSHTARGET(target, "tattoo_rotate_4", VAL);
-	PUSHTARGET(target, "tattoo_rotate_5", VAL);
-	PUSHTARGET(target, "tattoo_rotate_6", VAL);
-	PUSHTARGET(target, "tattoo_rotate_7", VAL);
-	PUSHTARGET(target, "tattoo_rotate_8", VAL);
-	PUSHTARGET(target, "tattoo_rotate_9", VAL);
+	PUSHTARGET(target, "tattoo_rotate_10", INT);
+	PUSHTARGET(target, "tattoo_rotate_11", INT);
+	PUSHTARGET(target, "tattoo_rotate_12", INT);
+	PUSHTARGET(target, "tattoo_rotate_13", INT);
+	PUSHTARGET(target, "tattoo_rotate_14", INT);
+	PUSHTARGET(target, "tattoo_rotate_15", INT);
+	PUSHTARGET(target, "tattoo_rotate_16", INT);
+	PUSHTARGET(target, "tattoo_rotate_17", INT);
+	PUSHTARGET(target, "tattoo_rotate_18", INT);
+	PUSHTARGET(target, "tattoo_rotate_19", INT);
+	PUSHTARGET(target, "tattoo_rotate_1", INT);
+	PUSHTARGET(target, "tattoo_rotate_20", INT);
+	PUSHTARGET(target, "tattoo_rotate_2", INT);
+	PUSHTARGET(target, "tattoo_rotate_3", INT);
+	PUSHTARGET(target, "tattoo_rotate_4", INT);
+	PUSHTARGET(target, "tattoo_rotate_5", INT);
+	PUSHTARGET(target, "tattoo_rotate_6", INT);
+	PUSHTARGET(target, "tattoo_rotate_7", INT);
+	PUSHTARGET(target, "tattoo_rotate_8", INT);
+	PUSHTARGET(target, "tattoo_rotate_9", INT);
 	PUSHTARGET(target, "tattoo_scalex_10", VAL);
 	PUSHTARGET(target, "tattoo_scalex_11", VAL);
 	PUSHTARGET(target, "tattoo_scalex_12", VAL);
@@ -577,6 +619,7 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "tattoo_scalex_18", VAL);
 	PUSHTARGET(target, "tattoo_scalex_19", VAL);
 	PUSHTARGET(target, "tattoo_scalex_1", VAL);
+	PUSHTARGET(target, "tattoo_scalex_20", VAL);
 	PUSHTARGET(target, "tattoo_scalex_2", VAL);
 	PUSHTARGET(target, "tattoo_scalex_3", VAL);
 	PUSHTARGET(target, "tattoo_scalex_4", VAL);
@@ -596,6 +639,7 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "tattoo_scaley_18", VAL);
 	PUSHTARGET(target, "tattoo_scaley_19", VAL);
 	PUSHTARGET(target, "tattoo_scaley_1", VAL);
+	PUSHTARGET(target, "tattoo_scaley_20", VAL);
 	PUSHTARGET(target, "tattoo_scaley_2", VAL);
 	PUSHTARGET(target, "tattoo_scaley_3", VAL);
 	PUSHTARGET(target, "tattoo_scaley_4", VAL);
@@ -615,6 +659,7 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "tattoo_type_18", STR);
 	PUSHTARGET(target, "tattoo_type_19", STR);
 	PUSHTARGET(target, "tattoo_type_1", STR);
+	PUSHTARGET(target, "tattoo_type_20", STR);
 	PUSHTARGET(target, "tattoo_type_2", STR);
 	PUSHTARGET(target, "tattoo_type_3", STR);
 	PUSHTARGET(target, "tattoo_type_4", STR);
@@ -623,8 +668,26 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "tattoo_type_7", STR);
 	PUSHTARGET(target, "tattoo_type_8", STR);
 	PUSHTARGET(target, "tattoo_type_9", STR);
+	PUSHTARGET(target, "teeth_bumpmap_texture_url", STR);
 	PUSHTARGET(target, "teeth_color", COL);
+	PUSHTARGET(target, "teeth_lightwarp_texture", STR);
+	PUSHTARGET(target, "teeth_lightwarp_texture_url", STR);
+	PUSHTARGET(target, "teeth_phong_boost", VAL);
+	PUSHTARGET(target, "teeth_phong_exponent", VAL);
+	PUSHTARGET(target, "teeth_phong_front", VAL);
+	PUSHTARGET(target, "teeth_phong_middle", VAL);
+	PUSHTARGET(target, "teeth_phong_sliding", VAL);
+	PUSHTARGET(target, "teeth_phong_tint", COL);
+	PUSHTARGET(target, "tongue_bumpmap_texture_url", STR);
 	PUSHTARGET(target, "tongue_color", COL);
+	PUSHTARGET(target, "tongue_lightwarp_texture", STR);
+	PUSHTARGET(target, "tongue_lightwarp_texture_url", STR);
+	PUSHTARGET(target, "tongue_phong_boost", VAL);
+	PUSHTARGET(target, "tongue_phong_exponent", VAL);
+	PUSHTARGET(target, "tongue_phong_front", VAL);
+	PUSHTARGET(target, "tongue_phong_middle", VAL);
+	PUSHTARGET(target, "tongue_phong_sliding", VAL);
+	PUSHTARGET(target, "tongue_phong_tint", COL);
 	PUSHTARGET(target, "uppermane_bumpmap_texture_url", STR);
 	PUSHTARGET(target, "upper_mane_color_1", COL);
 	PUSHTARGET(target, "upper_mane_color_2", COL);
@@ -677,6 +740,7 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "wings_url_color_1", COL);
 	PUSHTARGET(target, "wings_url_color_2", COL);
 	PUSHTARGET(target, "wings_url_color_3", COL);
+
 }
 
 void importTargetsSimple(char ** target) {

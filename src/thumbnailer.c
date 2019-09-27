@@ -35,7 +35,7 @@
 #define SOCKS_TEXTURE	4
 
 /* Should we print out targets instead of thumbnailing? */
-#define PRINT_TARGETS	1
+#define PRINT_TARGETS	0
 
 /* For determining if using separated eyes */
 typedef enum {

@@ -8,9 +8,10 @@
 #define VAL 	3
 #define BOOL	4
 #define GRUP	5
-#define SEP	6
+#define SEP		6
+#define INT		7
 
-#define TARGETCOUNT 672 
+#define TARGETCOUNT 735
 #define TARGETCOUNTSIMPLE 70
 #define PUSHTARGET(R,X,T)	sprintf((R)[target_at], "%c%s", (T), (X)); target_at++
 int target_at;
