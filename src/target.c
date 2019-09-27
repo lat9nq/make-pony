@@ -740,7 +740,6 @@ void importTargets(char ** target) {
 	PUSHTARGET(target, "wings_url_color_1", COL);
 	PUSHTARGET(target, "wings_url_color_2", COL);
 	PUSHTARGET(target, "wings_url_color_3", COL);
-
 }
 
 void importTargetsSimple(char ** target) {

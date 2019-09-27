@@ -6,6 +6,7 @@
 dat/*
 dat
 ppm2
+*svg
 
 # Prerequisites
 *.d
