@@ -1,3 +1,13 @@
+/* thumbnailer.c
+ * 
+ * A thumbnailer for Pony Player Models Second Generation (by dbotthepone).
+ * 
+ * Supports any hairstyle defined at style_{color,detail}_count, and any body
+ * detail. Also supports socks (old and new models only).
+ * 
+ * Requires libpng, and its dependency zlib.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,26 +17,34 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <stdint.h>
+
 #include "color.h"
 #include "pngimg.h"
 #include "nbt.h"
 
 #pragma GCC diagnostic ignored "-Wformat-overflow="
 
+/* Define memory management maximums for mane and body details. */
 #define DETAIL_MAX	6
 #define COLOR_MAX	6
 #define BODY_DETAIL_MAX	8
 
+/* Sock definitions for determining what kind of sock */
 #define SOCKS_NEW_MODEL	1
 #define SOCKS_MODEL	2
 #define SOCKS_TEXTURE	4
 
+/* Should we print out targets instead of thumbnailing? */
+#define PRINT_TARGETS	1
+
+/* For determining if using separated eyes */
 typedef enum {
 	BOTH = 0,
 	LEFT = 1,
 	RIGHT = 2,
 } which_eye_t;
 
+/* Pony race */
 typedef enum {
 	EARTH = 0,
 	PEGASUS = 1,
@@ -34,56 +52,67 @@ typedef enum {
 	ALICORN = 4,
 } race_t;
 
-int style_color_count(char * style);
-int style_detail_count(char * style);
-int sgetnum(char * s);
-void strtolower(char * s);
-void read_nbt_string(char * s, int fd);
+int style_color_count(char * style); /* Mane/Tail color count */
+int style_detail_count(char * style); /* Mane/Tail detail count */
+int sgetnum(char * s); /* Extract a number from a string */
+void strtolower(char * s); /* Converts ASCII characters in a string to their lowercase counterpart */
+void read_nbt_string(char * s, int fd); /* Read a NBT string from a file */
 
+/* Read 4 bytes and be able to use it as a different integer, or convert it from little to big endian */
 typedef union {
 	float f;
 	uint8_t a[4];
 } float_bin;
 
 int main(int argc, char * argv[]) {
+	/* Read the first and only the first argument as the input file */
 	if (argc < 2) {
 		printf("expected 2 arguments, found %d\n", argc);
 		printf("usage: %s <filename.dat>\n", argv[0]);
 		return 0;
 	}
-	else {
-	}
 
+	/* Point to the filename */
 	char * filename;
 	filename = argv[1];
 	int fd;
+	/* Open a file descriptor to the file */
 #ifdef _WIN64
+	/* In Windows, we must open it as a binary or risk an early file close */
 	fd = open(filename, O_RDONLY | O_BINARY);
 #else
 	fd = open(filename, O_RDONLY);
 #endif
+
+	/* If we can't read the file, exit */
 	if (fd == -1) {
 		printf("error: %s isn't accessible\n", filename);
 		return 0;
 	}
 
-	nbt_t nbt; // main NBT
-	int nbt_len, nbt_at;
+	nbt_t nbt; // main NBT, using as a header for an array of NBTs
+	int nbt_len, // max allocated length of the NBT data list
+		nbt_at; // "where are we" in the NBT data
 	nbt_len = 128;
 	nbt_at = 0;
 
+	/* Initialize the base NBT element */
 	nbt.code = NBT_GROUP;
 	nbt.name_length = 4;
 	strncpy(nbt.name, "data", nbt.name_length);
 	nbt.payload = malloc(sizeof(nbt_t) * nbt_len);
 
 	color body_color;
-	color body_detail[BODY_DETAIL_MAX];
+	color body_detail[BODY_DETAIL_MAX]; // array of body detail colors
 	color tail_color[6];
 	color mane_color[6];
 	color tail_detail[6];
 	color mane_detail[6];
-	uint8_t use_separated_eyes;
+	uint8_t use_separated_eyes; // boolean
+	/* For eye colors, we use an array of 3 for the both, left, and right colors
+	 * We don't know ahead of time whether we should keep just the both, or left
+	 * and right colors since there is no order in an NBT.
+	 */
 	color eye_sclera[3];
 	color eye_iris[3];
 	color eye_iris_gradient[3];
@@ -93,12 +122,15 @@ int main(int argc, char * argv[]) {
 	color eye_pupil[3];
 	color eye_brows;
 	color eye_lashes;
-	color socks_new[3];
-	color socks_model;
-	color_init(&eye_brows);
+	/* We initialize brow and eyelash colors since older OCs don't have a
+	 * color setting for these elements.
+	 */
+	color_init(&eye_brows); 
 	color_init(&eye_lashes);
 	eye_lashes.a = 255;
 	eye_brows.a = 255;
+	color socks_new[3];
+	color socks_model;
 	which_eye_t which_eye = BOTH;
 	uint8_t use_eyelashes = 1, use_socks = 0;
 	char uppermane[32];
@@ -109,36 +141,45 @@ int main(int argc, char * argv[]) {
 	body_color.r = 0;
 	body_color.g = 0;
 	body_color.b = 0;
+	/* Assume Derpy's mane/tail unless otherwise specified */
 	strcpy(uppermane, "mailcall");
 	strcpy(lowermane, "mailcall");
 	strcpy(tail, "mailcall");
 
-	uint8_t c;
-	char s[256];
-	uint32_t l;
-	float_bin f;
+	uint8_t c; // temporary character
+	char s[256]; // temporary string
+	uint32_t l; // temporary place to store 4 bytes
+	float_bin f; // converts endianess and extracts colors
 	//int print_c = 0;
 
+	/* Initialize body detail strings to blank */
 	for (int i = 0; i < BODY_DETAIL_MAX; i++) {
 		body_detail_s[i] = NULL;
 	}
 
+	/* Read input as long as there is data left in the file */
 	while (read(fd, &c, 1)) {
 		l = 0;
 		s[0] = 0;
 		switch (c) {
 			case NBT_GROUP:
 				read_nbt_string(s, fd);
-				//printf("\tPUSHTARGET(target, \"%s\", GRUP);\n");
+				if (PRINT_TARGETS)
+					printf("\tPUSHTARGET(target, \"%s\", GRUP);\n", s);
 			break;
 			case NBT_INT:
-			case NBT_FLOAT:
 				read_nbt_string(s, fd);
+				if (PRINT_TARGETS)
+					printf("\tPUSHTARGET(target, \"%s\", INT);\n", s);
+			case NBT_FLOAT:
+				if (c == NBT_FLOAT)
+					read_nbt_string(s, fd);
 				/*if (!strcmp(s, "tattoo_rotate_5")) {
 					printf("%s\n", s);
 				}*/
+				if (c == NBT_FLOAT && PRINT_TARGETS)
+					printf("\tPUSHTARGET(target, \"%s\", VAL);\n", s);
 				//printf("%s\n", s);
-				//printf("\tPUSHTARGET(target, \"%s\", VAL);\n");
 				read(fd, &f.a[3], 1);
 				read(fd, &f.a[2], 1);
 				read(fd, &f.a[1], 1);
@@ -167,7 +208,8 @@ int main(int argc, char * argv[]) {
 					printf("%s\n", s);
 					print_c = 1;
 				}*/
-				//printf("\tPUSHTARGET(target, \"%s\", STR);\n");
+				if (PRINT_TARGETS)
+					printf("\tPUSHTARGET(target, \"%s\", STR);\n", s);
 				read_nbt_string(s, fd);
 				switch (save) {
 					case 1: // mane_new
@@ -209,7 +251,8 @@ int main(int argc, char * argv[]) {
 			break;
 			case NBT_BOOLEAN:
 				read_nbt_string(s, fd);
-				//printf("\tPUSHTARGET(target, \"%s\", BOOL);\n");
+				if (PRINT_TARGETS)
+					printf("\tPUSHTARGET(target, \"%s\", BOOL);\n", s);
 				read(fd, &c, 1);
 				if (!strcmp(s, "separate_eyes")) {
 					use_separated_eyes = c;
@@ -223,7 +266,8 @@ int main(int argc, char * argv[]) {
 			break;
 			case NBT_COLOR:
 				read_nbt_string(s, fd);
-				//printf("\tPUSHTARGET(target, \"%s\", COL);\n");
+				if (PRINT_TARGETS)
+					printf("\tPUSHTARGET(target, \"%s\", COL);\n", s);
 				read(fd, &l, 4);
 				read(fd, &f, 4);
 
@@ -389,6 +433,9 @@ int main(int argc, char * argv[]) {
 			break;
 		}
 	}
+	
+	if (PRINT_TARGETS)
+			exit(0);
 
 	int width, height;
 	width = 1024;
