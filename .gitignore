@@ -3,6 +3,9 @@
 *.dat
 ./*.png
 *.zip
+*.7z
+montage/*
+montage
 dat/*
 dat
 ppm2

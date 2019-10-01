@@ -16,7 +16,7 @@ all:
 	+make -f $(abspath $(lastword $(MAKEFILE_LIST))) make-pony.exe
 	+make -f $(abspath $(lastword $(MAKEFILE_LIST))) thumbnailer.exe
 
-MKOFILES=$(BUILD)make-pony.o $(BUILD)target.o $(BUILD)color.o
+MKOFILES=$(BUILD)make-pony.o $(BUILD)target.o $(BUILD)color.o $(BUILD)nbt.o
 make-pony.exe:build/ $(MKOFILES)
 	$(CC) $(CCFLAGS) $(MKOFILES) -o$@ $(LIBFLAGS)
 

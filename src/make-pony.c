@@ -378,9 +378,6 @@ int main(int argc, char * argv[]) {
 
 	if (!colorgiven) {
 		static_hue = rand() % 360;
-		for (int i = 0; i < 7 || (static_hue >= 60 && static_hue <=180); i++) {
-			static_hue = rand() % 360;
-		}
 		hsvcolor.h = static_hue;
 		hsvcolor.s = 1.0f;
 		hsvcolor.v = 1.0f;
@@ -886,6 +883,7 @@ int main(int argc, char * argv[]) {
 		FILE * f = fopen(filename, "wb");
 #ifdef _WIN32
 		if (!f) {
+			char * oldfilename = filename;
 			filename = strrchr(filename, '\\')+1;
 			fprintf(stderr, "warning: could not write to %s, trying %s\n", oldfilename, filename);
 			f = fopen(filename, "wb");
