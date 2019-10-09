@@ -43,6 +43,9 @@ int main(int argc, char * argv[]) {
 	int desaturated = -1;//!(rand() & 15);
 	int white = -1;//desaturated && !(rand() & 3);
 	int wheel = -1;
+
+	int use_socks = -1;
+
 	int separate_hair = 0;
 	// desaturated = desaturated ^ white;
 
@@ -153,6 +156,9 @@ int main(int argc, char * argv[]) {
 							  }
 						  }
 						  break;
+					case 'l':
+						  use_socks = 1;
+						  break;
 					case 'v':
 						  verbose = 1;
 						  break;
@@ -215,6 +221,7 @@ int main(int argc, char * argv[]) {
 		fprintf(stderr, "and the default seed is the time since the UNIX epoch.\n");
 		fprintf(stderr, "\t-o<file>\toutput to a specific file (incompatible with -m)\n");
 		fprintf(stderr, "\t-m<n>\t\tgenerate n files\n\n");
+		fprintf(stderr, "\t-l\t\tenable socks\n");
 		fprintf(stderr, "\t-w\t\tcolor wheel options [15/56 chance per color]\n");
 		fprintf(stderr, "\t\t\t0 -- do not use\n");
 		fprintf(stderr, "\t\t\t1 -- use analogous colors [default]\n");
@@ -431,6 +438,12 @@ int main(int argc, char * argv[]) {
 
 	int r;
 	int r2;
+	if (use_socks == -1) {
+		use_socks = !(rand() % 6);
+	}
+	if (use_socks && clrcount < 2) {
+		clrcount = 2;
+	}
 
 	for (int i = 0; i < clrcount; i++) { //get hair colors
 		hsvcolor.h = static_hue;
@@ -503,6 +516,7 @@ int main(int argc, char * argv[]) {
 	// avg_sat /= (float)clrcount;
 	avg_sat /= 2.0f;
 
+	// Get a value from each mane color to help decide on a body color
 	for (int i = 0; i < clrcount; i++) {
 		float x;
 		// x = (desaturated) * value(&colors[i]) + (!desaturated) * saturation(&colors[i]) - avg_sat;
@@ -562,9 +576,9 @@ int main(int argc, char * argv[]) {
 		strcpy(details[i], "NONE");
 	}
 
-	char ** available_details = malloc(sizeof(*available_details)*8);
-	for (int i = 0; i < 8; i++) {
-		available_details[i] = malloc(sizeof(**available_details)*16);
+	char ** available_details = malloc(sizeof(*available_details)*16);
+	for (int i = 0; i < 16; i++) {
+		available_details[i] = malloc(sizeof(**available_details)*32);
 		available_details[i][0] = 0;
 	}
 
@@ -574,7 +588,7 @@ int main(int argc, char * argv[]) {
 		detail_color[i].g = 255;
 		detail_color[i].b = 255;
 	}
-	int use_floofers = (!(rand() % 6)) * (!traditional);
+	int use_floofers = (!(rand() % 6)) * (!traditional) * (!use_socks);
 
 	if (!traditional) {
 		at = 0;
@@ -583,7 +597,9 @@ int main(int argc, char * argv[]) {
 		PUSHSTRING(available_details, "STRIPES");
 		PUSHSTRING(available_details, "LINES");
 		PUSHSTRING(available_details, "FRECKLES");
+		PUSHSTRING(available_details, "MUZZLE");
 
+		// generate colors if using floofers
 		if (use_floofers) {
 			strcpy(details[details_in_use], "GRADIENT");
 			if (any_saturation) {
@@ -597,7 +613,14 @@ int main(int argc, char * argv[]) {
 			detail_color[details_in_use] = colors[1 + (key == BOOKWORM || key == SPEEDSTER)];
 			details_in_use += 1;
 		}
+		else {
+			PUSHSTRING(available_details, "HOOF_SMALL");
+			PUSHSTRING(available_details, "GRADIENT");
+			PUSHSTRING(available_details, "HOOF_ROUND_SMALL");
+			PUSHSTRING(available_details, "SHARP_HOOVES");
+		}
 
+		// generate colors for other details
 		for (int i = 0 + 2 * use_floofers; i < DETAILCOUNT; i++) {
 			if (!(rand() % DETAILCHANCE)) {
 				strcpy(details[details_in_use], available_details[i]);
@@ -608,6 +631,7 @@ int main(int argc, char * argv[]) {
 				details_in_use += 1;
 			}
 		}
+
 	}
 
 
@@ -663,6 +687,23 @@ int main(int argc, char * argv[]) {
 				c.r = 1;
 				c.g = 1;
 				c.b = 1;
+			}
+			else if (strstr(cur+1, "socks_new_model")) {
+				if (strstr(cur+1, "1")) {
+					c.r = colors[0].r;
+					c.g = colors[0].g;
+					c.b = colors[0].b;
+				}
+				else if (strstr(cur+1, "2")) {
+					c.r = colors[1].r;
+					c.g = colors[1].g;
+					c.b = colors[1].b;
+				}
+				else {
+					c.r = 255;
+					c.g = 255;
+					c.b = 255;
+				}
 			}
 			else if (strstr(cur+1, "horn") && !any_saturation) {
 				c = colors[0];
@@ -813,6 +854,7 @@ int main(int argc, char * argv[]) {
 			x = (strstr(cur+1, "hoof_") && use_floofers) || x;
 			x = (strstr(cur+1, "weapon_hide")) || x;
 			x = (strstr(cur+1, "new_male_muzzle")) || x;
+			x = (strstr(cur+1, "socks_model_new") && use_socks) || x;
 
 			s_len = addBool(cur+1, x, 1, s);
 		}
@@ -821,6 +863,9 @@ int main(int argc, char * argv[]) {
 
 			if (!strcmp(cur+1, "hoof_fluffers_strength")) {
 				x = 0.8f;
+			}
+			else if (strstr(cur+1, "bump")) {
+				x = 0.0f;
 			}
 			else if (strstr(cur+1,"_phong_")) {
 				if (strstr(cur+1,"_boost")) {
