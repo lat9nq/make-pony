@@ -5,7 +5,7 @@ BUILD=./build/
 
 MAKE=make
 CC=gcc
-CCFLAGS=-Wall -O3
+CCFLAGS=-Wall -g
 CLIBS=
 LIBS=
 

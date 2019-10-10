@@ -872,13 +872,13 @@ int main(int argc, char * argv[]) {
 			pngimg_merge(canvas, canvas_wing_outline);
 		}
 		pngimg_merge(canvas, canvas_lowermane_fill);
-		for (int i = 0; i < style_detail_count(lowermane); i++) {
-			pngimg_merge(canvas, canvas_lowermane_detail[i]);
-		}
 		pngimg_merge(canvas, canvas_lowermane_outline);
 		for (int i = 0; i < style_color_count(lowermane); i++) {
 			pngimg_merge(canvas, canvas_lowermane_color[i + 1]);
 			pngimg_merge(canvas, canvas_lowermane_color_outline[i + 1]);
+		}
+		for (int i = 0; i < style_detail_count(lowermane); i++) {
+			pngimg_merge(canvas, canvas_lowermane_detail[i]);
 		}
 		pngimg_merge(canvas, canvas_uppermane_fill);
 		for (int i = 0; i < style_detail_count(uppermane); i++) {
@@ -955,7 +955,7 @@ int style_detail_count(char * style) {
 
 int style_color_count(char * style) {
 	if (!strcmp(style, "bookworm")) {
-		return 0;
+		return 1;
 	}
 	else if (!strcmp(style, "adventurous")) {
 		return 1;
@@ -972,7 +972,13 @@ int style_color_count(char * style) {
 	else if (!strcmp(style, "moon")) {
 		return 1;
 	}
+	else if (!strcmp(style, "floofeh")) {
+		return 1;
+	}
 	else if (!strcmp(style, "speedster")) {
+		return 1;
+	}
+	else if (!strcmp(style, "mechanic")) {
 		return 1;
 	}
 	return 0;
