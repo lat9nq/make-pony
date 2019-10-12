@@ -669,7 +669,11 @@ void on_btn_save_clicked() {
 		snprintf(output, 1023, "%s/%s%s.png", directory, thumb_dir, filename);
 		
 		FILE * f;
+#ifdef _WIN64
 		f = fopen(output, "w");
+#else
+		f = fopen(output, "wb");
+#endif
 		if (!f) {
 			fprintf(sterr, "error: thumbnail output is inaccessible\n");
 			update_txt_log();

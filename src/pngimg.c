@@ -140,7 +140,11 @@ int pngimg_write(PNGIMG * img, FILE * f) {
 
 int pngimg_read(PNGIMG * img, char * filename) {
 	FILE * f;
+#ifdef _WIN64
+	f = fopen(filename, "rb");
+#else
 	f = fopen(filename, "r");
+#endif
 	
 	int val;
 	val = pngimg_read_fp(img, f);
