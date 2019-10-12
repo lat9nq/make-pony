@@ -1,69 +1,41 @@
-BIN=./bin/
-SRC=./src/
-LIB=./lib/
-BUILD=./build/
-
-MAKE=make
 CC=gcc
-#CC=x86_64-w64-mingw32-gcc
-CCFLAGS=-Wall -g -pthread -pipe
-CLIBS=
-LIBS=
-SYS_LIBS=`pkg-config --cflags --libs gtk+-3.0 libpng16`
+CCFLAGS=-Wall -O3 -pipe -pthread
+LIBFLAGS=-lm -lpng `pkg-config --cflags --libs gtk+-3.0 libpng16`
 
-$(BUILD)%.o.1:$(SRC)%.c
-	$(CC) $(CCFLAGS) -c -fPIC -o$@ $< $(CLIBS)
-
-$(BUILD)%.o:$(SRC)%.c
-	$(CC) $(CCFLAGS) -c -o$@ $< $(CLIBS) $(SYS_LIBS)
-
-lib%.so:$(BUILD)%.o.1
-	$(CC) $(CCFLAGS) -shared -Wl,-soname,$@ -o$(LIB)$@ $< $(CLIBS) $(SYS_LIBS)
-
-# Build Make-Pony
-
-MKPNY_LIBS=color target nbt pngimg
-MKPNY_REQ=$(SRC)make-pony.c $(SRC)color.h $(SRC)target.h $(SRC)make-pony.h $(SRC)nbt.h
-
-%.build:$(BUILD)%.o $(addsuffix .so, $(addprefix lib, $(LIBS)))
-	$(CC) $(CCFLAGS) -o$* $< -Wl,-rpath,$(LIB) -L$(LIB) $(addprefix -l, $(LIBS) m) $(CLIBS)
+SRC=./src/
+BUILD=./build/
 
 %/:
 	mkdir $@
 
+$(BUILD)%.o:$(SRC)%.c
+	$(CC) $(CCFLAGS) -c $< -o$@ $(LIBFLAGS)
+
+.PHONY: all
 all:
-	+$(MAKE) make-pony
-	+$(MAKE) thumbnailer
+	+make -f $(abspath $(lastword $(MAKEFILE_LIST))) make-pony
+	+make -f $(abspath $(lastword $(MAKEFILE_LIST))) thumbnailer
 
-make-pony:build/ lib/ $(MKPNY_REQ) $(addsuffix .so, $(addprefix lib, $(MKPNY_LIBS))) $(BUILD)make-pony.o
-	$(CC) $(CCFLAGS) -o$@ $(BUILD)$@.o -Wl,-rpath,$(LIB) -L$(LIB) $(addprefix -l, $(MKPNY_LIBS) m) $(CLIBS) $(SYS_LIBS) -export-dynamic
+MKOFILES=$(BUILD)make-pony.o $(BUILD)target.o $(BUILD)color.o $(BUILD)nbt.o $(BUILD)pngimg.o $(BUILD)pixel.o
+make-pony:build/ $(MKOFILES)
+	$(CC) $(CCFLAGS) $(MKOFILES) -o$@ $(LIBFLAGS) -rdynamic
 
-make-pony.exe:build/ $(MKPNY_REQ)
-	+$(MAKE) -f Makefile.win32 make-pony.exe
-	strip $@
+THUMB_OFILES=$(BUILD)color.o $(BUILD)nbt.o $(BUILD)pixel.o $(BUILD)pngimg.o $(BUILD)thumbnailer.o $(BUILD)thumbnailer_main.o
+thumbnailer:build/ $(THUMB_OFILES)
+	$(CC) $(CCFLAGS) $(THUMB_OFILES) -o$@ $(LIBFLAGS)
 
-make-pony.x86_64.exe:build/ $(MKPNY_REQ)
-	+$(MAKE) -f Makefile.win64 make-pony.x86_64.exe
-	strip $@
+$(BUILD)color.o: $(SRC)color.c $(SRC)color.h
+$(BUILD)make-pony.o: $(SRC)make-pony.c $(SRC)color.h $(SRC)target.h $(SRC)make-pony.h \
+ $(SRC)nbt.h $(SRC)pngimg.h $(SRC)pixel.h
+$(BUILD)nbt.o: $(SRC)nbt.c $(SRC)nbt.h $(SRC)color.h
+$(BUILD)pixel.o: $(SRC)pixel.c $(SRC)pixel.h
+$(BUILD)pngimg.o: $(SRC)pngimg.c $(SRC)pngimg.h $(SRC)pixel.h $(SRC)color.h
+$(BUILD)target.o: $(SRC)target.c $(SRC)target.h
+$(BUILD)thumbnailer.o: $(SRC)thumbnailer.c $(SRC)color.h $(SRC)pngimg.h $(SRC)pixel.h \
+ $(SRC)nbt.h $(SRC)thumbnailer.h
+$(BUILD)thumbnailer_main.o: $(SRC)thumbnailer_main.c $(SRC)color.h src/pngimg.h \
+ src/pixel.h src/nbt.h src/thumbnailer.h
 
+.PHONY:clean
 clean:
-	-rm -rvf build/ lib/ *.exe make-pony thumbnailer
-	cd libpng; $(MAKE) -f Makefile.win clean
-	cd zlib; $(MAKE) -f Makefile.win clean
-
-$(BUILD)nbt.o.1:$(SRC)nbt.c $(SRC)nbt.h
-$(BUILD)color.o.1:$(SRC)color.c $(SRC)color.h
-$(BUILD)target.o.1:$(SRC)target.c $(SRC)target.h
-$(BUILD)make-pony.o:$(MKPNY_REQ)
-
-
-THUMB_LIBS=pngimg pixel color nbt
-THUMB_REQ=$(SRC)thumbnailer.c $(SRC)color.h $(SRC)pngimg.h $(SRC)pixel.h $(SRC)nbt.h
-thumbnailer:build/ lib/ $(THUMB_REQ) $(addsuffix .so, $(addprefix lib, $(THUMB_LIBS))) $(BUILD)thumbnailer.o
-	$(eval CLIBS += -lpng)
-	$(CC) $(CCFLAGS) -o$@ $(BUILD)$@.o -Wl,-rpath,$(LIB) -L$(LIB) $(addprefix -l, $(THUMB_LIBS) m) $(CLIBS)
-
-$(BUILD)pngimg.o.1:$(SRC)pngimg.c $(SRC)pngimg.h $(SRC)pixel.h
-$(BUILD)pixel.o.1:$(SRC)pixel.c $(SRC)pixel.h
-$(BUILD)thumbnailer.o:$(SRC)thumbnailer.c $(SRC)color.h $(SRC)pngimg.h $(SRC)pixel.h \
- $(SRC)nbt.h
+	-rm -rvf build/ thumbnailer thumbnailer.exe make-pony make-pony.exe

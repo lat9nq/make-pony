@@ -39,3 +39,7 @@ $(BUILD)pngimg.o: src/pngimg.c src/pngimg.h src/pixel.h src/color.h
 $(BUILD)target.o: src/target.c src/target.h
 $(BUILD)thumbnailer.o: src/thumbnailer.c src/color.h src/pngimg.h src/pixel.h \
  src/nbt.h
+
+.PHONY:clean
+clean:
+	-rm -rvf build/ thumbnailer thumbnailer.exe make-pony make-pony.exe

@@ -36,7 +36,7 @@ void strtolower(char * s); /* Converts ASCII characters in a string to their low
 void read_nbt_string(char * s, int fd); /* Read a NBT string from a file */
 int get_nbt_string(char * s, uint8_t * data); /* Extract a NBT string from data */
 
-int
+int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len);
 
 /* Read 4 bytes and be able to use it as a different integer, or convert it from little to big endian */
 typedef union {

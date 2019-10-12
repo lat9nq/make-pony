@@ -24,9 +24,7 @@
 
 #include "thumbnailer.h"
 
-#pragma GCC diagnostic ignored "-Wformat-overflow="
-
-int thumbnail(PNGIMG * canvas, int fd) {
+int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 	nbt_t nbt; // main NBT, using as a header for an array of NBTs
 	int nbt_len, // max allocated length of the NBT data list
 		nbt_at; // "where are we" in the NBT data
@@ -93,17 +91,6 @@ int thumbnail(PNGIMG * canvas, int fd) {
 	for (int i = 0; i < BODY_DETAIL_MAX; i++) {
 		body_detail_s[i] = NULL;
 	}
-	
-	uint8_t * data;
-	data = malloc(sizeof(*data) * 32768);
-	memset(data, 0, 32768);
-	int data_len;
-	data_len = 0;
-	while (read(fd, &c, 1)) {
-		data[data_len] = c;
-		data_len++;
-	}
-	data[data_len] = 0;
 
 	/* Read input as long as there is data left in the file */
 	//while (read(fd, &c, 1)) {
@@ -426,9 +413,6 @@ int thumbnail(PNGIMG * canvas, int fd) {
 	PNGIMG * canvas_uppermane_fill;
 	PNGIMG * canvas_uppermane_color[COLOR_MAX];
 	PNGIMG * canvas_uppermane_color_outline[COLOR_MAX];
-	PNGIMG * canvas_uppermane_detail[DETAIL_MAX];
-	PNGIMG * canvas_horn_fill = pngimg_init();
-	PNGIMG * canvas_horn_outline = pngimg_init();
 	PNGIMG * canvas_lowermane_outline;
 	PNGIMG * canvas_lowermane_fill;
 	PNGIMG * canvas_lowermane_color[COLOR_MAX];
@@ -439,8 +423,19 @@ int thumbnail(PNGIMG * canvas, int fd) {
 	PNGIMG * canvas_tail_color[COLOR_MAX];
 	PNGIMG * canvas_tail_color_outline[COLOR_MAX];
 	PNGIMG * canvas_tail_detail[DETAIL_MAX];
-	PNGIMG * canvas_wing_fill = pngimg_init();
-	PNGIMG * canvas_wing_outline = pngimg_init();
+	PNGIMG * canvas_uppermane_detail[DETAIL_MAX];
+	PNGIMG * canvas_horn_fill;
+	PNGIMG * canvas_horn_outline;
+	PNGIMG * canvas_wing_fill;
+	PNGIMG * canvas_wing_outline;
+	if (race == UNICORN || race == ALICORN) {
+		canvas_horn_fill = pngimg_init();
+		canvas_horn_outline = pngimg_init();
+	}
+	if (race == PEGASUS || race == ALICORN) {
+		canvas_wing_fill = pngimg_init();
+		canvas_wing_outline = pngimg_init();
+	}
 
 	PNGIMG * canvas_eye_iris = pngimg_init();
 	PNGIMG * canvas_eye_iris_gradient = pngimg_init();
@@ -577,7 +572,7 @@ int thumbnail(PNGIMG * canvas, int fd) {
 	strcat(t_loc, tail);
 
 	int part_len;
-	char part_part[255];
+	char part_part[512];
 	strcpy(part_loc,um_loc);
 	part_len = strlen(part_loc);
 	strcat(part_loc, "/uppermane_outline.png");
@@ -846,6 +841,22 @@ int thumbnail(PNGIMG * canvas, int fd) {
 		pngimg_merge_and_free(canvas, canvas_ear_fill);
 		pngimg_merge_and_free(canvas, canvas_ear_outline);//*/
 	}
+	
+	void * payload;
+	for (int i = 0; i < nbt_at; i++) {
+		payload = ((nbt_t *)(nbt.payload))[nbt_at].payload;
+		if (payload != NULL) {
+			free(payload);
+		}
+	}
+	free(nbt.payload);
+	for (int i = 0; i < BODY_DETAIL_MAX; i++) {
+		if (body_detail_s[i] != NULL)
+			free(body_detail_s[i]);
+	}
+	free(data);
+	
+	return 0;
 }
 
 void read_nbt_string(char * s, int fd) {
