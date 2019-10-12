@@ -1,7 +1,6 @@
 # make-pony
 A generator for Pony Player Models Second Generation
 
-Screenshots:
 ![Linux usage](https://i.imgur.com/ov8LUnw.png)
 
 Credits for [PPM/2](https://git.dbot.serealia.ca/Ponyscape-open/PPM2) goes to DBot
