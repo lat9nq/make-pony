@@ -1,5 +1,5 @@
 CC=gcc
-CCFLAGS=-Wall -O3 -pipe -pthread
+CCFLAGS=-Wall -g -pipe -pthread
 LIBFLAGS=-lm `pkg-config --cflags --libs gtk+-3.0 libpng16`
 
 SRC=./src/

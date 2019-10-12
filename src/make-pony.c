@@ -675,9 +675,9 @@ void on_btn_save_clicked() {
 		
 		FILE * f;
 #ifdef _WIN64
-		f = fopen(output, "w");
-#else
 		f = fopen(output, "wb");
+#else
+		f = fopen(output, "w");
 #endif
 		if (!f) {
 			fprintf(sterr, "error: thumbnail output is inaccessible\n");

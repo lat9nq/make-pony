@@ -6,6 +6,7 @@
 #include "pixel.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
 PNGIMG * pngimg_init() {
 	PNGIMG * img = (PNGIMG *)malloc(sizeof(*img));
@@ -120,18 +121,12 @@ int pngimg_write(PNGIMG * img, FILE * f) {
 		fprintf(stderr,"error: failure on write initialize\n");
 		return -2;
 	}
-#ifdef _WIN64
-	const uint8_t * header = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
-	fwrite(header,8,1,f);
-	png_set_sig_bytes(png_ptr, 8);
-#else
 	png_init_io(png_ptr, f);
 	if (setjmp(png_jmpbuf(png_ptr))) {
 		png_destroy_write_struct(&png_ptr, &info_ptr);
 		fprintf(stderr,"error: failure writing header\n");
 		return -3;
 	}
-#endif
 	png_set_IHDR(png_ptr, info_ptr, img->width, img->height,
 		8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
 		PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
