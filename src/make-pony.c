@@ -493,7 +493,10 @@ void update_txt_log() {
 	}
 	
 	GtkTextBuffer * buf = gtk_text_view_get_buffer((GtkTextView*)main_widgets->g_txt_log);
-	gtk_text_buffer_insert_at_cursor(buf, s, -1);
+	GtkTextIter iter;
+	gtk_text_buffer_get_end_iter(buf, &iter);
+	gtk_text_buffer_insert(buf, &iter, s, -1);
+	
 	
 	free(s);
 }
