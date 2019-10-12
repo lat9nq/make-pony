@@ -1,37 +1,37 @@
-	libgobject-2.0-0.dll => /mingw64/bin/libgobject-2.0-0.dll (0x67f00000)
-	libgtk-3-0.dll => /mingw64/bin/libgtk-3-0.dll (0x67700000)
-	libpng16-16.dll => /mingw64/bin/libpng16-16.dll (0x68b40000)
-	libgdk_pixbuf-2.0-0.dll => /mingw64/bin/libgdk_pixbuf-2.0-0.dll (0x6f740000)
-	libglib-2.0-0.dll => /mingw64/bin/libglib-2.0-0.dll (0x649c0000)
-	libffi-6.dll => /mingw64/bin/libffi-6.dll (0x6b740000)
-	zlib1.dll => /mingw64/bin/zlib1.dll (0x62e80000)
-	libintl-8.dll => /mingw64/bin/libintl-8.dll (0x61cc0000)
-	libgio-2.0-0.dll => /mingw64/bin/libgio-2.0-0.dll (0x613c0000)
-	libgmodule-2.0-0.dll => /mingw64/bin/libgmodule-2.0-0.dll (0x66c40000)
-	libwinpthread-1.dll => /mingw64/bin/libwinpthread-1.dll (0x64940000)
-	libiconv-2.dll => /mingw64/bin/libiconv-2.dll (0x66000000)
-	libpcre-1.dll => /mingw64/bin/libpcre-1.dll (0x69140000)
-	libcairo-gobject-2.dll => /mingw64/bin/libcairo-gobject-2.dll (0x6cf40000)
-	libatk-1.0-0.dll => /mingw64/bin/libatk-1.0-0.dll (0x6bd40000)
-	libepoxy-0.dll => /mingw64/bin/libepoxy-0.dll (0x6d880000)
-	libcairo-2.dll => /mingw64/bin/libcairo-2.dll (0x68dc0000)
-	libharfbuzz-0.dll => /mingw64/bin/libharfbuzz-0.dll (0x61600000)
-	libfribidi-0.dll => /mingw64/bin/libfribidi-0.dll (0x66600000)
-	libfreetype-6.dll => /mingw64/bin/libfreetype-6.dll (0x6aa40000)
-	libpango-1.0-0.dll => /mingw64/bin/libpango-1.0-0.dll (0x6d240000)
-	libpangocairo-1.0-0.dll => /mingw64/bin/libpangocairo-1.0-0.dll (0x65880000)
-	libgdk-3-0.dll => /mingw64/bin/libgdk-3-0.dll (0x6c1c0000)
-	libpangowin32-1.0-0.dll => /mingw64/bin/libpangowin32-1.0-0.dll (0x676c0000)
-	libpangoft2-1.0-0.dll => /mingw64/bin/libpangoft2-1.0-0.dll (0x6e7c0000)
-	libgcc_s_seh-1.dll => /mingw64/bin/libgcc_s_seh-1.dll (0x150000)
-	libfontconfig-1.dll => /mingw64/bin/libfontconfig-1.dll (0x64f80000)
-	libpixman-1-0.dll => /mingw64/bin/libpixman-1-0.dll (0x63500000)
-	libgraphite2.dll => /mingw64/bin/libgraphite2.dll (0x70540000)
-	libbz2-1.dll => /mingw64/bin/libbz2-1.dll (0x626c0000)
-	libthai-0.dll => /mingw64/bin/libthai-0.dll (0x66880000)
-	libexpat-1.dll => /mingw64/bin/libexpat-1.dll (0x68f40000)
-	libstdc++-6.dll => /mingw64/bin/libstdc++-6.dll (0x6fc40000)
-	libdatrie-1.dll => /mingw64/bin/libdatrie-1.dll (0x68ac0000)
-	libgcc_s_seh-1.dll => /mingw64/bin/libgcc_s_seh-1.dll (0x150000)
-	libgcc_s_seh-1.dll => /mingw64/bin/libgcc_s_seh-1.dll (0x150000)
-	libgcc_s_seh-1.dll => /mingw64/bin/libgcc_s_seh-1.dll (0x150000)
+/mingw64/bin/libgobject-2.0-0.dll
+/mingw64/bin/libgtk-3-0.dll
+/mingw64/bin/libpng16-16.dll
+/mingw64/bin/libgdk_pixbuf-2.0-0.dll
+/mingw64/bin/libglib-2.0-0.dll
+/mingw64/bin/libffi-6.dll
+/mingw64/bin/zlib1.dll
+/mingw64/bin/libintl-8.dll
+/mingw64/bin/libgio-2.0-0.dll
+/mingw64/bin/libgmodule-2.0-0.dll
+/mingw64/bin/libwinpthread-1.dll
+/mingw64/bin/libiconv-2.dll
+/mingw64/bin/libpcre-1.dll
+/mingw64/bin/libcairo-gobject-2.dll
+/mingw64/bin/libatk-1.0-0.dll
+/mingw64/bin/libepoxy-0.dll
+/mingw64/bin/libcairo-2.dll
+/mingw64/bin/libharfbuzz-0.dll
+/mingw64/bin/libfribidi-0.dll
+/mingw64/bin/libfreetype-6.dll
+/mingw64/bin/libpango-1.0-0.dll
+/mingw64/bin/libpangocairo-1.0-0.dll
+/mingw64/bin/libgdk-3-0.dll
+/mingw64/bin/libpangowin32-1.0-0.dll
+/mingw64/bin/libpangoft2-1.0-0.dll
+/mingw64/bin/libgcc_s_seh-1.dll
+/mingw64/bin/libfontconfig-1.dll
+/mingw64/bin/libpixman-1-0.dll
+/mingw64/bin/libgraphite2.dll
+/mingw64/bin/libbz2-1.dll
+/mingw64/bin/libthai-0.dll
+/mingw64/bin/libexpat-1.dll
+/mingw64/bin/libstdc++-6.dll
+/mingw64/bin/libdatrie-1.dll
+/mingw64/bin/libgcc_s_seh-1.dll
+/mingw64/bin/libgcc_s_seh-1.dll
+/mingw64/bin/libgcc_s_seh-1.dll
