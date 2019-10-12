@@ -1,26 +1,24 @@
 # make-pony
 A generator for Pony Player Models Second Generation
 
+Screenshots:
+![Linux usage](https://i.imgur.com/ov8LUnw.png)
+
 Credits for [PPM/2](https://git.dbot.serealia.ca/Ponyscape-open/PPM2) goes to DBot
 
-It is best to use this program with the command prompt (Windows) or the terminal emulator (Linux).
-Use `make-pony -h` for help
-
-To use with Windows:
-- Download the executable
-- Run from explorer (generates a single file)
-- Or run from command prompt for more options (see -h)
-
-To compile for Linux:
-- `tar -xf make-pony-1.0.tar.gz`
-- `cd make-pony-1.0`
-- `make`
-
 The thumbnailer isn't possible without:
+- [GTK+](https://www.gtk.org/)
 - [libpng](http://www.libpng.org/pub/png/libpng.html) and
 - [zlib](https://www.zlib.net/)
 
 Changelog:
+
+v2.0-rc1
+- Adds GTK+ support to Make-pony in both Linux and Windows
+	- Integrates the thumbnailer into Make-pony
+- Hue selection is less restricted, and saturation/value selection is unlocked
+- Fixed where certain switches cause a seed to produce vastly different results
+
 v1.4
 - Added the thumbnailer, which is not complete but for many OC's is compatible and produces colorful results.
 - The main program is compatible with changes to PPM/2 from over a year ago, namely the conversion from .txt, JSON-like formats to a proprietary "NBT" format.
