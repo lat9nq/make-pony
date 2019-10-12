@@ -21,6 +21,10 @@
       <object class="GtkFixed">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="margin_left">20</property>
+        <property name="margin_right">20</property>
+        <property name="margin_top">20</property>
+        <property name="margin_bottom">20</property>
         <child>
           <object class="GtkFileChooserButton" id="fch_outdir">
             <property name="width_request">260</property>
@@ -31,8 +35,7 @@
             <property name="title" translatable="yes">Choose an output directory</property>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">540</property>
+            <property name="y">520</property>
           </packing>
         </child>
         <child>
@@ -46,8 +49,8 @@
             <signal name="clicked" handler="on_btn_generate_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">290</property>
-            <property name="y">540</property>
+            <property name="x">270</property>
+            <property name="y">520</property>
           </packing>
         </child>
         <child>
@@ -60,8 +63,7 @@
             <property name="placeholder_text" translatable="yes">current time</property>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">460</property>
+            <property name="y">440</property>
           </packing>
         </child>
         <child>
@@ -75,8 +77,8 @@
             <signal name="clicked" handler="on_btn_seed_random_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">360</property>
-            <property name="y">460</property>
+            <property name="x">340</property>
+            <property name="y">440</property>
           </packing>
         </child>
         <child>
@@ -88,8 +90,7 @@
             <property name="label" translatable="yes">Output directory:</property>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">510</property>
+            <property name="y">490</property>
           </packing>
         </child>
         <child>
@@ -101,8 +102,7 @@
             <property name="label" translatable="yes">Seed:</property>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">430</property>
+            <property name="y">410</property>
           </packing>
         </child>
         <child>
@@ -117,8 +117,8 @@
             <property name="draw_indicator">True</property>
           </object>
           <packing>
-            <property name="x">360</property>
-            <property name="y">276</property>
+            <property name="x">340</property>
+            <property name="y">256</property>
           </packing>
         </child>
         <child>
@@ -138,8 +138,7 @@
             </child>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">620</property>
+            <property name="y">600</property>
           </packing>
         </child>
         <child>
@@ -150,10 +149,6 @@
             <property name="can_focus">False</property>
             <property name="label" translatable="yes">Saturation type:</property>
           </object>
-          <packing>
-            <property name="x">20</property>
-            <property name="y">20</property>
-          </packing>
         </child>
         <child>
           <object class="GtkLabel">
@@ -164,8 +159,7 @@
             <property name="label" translatable="yes">Hair color wheel:</property>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">80</property>
+            <property name="y">60</property>
           </packing>
         </child>
         <child>
@@ -183,8 +177,7 @@
             </items>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">110</property>
+            <property name="y">90</property>
           </packing>
         </child>
         <child>
@@ -202,8 +195,7 @@
             </items>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">50</property>
+            <property name="y">30</property>
           </packing>
         </child>
         <child>
@@ -215,8 +207,7 @@
             <property name="label" translatable="yes">Hair style:</property>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">360</property>
+            <property name="y">340</property>
           </packing>
         </child>
         <child>
@@ -248,8 +239,7 @@
             </items>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">390</property>
+            <property name="y">370</property>
           </packing>
         </child>
         <child>
@@ -264,8 +254,7 @@
             <signal name="toggled" handler="on_chk_hue_toggled" swapped="no"/>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">290</property>
+            <property name="y">270</property>
           </packing>
         </child>
         <child>
@@ -281,8 +270,7 @@
             <signal name="value-changed" handler="on_scl_hue_value_changed" swapped="no"/>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">320</property>
+            <property name="y">300</property>
           </packing>
         </child>
         <child>
@@ -296,8 +284,7 @@
             <property name="draw_indicator">True</property>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">585</property>
+            <property name="y">565</property>
           </packing>
         </child>
         <child>
@@ -312,8 +299,8 @@
             <property name="draw_indicator">True</property>
           </object>
           <packing>
-            <property name="x">160</property>
-            <property name="y">585</property>
+            <property name="x">140</property>
+            <property name="y">565</property>
           </packing>
         </child>
         <child>
@@ -327,8 +314,8 @@
             <property name="placeholder_text" translatable="yes">Thumbnail directory</property>
           </object>
           <packing>
-            <property name="x">280</property>
-            <property name="y">585</property>
+            <property name="x">260</property>
+            <property name="y">565</property>
           </packing>
         </child>
         <child>
@@ -342,8 +329,8 @@
             <signal name="clicked" handler="on_btn_save_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">380</property>
-            <property name="y">540</property>
+            <property name="x">360</property>
+            <property name="y">520</property>
           </packing>
         </child>
         <child>
@@ -357,8 +344,7 @@
             <property name="draw_indicator">True</property>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">260</property>
+            <property name="y">240</property>
           </packing>
         </child>
         <child>
@@ -370,8 +356,7 @@
             <property name="label" translatable="yes">Socks:</property>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">140</property>
+            <property name="y">120</property>
           </packing>
         </child>
         <child>
@@ -388,8 +373,7 @@
             </items>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">170</property>
+            <property name="y">150</property>
           </packing>
         </child>
         <child>
@@ -401,8 +385,7 @@
             <property name="label" translatable="yes">Gender:</property>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">200</property>
+            <property name="y">180</property>
           </packing>
         </child>
         <child>
@@ -419,8 +402,7 @@
             </items>
           </object>
           <packing>
-            <property name="x">20</property>
-            <property name="y">230</property>
+            <property name="y">210</property>
           </packing>
         </child>
         <child>
@@ -434,8 +416,8 @@
             <signal name="changed" handler="on_entry_hue_changed" swapped="no"/>
           </object>
           <packing>
-            <property name="x">190</property>
-            <property name="y">290</property>
+            <property name="x">170</property>
+            <property name="y">270</property>
           </packing>
         </child>
         <child>
@@ -449,8 +431,8 @@
             <signal name="clicked" handler="on_btn_seed_now_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">250</property>
-            <property name="y">460</property>
+            <property name="x">230</property>
+            <property name="y">440</property>
           </packing>
         </child>
         <child>
@@ -462,8 +444,7 @@
             <property name="stock">gtk-missing-image</property>
           </object>
           <packing>
-            <property name="x">204</property>
-            <property name="y">20</property>
+            <property name="x">184</property>
           </packing>
         </child>
       </object>
