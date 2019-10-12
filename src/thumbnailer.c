@@ -22,74 +22,11 @@
 #include "pngimg.h"
 #include "nbt.h"
 
+#include "thumbnailer.h"
+
 #pragma GCC diagnostic ignored "-Wformat-overflow="
 
-/* Define memory management maximums for mane and body details. */
-#define DETAIL_MAX	6
-#define COLOR_MAX	6
-#define BODY_DETAIL_MAX	8
-
-/* Sock definitions for determining what kind of sock */
-#define SOCKS_NEW_MODEL	1
-#define SOCKS_MODEL	2
-#define SOCKS_TEXTURE	4
-
-/* Should we print out targets instead of thumbnailing? */
-#define PRINT_TARGETS	0
-
-/* For determining if using separated eyes */
-typedef enum {
-	BOTH = 0,
-	LEFT = 1,
-	RIGHT = 2,
-} which_eye_t;
-
-/* Pony race */
-typedef enum {
-	EARTH = 0,
-	PEGASUS = 1,
-	UNICORN = 2,
-	ALICORN = 4,
-} race_t;
-
-int style_color_count(char * style); /* Mane/Tail color count */
-int style_detail_count(char * style); /* Mane/Tail detail count */
-int sgetnum(char * s); /* Extract a number from a string */
-void strtolower(char * s); /* Converts ASCII characters in a string to their lowercase counterpart */
-void read_nbt_string(char * s, int fd); /* Read a NBT string from a file */
-int get_nbt_string(char * s, uint8_t * data); /* Extract a NBT string from data */
-
-/* Read 4 bytes and be able to use it as a different integer, or convert it from little to big endian */
-typedef union {
-	float f;
-	uint8_t a[4];
-} float_bin;
-
-int main(int argc, char * argv[]) {
-	/* Point to the filename */
-	const char * filename;
-	filename = "thumb.dat";
-	int fd;
-	/* Open a file descriptor to the file if specified */
-	if (argc == 2) {
-		filename = argv[1];
-#ifdef _WIN64
-		/* In Windows, we must open it as a binary or risk an early file close */
-		fd = open(filename, O_RDONLY | O_BINARY);
-#else
-		fd = open(filename, O_RDONLY);
-#endif
-	}
-	else {
-		fd = STDIN_FILENO;
-	}
-
-	/* If we can't read the file, exit */
-	if (fd == -1) {
-		fprintf(stderr,"error: %s isn't accessible\n", filename);
-		return 0;
-	}
-
+int thumbnail(PNGIMG * canvas, int fd) {
 	nbt_t nbt; // main NBT, using as a header for an array of NBTs
 	int nbt_len, // max allocated length of the NBT data list
 		nbt_at; // "where are we" in the NBT data
@@ -449,8 +386,6 @@ int main(int argc, char * argv[]) {
 		}
 	}
 	
-	close(fd);
-	
 	if (PRINT_TARGETS)
 			exit(0);
 
@@ -458,8 +393,6 @@ int main(int argc, char * argv[]) {
 	width = 1024;
 	height = 1024;
 
-	PNGIMG * canvas;
-	canvas = pngimg_init();
 	pngimg_alloc(canvas, width, height);
 
 	for (int i = 0; i < height; i++) {
@@ -913,40 +846,6 @@ int main(int argc, char * argv[]) {
 		pngimg_merge_and_free(canvas, canvas_ear_fill);
 		pngimg_merge_and_free(canvas, canvas_ear_outline);//*/
 	}
-
-	FILE * outf;
-	if (argc > 1) {
-		char name[255];
-		strcpy(name, filename);
-		strrchr(name, '.')[0] = '\0';
-		strcat(name, ".png");
-		outf = fopen(name, "w");
-	}
-	else {
-		outf = fdopen(STDOUT_FILENO, "w");
-		//~ png_bytep * png_data;
-		//~ png_data = pngimg_getData(canvas);
-		
-		//~ int width, height;
-		//~ width = pngimg_width(canvas);
-		//~ height = pngimg_height(canvas);
-		
-		//~ write(STDOUT_FILENO, &width, 4);
-		//~ write(STDOUT_FILENO, &height, 4);
-		
-		//~ for (int i = 0; i < height; i++) {
-			//~ for (int j = 0; j < width; j++) {
-				//~ write(STDOUT_FILENO, &png_data[i][4*j + 0], 1);
-				//~ write(STDOUT_FILENO, &png_data[i][4*j + 1], 1);
-				//~ write(STDOUT_FILENO, &png_data[i][4*j + 2], 1);
-				//~ write(STDOUT_FILENO, &png_data[i][4*j + 3], 1);
-			//~ }
-			//~ free(png_data[i]);
-		//~ }
-		//~ free(png_data);
-	}
-	pngimg_write(canvas, outf);
-	fclose(outf);
 }
 
 void read_nbt_string(char * s, int fd) {
