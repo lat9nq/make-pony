@@ -822,9 +822,9 @@ void mp_pick_colors(mp_data * oc) {
 	float std_dev = 0.0f;
 
 	if (oc->desaturated == -1) {
-		oc->desaturated = !(rand() & 15) ;
-		oc->white = oc->desaturated && !(rand() & 3);
-		oc->desaturated = oc->desaturated ^ oc->white;
+		oc->desaturated = !(rand() & 15);
+		oc->white = !(rand() & 3) && oc->desaturated;
+		oc->desaturated = oc->desaturated + oc->white;
 		if (oc->traditional) {
 			oc->desaturated = 0;
 		}
@@ -833,7 +833,7 @@ void mp_pick_colors(mp_data * oc) {
 		rand();
 		rand();
 	}
-	oc->any_saturation = !oc->desaturated;
+	oc->any_saturation = 0;
 
 	if (oc->verbose) {
 		fprintf(sterr, "body is %ssaturated\n", (oc->desaturated) ? "de" : "");
@@ -900,18 +900,22 @@ void mp_pick_colors(mp_data * oc) {
 		if (oc->key == BOOKWORM && i == 1) {
 			oc->colors[i] = oc->colors[0];
 		}
-		else if (r2 & (1/*  + 2 * (hsvcolor.h != static_hue) */)) {
-			hsvcolor.s = (!oc->desaturated) ? (rand() & 15) / 15.0f : 0.0f;
-			if (oc->desaturated) {
-				hsvcolor.v = (!oc->desaturated) ? sqrtf((rand() % 12 + 4) / 15.0f) : sqrtf((rand() & 15) / 15.0f);
+		else if (!(r2 & 3)) {
+			if (oc->desaturated == 1) {
+				hsvcolor.s = 0.0f; rand();
+				hsvcolor.v = sqrtf((rand() & 15) / 15.0f);
+			}
+			else {
+				hsvcolor.s = (rand() & 15) / 15.0f;
+				hsvcolor.v = sqrtf((rand() % 12 + 4) / 15.0f);
 			}
 		}
 		else {
-			hsvcolor.v = (!oc->desaturated) ? sqrtf((rand() % 12 + 4) / 15.0f) : sqrtf((rand() & 15) / 15.0f);
-			oc->any_saturation = (1 & (hsvcolor.v > 0.0f)) | oc->any_saturation;
+			hsvcolor.v = (oc->desaturated != 1) ? sqrtf((rand() % 12 + 4) / 15.0f) : sqrtf((rand() & 15) / 15.0f);
 		}
+		oc->any_saturation = (hsvcolor.s > 0.0f) | oc->any_saturation;
 
-		avg_sat += ((!oc->desaturated) * hsvcolor.s + (oc->desaturated) * hsvcolor.v) / pow(2,i);
+		avg_sat += ((oc->desaturated != 1) * hsvcolor.s + (oc->desaturated == 1) * hsvcolor.v) / pow(2,i);
 		hsvToRGB(&hsvcolor,&oc->colors[i]);
 
 		if (oc->verbose) {
