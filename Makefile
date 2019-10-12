@@ -18,7 +18,7 @@ $(BUILD)%.o:$(SRC)%.c
 	$(CC) $(CCFLAGS) -c -o$@ $< $(CLIBS) $(SYS_LIBS)
 
 lib%.so:$(BUILD)%.o.1
-	$(CC) $(CCFLAGS) -shared -Wl,-soname,$@ -o$(LIB)$@ $< $(CLIBS)
+	$(CC) $(CCFLAGS) -shared -Wl,-soname,$@ -o$(LIB)$@ $< $(CLIBS) $(SYS_LIBS)
 
 # Build Make-Pony
 

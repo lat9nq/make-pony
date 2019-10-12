@@ -15,10 +15,16 @@
 #include <math.h>
 #include <ctype.h>
 #include <gtk/gtk.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#ifdef _WIN64
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
+
 #include "color.h"
 #include "target.h"
 #include "make-pony.h"
@@ -383,14 +389,14 @@ int main(int argc, char * argv[]) {
 		
 		if (!stdo) {
 			FILE * f = fopen(filename, "wb");
-	#ifdef _WIN32
+/*	#ifdef _WIN32
 			if (!f) {
 				char * oldfilename = filename;
 				filename = strrchr(filename, '\\')+1;
 				fprintf(sterr, "warning: could not write to %s, trying %s\n", oldfilename, filename);
 				f = fopen(filename, "wb");
 			}
-	#endif
+	#endif*/
 			if (!f) {
 				fprintf(sterr, "error: output file not accessible\n");
 				return 0;
@@ -412,7 +418,11 @@ int main(int argc, char * argv[]) {
 		main_oc = (mp_data *)malloc(sizeof(*main_oc));
 		mp_data_init(main_oc);
 		
+#ifdef _WIN64
+		_pipe(log_pipe, 4096, _O_BINARY);
+#else
 		pipe(log_pipe);
+#endif
 		sterr = fdopen(log_pipe[1], "w");
 		
 		mp_gtk_build(&argc, &argv, &main_widgets);
@@ -496,7 +506,7 @@ void mp_gtk_destroy(mp_gtk_widgets * widgets) {
 }
 
 void on_btn_generate_clicked() {
-	char text[255];
+	char text[256];
 	int seed;
 	
 	strncpy(text, gtk_entry_get_text((GtkEntry*)main_widgets->g_entry_seed), 255);
@@ -578,6 +588,11 @@ void on_btn_generate_clicked() {
 int render_oc(PNGIMG * img, uint8_t * nbt, int nbt_len, mp_data * oc) {
 	int thumb_pipe_in[2];
 	int thumb_pipe_out[2];
+#ifdef _WIN64
+	return -1;
+	_pipe(thumb_pipe_in, 4096, _O_BINARY);
+	_pipe(thumb_pipe_out, 4096, _O_BINARY);
+#else
 	pipe(thumb_pipe_in);
 	pipe(thumb_pipe_out);
 	
@@ -622,6 +637,7 @@ int render_oc(PNGIMG * img, uint8_t * nbt, int nbt_len, mp_data * oc) {
 	close(thumb_pipe_out[0]);
 	
 	return oc->seed;
+#endif
 }
 
 void on_btn_seed_now_clicked() {
@@ -635,7 +651,7 @@ void on_btn_seed_random_clicked() {
 }
 
 void on_btn_save_clicked() {
-	char directory[255];
+	char directory[256];
 	char * chooser_dir;
 	chooser_dir = gtk_file_chooser_get_filename((GtkFileChooser*)main_widgets->g_fch_outdir);
 	if (chooser_dir == NULL) {
@@ -652,10 +668,10 @@ void on_btn_save_clicked() {
 		return;
 	}
 	
-	char filename[255];
-	sprintf(filename, "%ld_%d_makepony", time(NULL), main_oc->seed);
+	char filename[256];
+	sprintf(filename, "%ld_%d_makepony", (long)time(NULL), main_oc->seed);
 	
-	char output[1023];
+	char output[1024];
 	snprintf(output, 1023, "%s/%s.dat", directory, filename);
 	
 	int fd;
@@ -682,7 +698,7 @@ void on_btn_save_clicked() {
 			return;
 		}
 		
-		char thumb_dir[255];
+		char thumb_dir[256];
 		int thumb_dir_len;
 		
 		strncpy(thumb_dir, gtk_entry_get_text((GtkEntry*)main_widgets->g_entry_thumbnail_dir), 255);
@@ -725,7 +741,7 @@ void on_chk_hue_toggled() {
 }
 
 void on_entry_hue_changed() {
-	char text[255];
+	char text[256];
 	int length, valid;
 	color c;
 	
@@ -747,7 +763,11 @@ void on_entry_hue_changed() {
 	}
 	
 	if (valid) {
-		sscanf(text, "#%02hhx%02hhx%02hhx", &c.r, &c.g, &c.b);
+		int r, g, b;
+		sscanf(text, "#%02x%02x%02x", &r, &g, &b);
+		c.r = (uint8_t)r;
+		c.g = (uint8_t)g;
+		c.b = (uint8_t)b;
 		gtk_range_set_value((GtkRange*)main_widgets->g_scl_hue, hue(&c));
 	}
 }
