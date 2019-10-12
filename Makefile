@@ -5,22 +5,24 @@ BUILD=./build/
 
 MAKE=make
 CC=gcc
-CCFLAGS=-Wall -g
+#CC=x86_64-w64-mingw32-gcc
+CCFLAGS=-Wall -g -pthread -pipe
 CLIBS=
 LIBS=
+SYS_LIBS=`pkg-config --cflags --libs gtk+-3.0 libpng16`
 
 $(BUILD)%.o.1:$(SRC)%.c
 	$(CC) $(CCFLAGS) -c -fPIC -o$@ $< $(CLIBS)
 
 $(BUILD)%.o:$(SRC)%.c
-	$(CC) $(CCFLAGS) -c -o$@ $< $(CLIBS)
+	$(CC) $(CCFLAGS) -c -o$@ $< $(CLIBS) $(SYS_LIBS)
 
 lib%.so:$(BUILD)%.o.1
 	$(CC) $(CCFLAGS) -shared -Wl,-soname,$@ -o$(LIB)$@ $< $(CLIBS)
 
 # Build Make-Pony
 
-MKPNY_LIBS=color target nbt
+MKPNY_LIBS=color target nbt pngimg
 MKPNY_REQ=$(SRC)make-pony.c $(SRC)color.h $(SRC)target.h $(SRC)make-pony.h $(SRC)nbt.h
 
 %.build:$(BUILD)%.o $(addsuffix .so, $(addprefix lib, $(LIBS)))
@@ -34,7 +36,7 @@ all:
 	+$(MAKE) thumbnailer
 
 make-pony:build/ lib/ $(MKPNY_REQ) $(addsuffix .so, $(addprefix lib, $(MKPNY_LIBS))) $(BUILD)make-pony.o
-	$(CC) $(CCFLAGS) -o$@ $(BUILD)$@.o -Wl,-rpath,$(LIB) -L$(LIB) $(addprefix -l, $(MKPNY_LIBS) m) $(CLIBS)
+	$(CC) $(CCFLAGS) -o$@ $(BUILD)$@.o -Wl,-rpath,$(LIB) -L$(LIB) $(addprefix -l, $(MKPNY_LIBS) m) $(CLIBS) $(SYS_LIBS) -export-dynamic
 
 make-pony.exe:build/ $(MKPNY_REQ)
 	+$(MAKE) -f Makefile.win32 make-pony.exe

@@ -34,8 +34,19 @@ void pngimg_free(PNGIMG * img) {
 	img->height = 0;
 }
 
+void pngimg_destroy_data(png_byte * data, void * _) {
+	free(data);
+}
+
+void pngimg_destroy_datap(png_bytep * data) {
+	for (int i = 0; data[i]; i++) {
+		free(data[i]);
+	}
+	free(data);
+}
+
 png_byte ** pngimg_getData(PNGIMG * img) {
-	png_bytep * data = (png_bytep*)malloc(sizeof(*data)*img->height);
+	png_bytep * data = (png_bytep*)malloc(sizeof(*data)*(img->height + 1));
 	for (int i = 0; i < img->height; i++) {
 		data[i] = (png_byte*)malloc(sizeof(*data[i])*img->width*4);
 		for (int j = 0; j < img->width; j++) {
@@ -44,15 +55,34 @@ png_byte ** pngimg_getData(PNGIMG * img) {
 			data[i][4*j+2] = (uint8_t)img->pixels[i][j].b;
 			data[i][4*j+3] = (uint8_t)img->pixels[i][j].a;
 		}
+		data[i + 1] = NULL;
 	}
 	return data;
 }
 
-int pngimg_w(PNGIMG * img) {
+png_byte * pngimg_get_data_array(PNGIMG * img) {
+	int x;
+	png_byte * data;
+	
+	data = (png_byte *)malloc(sizeof(*data)*img->height * img->width * 4);
+	for (int i = 0; i < img->height; i++) {
+		x = i * img->width;
+		for (int j = 0; j < img->width; j++) {
+			data[x + 0] = (uint8_t)img->pixels[i][j].r;
+			data[x + 1] = (uint8_t)img->pixels[i][j].g;
+			data[x + 2] = (uint8_t)img->pixels[i][j].b;
+			data[x + 3] = (uint8_t)img->pixels[i][j].a;
+			x += 4;
+		}
+	}
+	return data;
+}
+
+int pngimg_width(PNGIMG * img) {
 	return img->width;
 }
 
-int pngimg_h(PNGIMG * img) {
+int pngimg_height(PNGIMG * img) {
 	return img->height;
 }
 
@@ -60,11 +90,10 @@ Pixel * pngimg_at(PNGIMG * img, int x, int y) {
 	return &(img->pixels[y][x]);
 }
 
-int pngimg_write(PNGIMG * img, char * filename) {
-	FILE * f = fopen(filename, "wb");
+int pngimg_write(PNGIMG * img, FILE * f) {
 	png_bytep * rows = pngimg_getData(img);
 	if (f == NULL) {
-		fprintf(stderr,"error: %s refused binary write access\n",filename);
+		fprintf(stderr,"error: file refused binary write access\n");
 		return -1;
 	}
 	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -97,24 +126,34 @@ int pngimg_write(PNGIMG * img, char * filename) {
 		free(rows[i]);
 	free(rows);
 	
-	fclose(f);
 	return 0;
+}
+
+int pngimg_read(PNGIMG * img, char * filename) {
+	FILE * f;
+	f = fopen(filename, "r");
+	
+	int val;
+	val = pngimg_read_fp(img, f);
+	
+	fclose(f);
+	
+	return val;
 }
 
 /* Credits to Guillaume Cottenceau
  */
-int pngimg_read(PNGIMG * img, char * filename) {
+int pngimg_read_fp(PNGIMG * img, FILE * f) {
 	unsigned char header[8];
 	int width, height;
 	
-	FILE * f = fopen(filename, "rb");
 	if (f == NULL) {
-		fprintf(stderr, "error: %s refused read access\n", filename);
+		fprintf(stderr, "error: file refused read access\n");
 		return -1;
 	}
 	fread(header, 1, 8, f);
 	if (png_sig_cmp(header, 0, 8)) {
-		fprintf(stderr, "error: %s is not a well-formed PNG file\n", filename);
+		fprintf(stderr, "error: file is not a well-formed PNG file\n");
 		return -2;
 	}
 	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -171,8 +210,6 @@ int pngimg_read(PNGIMG * img, char * filename) {
 	}
 	free(data);
 	
-	fclose(f);
-	
 	return 0;
 }
 
@@ -182,8 +219,8 @@ int pngimg_merge(PNGIMG *img1, PNGIMG *img2) {
 	}
 	for (int i = 0; i < img1->width; i++) {
 		for (int j = 0; j < img1->height; j++) {
-			Pixel * p2 = pngimg_at(img1, j, i);
-			Pixel * p1 = pngimg_at(img2, j, i);
+			Pixel * p2 = &img1->pixels[j][i];//pngimg_at(img1, j, i);
+			Pixel * p1 = &img2->pixels[j][i];//pngimg_at(img2, j, i);
 			if (p1->a == 0)
 				continue;
 			p2->r = (p1->r * p1->a + p2->r * p2->a * (255.0f - p1->a) / 255.0f)
@@ -212,6 +249,12 @@ int pngimg_merge(PNGIMG *img1, PNGIMG *img2) {
 		}
 	}
 	return 0;
+}
+
+int pngimg_merge_and_free(PNGIMG *img1, PNGIMG *img2) {
+	int val = pngimg_merge(img1, img2);
+	pngimg_free(img2);
+	return val;
 }
 
 void pngimg_colorify(PNGIMG *img, const color * c, float val) {

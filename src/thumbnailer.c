@@ -57,6 +57,7 @@ int style_detail_count(char * style); /* Mane/Tail detail count */
 int sgetnum(char * s); /* Extract a number from a string */
 void strtolower(char * s); /* Converts ASCII characters in a string to their lowercase counterpart */
 void read_nbt_string(char * s, int fd); /* Read a NBT string from a file */
+int get_nbt_string(char * s, uint8_t * data); /* Extract a NBT string from data */
 
 /* Read 4 bytes and be able to use it as a different integer, or convert it from little to big endian */
 typedef union {
@@ -65,28 +66,27 @@ typedef union {
 } float_bin;
 
 int main(int argc, char * argv[]) {
-	/* Read the first and only the first argument as the input file */
-	if (argc < 2) {
-		printf("expected 2 arguments, found %d\n", argc);
-		printf("usage: %s <filename.dat>\n", argv[0]);
-		return 0;
-	}
-
 	/* Point to the filename */
-	char * filename;
-	filename = argv[1];
+	const char * filename;
+	filename = "thumb.dat";
 	int fd;
-	/* Open a file descriptor to the file */
+	/* Open a file descriptor to the file if specified */
+	if (argc == 2) {
+		filename = argv[1];
 #ifdef _WIN64
-	/* In Windows, we must open it as a binary or risk an early file close */
-	fd = open(filename, O_RDONLY | O_BINARY);
+		/* In Windows, we must open it as a binary or risk an early file close */
+		fd = open(filename, O_RDONLY | O_BINARY);
 #else
-	fd = open(filename, O_RDONLY);
+		fd = open(filename, O_RDONLY);
 #endif
+	}
+	else {
+		fd = STDIN_FILENO;
+	}
 
 	/* If we can't read the file, exit */
 	if (fd == -1) {
-		printf("error: %s isn't accessible\n", filename);
+		fprintf(stderr,"error: %s isn't accessible\n", filename);
 		return 0;
 	}
 
@@ -156,37 +156,51 @@ int main(int argc, char * argv[]) {
 	for (int i = 0; i < BODY_DETAIL_MAX; i++) {
 		body_detail_s[i] = NULL;
 	}
+	
+	uint8_t * data;
+	data = malloc(sizeof(*data) * 32768);
+	memset(data, 0, 32768);
+	int data_len;
+	data_len = 0;
+	while (read(fd, &c, 1)) {
+		data[data_len] = c;
+		data_len++;
+	}
+	data[data_len] = 0;
 
 	/* Read input as long as there is data left in the file */
-	while (read(fd, &c, 1)) {
+	//while (read(fd, &c, 1)) {
+	for (int i = 0; i < data_len; ) {
+		c = data[i];
+		i++;
 		l = 0;
 		s[0] = 0;
 		switch (c) {
 			case NBT_GROUP:
-				read_nbt_string(s, fd);
+				i += get_nbt_string(s, data+i);
 				if (PRINT_TARGETS)
 					printf("\tPUSHTARGET(target, \"%s\", GRUP);\n", s);
 			break;
 			case NBT_INT:
-				read_nbt_string(s, fd);
+				i += get_nbt_string(s, data+i);
 				if (PRINT_TARGETS)
 					printf("\tPUSHTARGET(target, \"%s\", INT);\n", s);
 			case NBT_FLOAT:
 				if (c == NBT_FLOAT)
-					read_nbt_string(s, fd);
+					i += get_nbt_string(s, data+i);
 				/*if (!strcmp(s, "tattoo_rotate_5")) {
-					printf("%s\n", s);
+					fprintf(stderr,"%s\n", s);
 				}*/
 				if (c == NBT_FLOAT && PRINT_TARGETS)
 					printf("\tPUSHTARGET(target, \"%s\", VAL);\n", s);
-				//printf("%s\n", s);
-				read(fd, &f.a[3], 1);
-				read(fd, &f.a[2], 1);
-				read(fd, &f.a[1], 1);
-				read(fd, &f.a[0], 1);
+				//fprintf(stderr,"%s\n", s);
+				f.a[3] = data[i]; i++;
+				f.a[2] = data[i]; i++;
+				f.a[1] = data[i]; i++;
+				f.a[0] = data[i]; i++;
 			break;
 			case NBT_STRING:
-				read_nbt_string(s, fd);
+				i += get_nbt_string(s, data+i);
 				int save = 0;
 				int n;
 				if (!strcmp("mane_new",s))
@@ -205,12 +219,12 @@ int main(int argc, char * argv[]) {
 					n = sgetnum(s) - 1;
 				}
 			/*	else if (!strcmp("eye_url_right",s)) {
-					printf("%s\n", s);
+					fprintf(stderr,"%s\n", s);
 					print_c = 1;
 				}*/
 				if (PRINT_TARGETS)
 					printf("\tPUSHTARGET(target, \"%s\", STR);\n", s);
-				read_nbt_string(s, fd);
+				i += get_nbt_string(s, data+i);
 				switch (save) {
 					case 1: // mane_new
 						strcpy(uppermane, s);
@@ -250,10 +264,11 @@ int main(int argc, char * argv[]) {
 				}
 			break;
 			case NBT_BOOLEAN:
-				read_nbt_string(s, fd);
+				i += get_nbt_string(s, data+i);
 				if (PRINT_TARGETS)
 					printf("\tPUSHTARGET(target, \"%s\", BOOL);\n", s);
-				read(fd, &c, 1);
+				c = data[i];
+				i++;
 				if (!strcmp(s, "separate_eyes")) {
 					use_separated_eyes = c;
 				}
@@ -265,11 +280,11 @@ int main(int argc, char * argv[]) {
 				}
 			break;
 			case NBT_COLOR:
-				read_nbt_string(s, fd);
+				i += get_nbt_string(s, data+i);
 				if (PRINT_TARGETS)
 					printf("\tPUSHTARGET(target, \"%s\", COL);\n", s);
-				read(fd, &l, 4);
-				read(fd, &f, 4);
+				l = *(int*)(data + i); i += 4;
+				f = *(float_bin*)(data + i); i += 4;
 
 				if (!strcmp(s,"body")) {
 					body_color.r = f.a[0];
@@ -288,7 +303,7 @@ int main(int argc, char * argv[]) {
 					}
 				}
 				else if (strstr(s,"eye")) {
-					//printf("%s\n", s);
+					//fprintf(stderr,"%s\n", s);
 					which_eye_t use_eye = BOTH;
 					if (strstr(s, "_left")) {
 						use_eye = LEFT;
@@ -301,7 +316,7 @@ int main(int argc, char * argv[]) {
 						eye_sclera[use_eye].g = f.a[1] + 128;
 						eye_sclera[use_eye].b = f.a[2] + 128;
 						eye_sclera[use_eye].a = f.a[3] + 128;
-						//printf("%s %02x %02x %02x %02x\n", s, f.a[0], f.a[1], f.a[2], f.a[3]);
+						//fprintf(stderr,"%s %02x %02x %02x %02x\n", s, f.a[0], f.a[1], f.a[2], f.a[3]);
 					}
 					else if (strstr(s, "eye_irisline1")) {
 						eye_irisline1[use_eye].r = f.a[0] + 128;
@@ -338,7 +353,7 @@ int main(int argc, char * argv[]) {
 						eye_pupil[use_eye].g = f.a[1] + 128;
 						eye_pupil[use_eye].b = f.a[2] + 128;
 						eye_pupil[use_eye].a = f.a[3] + 128;
-						//printf("%02x %02x %02x %02s\n", f.a[0], f.a[1], f.a[2], f.a[3]);
+						//fprintf(stderr,"%02x %02x %02x %02s\n", f.a[0], f.a[1], f.a[2], f.a[3]);
 					}
 					else if (strstr(s,"brows")) {
 						eye_brows.r = f.a[0] + 128;
@@ -372,7 +387,7 @@ int main(int argc, char * argv[]) {
 						tail_detail[sgetnum(s)-1].g = f.a[1]+ 128;
 						tail_detail[sgetnum(s)-1].b = f.a[2]+ 128;
 						tail_detail[sgetnum(s)-1].a = f.a[3]+ 128;
-						//printf("%s %02x %02x %02x\n", s, tail_detail[sgetnum(s)-1].r, tail_detail[sgetnum(s)-1].g, tail_detail[sgetnum(s)-1].b);
+						//fprintf(stderr,"%s %02x %02x %02x\n", s, tail_detail[sgetnum(s)-1].r, tail_detail[sgetnum(s)-1].g, tail_detail[sgetnum(s)-1].b);
 					}
 				}
 				else if (strstr(s, "socks")) {
@@ -381,7 +396,7 @@ int main(int argc, char * argv[]) {
 						socks_new[sgetnum(s)-1].g = f.a[1] + 128;
 						socks_new[sgetnum(s)-1].b = f.a[2] + 128;
 						socks_new[sgetnum(s)-1].a = 255;
-						//printf("%s %d %02x %02x %02x\n", s, sgetnum(s), f.a[0], f.a[1], f.a[2]);
+						//fprintf(stderr,"%s %d %02x %02x %02x\n", s, sgetnum(s), f.a[0], f.a[1], f.a[2]);
 					}
 					else if (strstr(s, "socks_model")) {
 						socks_model.r = f.a[0] + 128;
@@ -433,6 +448,8 @@ int main(int argc, char * argv[]) {
 			break;
 		}
 	}
+	
+	close(fd);
 	
 	if (PRINT_TARGETS)
 			exit(0);
@@ -825,88 +842,111 @@ int main(int argc, char * argv[]) {
 		}
 
 
-		pngimg_merge(canvas, canvas_tail_fill);
+		pngimg_merge_and_free(canvas, canvas_tail_fill);
 		for (int i = 0; i < style_detail_count(tail); i++) {
-			pngimg_merge(canvas, canvas_tail_detail[i]);
+			pngimg_merge_and_free(canvas, canvas_tail_detail[i]);
 		}
-		pngimg_merge(canvas, canvas_tail_outline);
+		pngimg_merge_and_free(canvas, canvas_tail_outline);
 		for (int i = 0; i < style_color_count(tail); i++) {
-			pngimg_merge(canvas, canvas_tail_color[i + 1]);
-			pngimg_merge(canvas, canvas_tail_color_outline[i + 1]);
+			pngimg_merge_and_free(canvas, canvas_tail_color[i + 1]);
+			pngimg_merge_and_free(canvas, canvas_tail_color_outline[i + 1]);
 		}
-		pngimg_merge(canvas, canvas_body_fill);
+		pngimg_merge_and_free(canvas, canvas_body_fill);
 		for (int i = 0; i < BODY_DETAIL_MAX; i++) {
 			if (body_detail_s[i] == NULL)
 				continue;
-			pngimg_merge(canvas, canvas_body_detail[i]);
+			pngimg_merge_and_free(canvas, canvas_body_detail[i]);
 		}
 		if (use_eyelashes)
-			pngimg_merge(canvas, canvas_eye_lashes);
-		pngimg_merge(canvas, canvas_eye_sclera);
-		pngimg_merge(canvas, canvas_eye_iris);
-		pngimg_merge(canvas, canvas_eye_iris_gradient);
-		pngimg_merge(canvas, canvas_eye_irisline2);
-		pngimg_merge(canvas, canvas_eye_irisline1);
-		pngimg_merge(canvas, canvas_eye_pupil);
-		pngimg_merge(canvas, canvas_eye_reflection);
+			pngimg_merge_and_free(canvas, canvas_eye_lashes);
+		pngimg_merge_and_free(canvas, canvas_eye_sclera);
+		pngimg_merge_and_free(canvas, canvas_eye_iris);
+		pngimg_merge_and_free(canvas, canvas_eye_iris_gradient);
+		pngimg_merge_and_free(canvas, canvas_eye_irisline2);
+		pngimg_merge_and_free(canvas, canvas_eye_irisline1);
+		pngimg_merge_and_free(canvas, canvas_eye_pupil);
+		pngimg_merge_and_free(canvas, canvas_eye_reflection);
 		if (use_separated_eyes) {
-			pngimg_merge(canvas, canvas_reye_sclera);
-			pngimg_merge(canvas, canvas_reye_iris);
-			pngimg_merge(canvas, canvas_reye_iris_gradient);
-			pngimg_merge(canvas, canvas_reye_irisline2);
-			pngimg_merge(canvas, canvas_reye_irisline1);
-			pngimg_merge(canvas, canvas_reye_pupil);
-			pngimg_merge(canvas, canvas_reye_reflection);
+			pngimg_merge_and_free(canvas, canvas_reye_sclera);
+			pngimg_merge_and_free(canvas, canvas_reye_iris);
+			pngimg_merge_and_free(canvas, canvas_reye_iris_gradient);
+			pngimg_merge_and_free(canvas, canvas_reye_irisline2);
+			pngimg_merge_and_free(canvas, canvas_reye_irisline1);
+			pngimg_merge_and_free(canvas, canvas_reye_pupil);
+			pngimg_merge_and_free(canvas, canvas_reye_reflection);
 		}
-		pngimg_merge(canvas, canvas_eye_brows);
-		pngimg_merge(canvas, canvas_body_outline);
+		pngimg_merge_and_free(canvas, canvas_eye_brows);
+		pngimg_merge_and_free(canvas, canvas_body_outline);
 		if (use_socks) {
 			//puts("Merged socks");
-			pngimg_merge(canvas, canvas_socks_fill);
-			pngimg_merge(canvas, canvas_socks_color1);
-			pngimg_merge(canvas, canvas_socks_outline);
-			pngimg_merge(canvas, canvas_socks_color2);
+			pngimg_merge_and_free(canvas, canvas_socks_fill);
+			pngimg_merge_and_free(canvas, canvas_socks_color1);
+			pngimg_merge_and_free(canvas, canvas_socks_outline);
+			pngimg_merge_and_free(canvas, canvas_socks_color2);
 		}
 		if (race & (PEGASUS | ALICORN)) {
-			pngimg_merge(canvas, canvas_wing_fill);
-			pngimg_merge(canvas, canvas_wing_outline);
+			pngimg_merge_and_free(canvas, canvas_wing_fill);
+			pngimg_merge_and_free(canvas, canvas_wing_outline);
 		}
-		pngimg_merge(canvas, canvas_lowermane_fill);
-		pngimg_merge(canvas, canvas_lowermane_outline);
+		pngimg_merge_and_free(canvas, canvas_lowermane_fill);
+		pngimg_merge_and_free(canvas, canvas_lowermane_outline);
 		for (int i = 0; i < style_color_count(lowermane); i++) {
-			pngimg_merge(canvas, canvas_lowermane_color[i + 1]);
-			pngimg_merge(canvas, canvas_lowermane_color_outline[i + 1]);
+			pngimg_merge_and_free(canvas, canvas_lowermane_color[i + 1]);
+			pngimg_merge_and_free(canvas, canvas_lowermane_color_outline[i + 1]);
 		}
 		for (int i = 0; i < style_detail_count(lowermane); i++) {
-			pngimg_merge(canvas, canvas_lowermane_detail[i]);
+			pngimg_merge_and_free(canvas, canvas_lowermane_detail[i]);
 		}
-		pngimg_merge(canvas, canvas_uppermane_fill);
+		pngimg_merge_and_free(canvas, canvas_uppermane_fill);
 		for (int i = 0; i < style_detail_count(uppermane); i++) {
-			pngimg_merge(canvas, canvas_uppermane_detail[i]);
+			pngimg_merge_and_free(canvas, canvas_uppermane_detail[i]);
 		}
-		pngimg_merge(canvas, canvas_uppermane_outline);
+		pngimg_merge_and_free(canvas, canvas_uppermane_outline);
 		for (int i = 0; i < style_color_count(uppermane); i++) {
-			pngimg_merge(canvas, canvas_uppermane_color[i + 1]);
-			pngimg_merge(canvas, canvas_uppermane_color_outline[i + 1]);
+			pngimg_merge_and_free(canvas, canvas_uppermane_color[i + 1]);
+			pngimg_merge_and_free(canvas, canvas_uppermane_color_outline[i + 1]);
 		}
 		if (race & (UNICORN | ALICORN)) {
-			pngimg_merge(canvas, canvas_horn_fill);
-			pngimg_merge(canvas, canvas_horn_outline);
+			pngimg_merge_and_free(canvas, canvas_horn_fill);
+			pngimg_merge_and_free(canvas, canvas_horn_outline);
 		}
-		pngimg_merge(canvas, canvas_ear_fill);
-		pngimg_merge(canvas, canvas_ear_outline);//*/
+		pngimg_merge_and_free(canvas, canvas_ear_fill);
+		pngimg_merge_and_free(canvas, canvas_ear_outline);//*/
 	}
 
-	strrchr(filename, '.')[0] = '\0';
-	strcat(filename, ".png");
-	//pngimg_merge(canvas_body_fill, canvas_body_outline);
-	//pngimg_merge(canvas_body_outline, canvas_body_fill);
-	//pngimg_merge(canvas_body_outline, canvas_ear_fill);
-	//pngimg_merge(canvas_body_outline, canvas_ear_outline);
-	//merge(top/target, bottom)
-	pngimg_write(canvas, filename);
-
-	close(fd);
+	FILE * outf;
+	if (argc > 1) {
+		char name[255];
+		strcpy(name, filename);
+		strrchr(name, '.')[0] = '\0';
+		strcat(name, ".png");
+		outf = fopen(name, "w");
+	}
+	else {
+		outf = fdopen(STDOUT_FILENO, "w");
+		//~ png_bytep * png_data;
+		//~ png_data = pngimg_getData(canvas);
+		
+		//~ int width, height;
+		//~ width = pngimg_width(canvas);
+		//~ height = pngimg_height(canvas);
+		
+		//~ write(STDOUT_FILENO, &width, 4);
+		//~ write(STDOUT_FILENO, &height, 4);
+		
+		//~ for (int i = 0; i < height; i++) {
+			//~ for (int j = 0; j < width; j++) {
+				//~ write(STDOUT_FILENO, &png_data[i][4*j + 0], 1);
+				//~ write(STDOUT_FILENO, &png_data[i][4*j + 1], 1);
+				//~ write(STDOUT_FILENO, &png_data[i][4*j + 2], 1);
+				//~ write(STDOUT_FILENO, &png_data[i][4*j + 3], 1);
+			//~ }
+			//~ free(png_data[i]);
+		//~ }
+		//~ free(png_data);
+	}
+	pngimg_write(canvas, outf);
+	fclose(outf);
 }
 
 void read_nbt_string(char * s, int fd) {
@@ -924,6 +964,31 @@ void read_nbt_string(char * s, int fd) {
 	}
 	read(fd, s, l);
 	s[l] = 0;
+}
+
+int get_nbt_string(char * s, uint8_t * data) {
+	uint8_t c;
+	uint32_t l;
+	int i = 0;
+	l = 0;
+	c = data[i];
+	i++;
+	l = data[i];
+	i++;
+	l |= c << 8;
+	if (l > 256)
+		l = 256;
+	else if (l == 0) {
+		s[0] = 0;
+		return 2;
+	}
+	//printf("%d\n", l);
+	for (int j = 0; j < l; j++)
+		s[j] = (data + i)[j];
+	i += l;
+	s[l] = 0;
+	
+	return i;
 }
 
 void strtolower(char * s) {
