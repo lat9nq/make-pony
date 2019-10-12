@@ -1,6 +1,7 @@
 CC=gcc
 CCFLAGS=-Wall -O3 -pipe -pthread
-LIBFLAGS=-lm `pkg-config --cflags --libs gtk+-3.0 libpng16`
+LIBFLAGS=-lm `pkg-config --cflags --libs gtk+-3.0`
+ARS=libpng/libpng.a zlib/libz.a
 
 SRC=./src/
 BUILD=./build/
@@ -17,12 +18,20 @@ all:
 	+make -f $(abspath $(lastword $(MAKEFILE_LIST))) thumbnailer
 
 MKOFILES=$(BUILD)make-pony.o $(BUILD)target.o $(BUILD)color.o $(BUILD)nbt.o $(BUILD)pngimg.o $(BUILD)pixel.o $(BUILD)thumbnailer.o
-make-pony:build/ $(MKOFILES)
-	$(CC) $(CCFLAGS) $(MKOFILES) -o$@ $(LIBFLAGS) -Wl,--export-all-symbols -mwindows
+make-pony:build/ $(MKOFILES) $(ARS)
+	$(CC) $(CCFLAGS) $(MKOFILES) -o$@ $(ARS) $(LIBFLAGS) -Wl,--export-all-symbols -mwindows
 
 THUMB_OFILES=$(BUILD)color.o $(BUILD)nbt.o $(BUILD)pixel.o $(BUILD)pngimg.o $(BUILD)thumbnailer.o $(BUILD)thumbnailer_main.o
-thumbnailer:build/ $(THUMB_OFILES)
-	$(CC) $(CCFLAGS) $(THUMB_OFILES) -o$@ $(LIBFLAGS)
+thumbnailer:build/ $(THUMB_OFILES) $(ARS)
+	$(CC) $(CCFLAGS) $(THUMB_OFILES) -o$@ $(ARS) $(LIBFLAGS)
+
+.PHONY:ars
+ars:libpng/libpng.a zlib/libz.a
+
+libpng/libpng.a:libpng/.git
+	cd libpng; sed -e 's/ gcc/ x86_64-w64-mingw32-gcc/g' scripts/makefile.gcc > ./Makefile.win; $(MAKE) -f Makefile.win libpng.a
+zlib/libz.a:zlib/.git
+	cd zlib; ./configure; sed -e 's/=gcc/=x86_64-w64-mingw32-gcc/g' Makefile > Makefile.win; $(MAKE) -f Makefile.win libz.a
 
 $(BUILD)color.o: $(SRC)color.c $(SRC)color.h
 $(BUILD)make-pony.o: $(SRC)make-pony.c $(SRC)color.h $(SRC)target.h $(SRC)make-pony.h \
