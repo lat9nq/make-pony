@@ -61,6 +61,7 @@ int main(int argc, char * argv[]) {
 	oc->white = -1;
 	oc->detail_count = -1;
 	oc->wheel = -1;
+	oc->any_saturation = 0;
 	oc->traditional = 0;
 	oc->verbose = 0;
 	oc->hue = -1;
@@ -524,6 +525,7 @@ void on_btn_generate_clicked() {
 	mp_data_init(main_oc);
 	main_oc->seed = seed;
 	main_oc->desaturated = atoi(gtk_combo_box_get_active_id((GtkComboBox*)main_widgets->g_cmb_saturation));
+	main_oc->white = (main_oc->desaturated == 2);
 	main_oc->wheel = atoi(gtk_combo_box_get_active_id((GtkComboBox*)main_widgets->g_cmb_wheel));
 	main_oc->use_socks = atoi(gtk_combo_box_get_active_id((GtkComboBox*)main_widgets->g_cmb_socks));
 	main_oc->male = atoi(gtk_combo_box_get_active_id((GtkComboBox*)main_widgets->g_cmb_male));
@@ -828,7 +830,7 @@ void mp_pick_colors(mp_data * oc) {
 		rand();
 		rand();
 	}
-	int any_saturation = !oc->desaturated;
+	oc->any_saturation = !oc->desaturated;
 
 	if (oc->verbose) {
 		fprintf(sterr, "body is %ssaturated\n", (oc->desaturated) ? "de" : "");
@@ -903,7 +905,7 @@ void mp_pick_colors(mp_data * oc) {
 		}
 		else {
 			hsvcolor.v = (!oc->desaturated) ? sqrtf((rand() % 12 + 4) / 15.0f) : sqrtf((rand() & 15) / 15.0f);
-			any_saturation = (1 & (hsvcolor.v > 0.0f)) | any_saturation;
+			oc->any_saturation = (1 & (hsvcolor.v > 0.0f)) | oc->any_saturation;
 		}
 
 		avg_sat += ((!oc->desaturated) * hsvcolor.s + (oc->desaturated) * hsvcolor.v) / pow(2,i);
@@ -991,7 +993,7 @@ void mp_pick_colors(mp_data * oc) {
 		// generate colors if using floofers
 		if (oc->use_floofers) {
 			strcpy(oc->details[details_in_use], "GRADIENT");
-			if (any_saturation) {
+			if (oc->any_saturation) {
 				oc->detail_color[details_in_use] = color1;
 			}
 			else {
@@ -1154,7 +1156,7 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 				// c.b = 255;
 				// }
 				else if (strstr(cur+1, "iris1")) {
-					if (oc->desaturated) {
+					if (!oc->any_saturation) {
 						hsvcolor.h = 0;
 						hsvcolor.s = 0.0f;
 						hsvcolor.v = 0.5f * (1.0f-value(&oc->body_color));
@@ -1170,15 +1172,15 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 				else if (strstr(cur+1, "irisline2")) {
 					c = color1;
 					hsvcolor.h = hue(&c);
-					hsvcolor.s = 0.1f * !oc->desaturated;
-					hsvcolor.v = 0.9f + 0.1 * !oc->desaturated;
+					hsvcolor.s = 0.1f * oc->any_saturation;
+					hsvcolor.v = 0.9f + 0.1 * oc->any_saturation;
 					hsvToRGB(&hsvcolor, &c);
 				}
 				else if (strstr(cur+1, "irisline1")) {
 					c = color1;
 					hsvcolor.h = hue(&c);
-					hsvcolor.s = 0.5f * !oc->desaturated;
-					hsvcolor.v = 0.5f + 0.5f * !oc->desaturated;
+					hsvcolor.s = 0.5f * oc->any_saturation;
+					hsvcolor.v = 0.5f + 0.5f * oc->any_saturation;
 					hsvToRGB(&hsvcolor, &c);
 				}
 				else {

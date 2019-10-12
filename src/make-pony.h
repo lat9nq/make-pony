@@ -73,6 +73,7 @@ typedef struct {
 	int male;
 	int desaturated;
 	int white;
+	int any_saturation;
 	int key; // style
 	int detail_count;
 	char ** details;

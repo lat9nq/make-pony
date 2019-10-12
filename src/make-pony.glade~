@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="upper">360</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkWindow" id="window_main">
+    <property name="width_request">480</property>
+    <property name="height_request">810</property>
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Make-pony</property>
+    <property name="resizable">False</property>
+    <signal name="destroy" handler="on_window_main_destroy" swapped="no"/>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <object class="GtkFixed">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_left">20</property>
+        <property name="margin_right">20</property>
+        <property name="margin_top">20</property>
+        <property name="margin_bottom">20</property>
+        <child>
+          <object class="GtkFileChooserButton" id="fch_outdir">
+            <property name="width_request">260</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="action">select-folder</property>
+            <property name="title" translatable="yes">Choose an output directory</property>
+          </object>
+          <packing>
+            <property name="y">520</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="btn_generate">
+            <property name="label" translatable="yes">Generate</property>
+            <property name="width_request">80</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_btn_generate_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">270</property>
+            <property name="y">520</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="entry_seed">
+            <property name="width_request">220</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Random number generator seed</property>
+            <property name="placeholder_text" translatable="yes">current time</property>
+          </object>
+          <packing>
+            <property name="y">440</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="btn_seed_random">
+            <property name="label" translatable="yes">Random</property>
+            <property name="width_request">100</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_btn_seed_random_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">340</property>
+            <property name="y">440</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Output directory:</property>
+          </object>
+          <packing>
+            <property name="y">490</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="width_request">0</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Seed:</property>
+          </object>
+          <packing>
+            <property name="y">410</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="chk_preview">
+            <property name="label" translatable="yes">Preview</property>
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="active">True</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
+            <property name="x">340</property>
+            <property name="y">256</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="scrl_log">
+            <property name="width_request">440</property>
+            <property name="height_request">170</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkTextView" id="txt_log">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="editable">False</property>
+                <signal name="size-allocate" handler="on_txt_log_size_allocate" swapped="no"/>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="y">600</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Saturation type:</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Hair color wheel:</property>
+          </object>
+          <packing>
+            <property name="y">60</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBoxText" id="cmb_wheel">
+            <property name="width_request">160</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="active_id">-1</property>
+            <items>
+              <item id="-1" translatable="yes">random</item>
+              <item id="0" translatable="yes">off</item>
+              <item id="1" translatable="yes">analogous</item>
+              <item id="2" translatable="yes">rectangular</item>
+            </items>
+          </object>
+          <packing>
+            <property name="y">90</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBoxText" id="cmb_saturation">
+            <property name="width_request">160</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="active_id">-1</property>
+            <items>
+              <item id="-1" translatable="yes">random</item>
+              <item id="0" translatable="yes">colored body</item>
+              <item id="1" translatable="yes">gray body</item>
+              <item id="2" translatable="yes">white body</item>
+            </items>
+          </object>
+          <packing>
+            <property name="y">30</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="width_request">0</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Hair style:</property>
+          </object>
+          <packing>
+            <property name="y">340</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBoxText" id="cmb_style">
+            <property name="width_request">440</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="active_id">-1</property>
+            <items>
+              <item id="-1" translatable="yes">random</item>
+              <item id="0" translatable="yes">ADVENTUROUS, ADVENTUROUS, ADVENTUROUS</item>
+              <item id="1" translatable="yes">SHOWBOAT, SHOWBOAT, SHOWBOAT</item>
+              <item id="2" translatable="yes">BOOKWORM, BOOKWORM, BOOKWORM</item>
+              <item id="3" translatable="yes">SPEEDSTER, SPEEDSTER, SPEEDSTER</item>
+              <item id="4" translatable="yes">ASSERTIVE, ASSERTIVE, ASSERTIVE</item>
+              <item id="5" translatable="yes">RADICAL, NONE, RADICAL</item>
+              <item id="6" translatable="yes">BUMPKIN, BUMPKIN, BUMPKIN</item>
+              <item id="7" translatable="yes">FLOOFEH, FLOOFEH, FLOOFEH</item>
+              <item id="8" translatable="yes">INSTRUCTOR, NONE, RADICAL</item>
+              <item id="9" translatable="yes">FILLY, ADVENTUROUS, SHOWBOAT</item>
+              <item id="10" translatable="yes">ADVENTUROUS, MOON, SHOWBOAT</item>
+              <item id="11" translatable="yes">BOOKWORM, TIMID, SHOWBOAT</item>
+              <item id="12" translatable="yes">ADVENTUROUS, ADVENTUROUS, RADICAL</item>
+              <item id="13" translatable="yes">BOLD, BOLD, RADICAL</item>
+              <item id="14" translatable="yes">MECHANIC, MOON, ADVENTUROUS</item>
+              <item id="15" translatable="yes">SHOWBOAT, BOOKWORM, SHOWBOAT</item>
+              <item id="16" translatable="yes">MAILCALL, MAILCALL, MAILCALL</item>
+            </items>
+          </object>
+          <packing>
+            <property name="y">370</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="chk_hue">
+            <property name="label" translatable="yes">Force a hue</property>
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="draw_indicator">True</property>
+            <signal name="toggled" handler="on_chk_hue_toggled" swapped="no"/>
+          </object>
+          <packing>
+            <property name="y">270</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScale" id="scl_hue">
+            <property name="width_request">440</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="sensitive">False</property>
+            <property name="can_focus">True</property>
+            <property name="adjustment">adjustment1</property>
+            <property name="round_digits">1</property>
+            <property name="digits">0</property>
+            <signal name="value-changed" handler="on_scl_hue_value_changed" swapped="no"/>
+          </object>
+          <packing>
+            <property name="y">300</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="chk_verbose">
+            <property name="label" translatable="yes">Verbose output</property>
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
+            <property name="y">565</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="chk_thumbnail">
+            <property name="label" translatable="yes">Save thumbnail</property>
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="active">True</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
+            <property name="x">140</property>
+            <property name="y">565</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="entry_thumbnail_dir">
+            <property name="width_request">180</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Place thumbnails in directory relative to output directory.</property>
+            <property name="text" translatable="yes">thumbnails</property>
+            <property name="placeholder_text" translatable="yes">Thumbnail directory</property>
+          </object>
+          <packing>
+            <property name="x">260</property>
+            <property name="y">565</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="btn_save">
+            <property name="label" translatable="yes">Save</property>
+            <property name="width_request">80</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_btn_save_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">360</property>
+            <property name="y">520</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="chk_traditional">
+            <property name="label" translatable="yes">Disable body details</property>
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
+            <property name="y">240</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="width_request">0</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Socks:</property>
+          </object>
+          <packing>
+            <property name="y">120</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBoxText" id="cmb_socks">
+            <property name="width_request">160</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="active_id">-1</property>
+            <items>
+              <item id="-1" translatable="yes">random</item>
+              <item id="0" translatable="yes">off</item>
+              <item id="1" translatable="yes">forced</item>
+            </items>
+          </object>
+          <packing>
+            <property name="y">150</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="width_request">0</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Gender:</property>
+          </object>
+          <packing>
+            <property name="y">180</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBoxText" id="cmb_male">
+            <property name="width_request">160</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="active_id">-1</property>
+            <items>
+              <item id="-1" translatable="yes">rarely male</item>
+              <item id="0" translatable="yes">female</item>
+              <item id="1" translatable="yes">male</item>
+            </items>
+          </object>
+          <packing>
+            <property name="y">210</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="entry_hue">
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="sensitive">False</property>
+            <property name="can_focus">True</property>
+            <property name="placeholder_text" translatable="yes">#000000</property>
+            <signal name="changed" handler="on_entry_hue_changed" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">170</property>
+            <property name="y">270</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="btn_seed_now">
+            <property name="label" translatable="yes">Now</property>
+            <property name="width_request">100</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_btn_seed_now_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">230</property>
+            <property name="y">440</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkImage" id="img_preview">
+            <property name="width_request">256</property>
+            <property name="height_request">256</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="stock">gtk-missing-image</property>
+          </object>
+          <packing>
+            <property name="x">184</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
