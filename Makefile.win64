@@ -1,6 +1,6 @@
 CC=gcc
 CCFLAGS=-Wall -O3 -pipe -pthread
-LIBFLAGS=-lm -lpng `pkg-config --cflags --libs gtk+-3.0 libpng16`
+LIBFLAGS=-lm `pkg-config --cflags --libs gtk+-3.0 libpng16`
 
 SRC=./src/
 BUILD=./build/
@@ -18,7 +18,7 @@ all:
 
 MKOFILES=$(BUILD)make-pony.o $(BUILD)target.o $(BUILD)color.o $(BUILD)nbt.o $(BUILD)pngimg.o $(BUILD)pixel.o $(BUILD)thumbnailer.o
 make-pony:build/ $(MKOFILES)
-	$(CC) $(CCFLAGS) $(MKOFILES) -o$@ $(LIBFLAGS) -Wl,--export-all-symbols
+	$(CC) $(CCFLAGS) $(MKOFILES) -o$@ $(LIBFLAGS) -Wl,--export-all-symbols -mwindows
 
 THUMB_OFILES=$(BUILD)color.o $(BUILD)nbt.o $(BUILD)pixel.o $(BUILD)pngimg.o $(BUILD)thumbnailer.o $(BUILD)thumbnailer_main.o
 thumbnailer:build/ $(THUMB_OFILES)
