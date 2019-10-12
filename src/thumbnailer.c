@@ -36,6 +36,7 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 	nbt.name_length = 4;
 	strncpy(nbt.name, "data", nbt.name_length);
 	nbt.payload = malloc(sizeof(nbt_t) * nbt_len);
+	memset(nbt.payload, 0, sizeof(nbt_t) * nbt_len);
 
 	color body_color;
 	color body_detail[BODY_DETAIL_MAX]; // array of body detail colors
@@ -735,8 +736,10 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 		pngimg_colorify(canvas_eye_lashes, &eye_lashes, 1.0);
 		pngimg_colorify(canvas_eye_brows, &eye_brows, 1.0);
 
-		pngimg_colorify(canvas_wing_outline, &body_color, 0.8);
-		pngimg_colorify(canvas_wing_fill, &body_color, 1.0);
+		if (race == PEGASUS || race == ALICORN) {
+			pngimg_colorify(canvas_wing_outline, &body_color, 0.8);
+			pngimg_colorify(canvas_wing_fill, &body_color, 1.0);
+		}
 
 		for (int i = 0; i < BODY_DETAIL_MAX; i++) {
 			if (body_detail_s[i] == NULL)
@@ -854,7 +857,6 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 		if (body_detail_s[i] != NULL)
 			free(body_detail_s[i]);
 	}
-	free(data);
 	
 	return 0;
 }

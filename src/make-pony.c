@@ -28,6 +28,7 @@
 #include "color.h"
 #include "target.h"
 #include "make-pony.h"
+#include "thumbnailer.h"
 
 int main(int argc, char * argv[]) {
 
@@ -586,58 +587,10 @@ void on_btn_generate_clicked() {
 }
 
 int render_oc(PNGIMG * img, uint8_t * nbt, int nbt_len, mp_data * oc) {
-	int thumb_pipe_in[2];
-	int thumb_pipe_out[2];
-#ifdef _WIN64
-	return -1;
-	_pipe(thumb_pipe_in, 4096, _O_BINARY);
-	_pipe(thumb_pipe_out, 4096, _O_BINARY);
-#else
-	pipe(thumb_pipe_in);
-	pipe(thumb_pipe_out);
-	
-	if (!fork()) {
-		dup2(thumb_pipe_in[0], STDIN_FILENO);
-		dup2(thumb_pipe_out[1], STDOUT_FILENO);
-		dup2(log_pipe[1], STDERR_FILENO);
-		close(thumb_pipe_in[1]);
-		close(thumb_pipe_out[0]);
-		close(log_pipe[0]);
-		close(thumb_pipe_out[1]);
-		close(thumb_pipe_in[0]);
-		close(log_pipe[1]);
-		
-		const char * thumbnailer = "./thumbnailer";
-		execlp(thumbnailer, thumbnailer, NULL);
-		
-		fprintf(stderr, "Failed to run %s\n", thumbnailer);
-		exit(0);
-	}
-	close(thumb_pipe_out[1]);
-	close(thumb_pipe_in[0]);
-	
-	for (int i = 0; i < nbt_len; i++) {
-		write(thumb_pipe_in[1], &nbt[i], 1);
-	}
-	
-	close(thumb_pipe_in[1]);
-	
-	FILE * f;
-	f = fdopen(thumb_pipe_out[0], "r");
-	if (!f) {
-		close(thumb_pipe_out[0]);
-		fprintf(sterr, "Error: could not open pipe for thumbnailer output.\n");
-		return -1;
-	}
-	if (pngimg_read_fp(img, f) < 0) {
-		preview_seed = 0;
-	}
-	fclose(f);
-	
-	close(thumb_pipe_out[0]);
-	
-	return oc->seed;
-#endif
+	//int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len);
+	preview_seed = oc->seed;
+	thumbnail(img, nbt, nbt_len);
+	return preview_seed;
 }
 
 void on_btn_seed_now_clicked() {

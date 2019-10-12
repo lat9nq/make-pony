@@ -1,5 +1,5 @@
 CC=gcc
-CCFLAGS=-Wall -O3 -pipe -pthread
+CCFLAGS=-Wall -g -pipe -pthread
 LIBFLAGS=-lm -lpng `pkg-config --cflags --libs gtk+-3.0 libpng16`
 
 SRC=./src/
@@ -16,7 +16,7 @@ all:
 	+make -f $(abspath $(lastword $(MAKEFILE_LIST))) make-pony
 	+make -f $(abspath $(lastword $(MAKEFILE_LIST))) thumbnailer
 
-MKOFILES=$(BUILD)make-pony.o $(BUILD)target.o $(BUILD)color.o $(BUILD)nbt.o $(BUILD)pngimg.o $(BUILD)pixel.o
+MKOFILES=$(BUILD)make-pony.o $(BUILD)target.o $(BUILD)color.o $(BUILD)nbt.o $(BUILD)pngimg.o $(BUILD)pixel.o $(BUILD)thumbnailer.o
 make-pony:build/ $(MKOFILES)
 	$(CC) $(CCFLAGS) $(MKOFILES) -o$@ $(LIBFLAGS) -rdynamic
 
@@ -26,7 +26,7 @@ thumbnailer:build/ $(THUMB_OFILES)
 
 $(BUILD)color.o: $(SRC)color.c $(SRC)color.h
 $(BUILD)make-pony.o: $(SRC)make-pony.c $(SRC)color.h $(SRC)target.h $(SRC)make-pony.h \
- $(SRC)nbt.h $(SRC)pngimg.h $(SRC)pixel.h
+ $(SRC)nbt.h $(SRC)pngimg.h $(SRC)pixel.h $(SRC)thumbnailer.h
 $(BUILD)nbt.o: $(SRC)nbt.c $(SRC)nbt.h $(SRC)color.h
 $(BUILD)pixel.o: $(SRC)pixel.c $(SRC)pixel.h
 $(BUILD)pngimg.o: $(SRC)pngimg.c $(SRC)pngimg.h $(SRC)pixel.h $(SRC)color.h

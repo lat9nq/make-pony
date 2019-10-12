@@ -19,8 +19,17 @@ void pngimg_alloc(PNGIMG * img, int w, int h) {
 	img->width = w;
 	img->height = h;
 	img->pixels = (Pixel**)malloc(sizeof(*(img->pixels)) * h);
-	for (int i = 0; i < h; i++) 
+	if (img->pixels == NULL) {
+		fprintf(stderr, "error: malloc could not allocate more memory\n");
+		return;
+	}
+	for (int i = 0; i < h; i++) {
 		img->pixels[i] = (Pixel*)malloc(sizeof(*(img->pixels[i]))*w);
+		if (img->pixels[i] == NULL) {
+			fprintf(stderr, "error: malloc could not allocate more memory\n");
+			return;
+		}
+	}
 }
 
 void pngimg_free(PNGIMG * img) {
@@ -135,8 +144,8 @@ int pngimg_read(PNGIMG * img, char * filename) {
 	
 	int val;
 	val = pngimg_read_fp(img, f);
-	
-	fclose(f);
+	if (val == 0)
+		fclose(f);
 	
 	return val;
 }
@@ -254,6 +263,7 @@ int pngimg_merge(PNGIMG *img1, PNGIMG *img2) {
 int pngimg_merge_and_free(PNGIMG *img1, PNGIMG *img2) {
 	int val = pngimg_merge(img1, img2);
 	pngimg_free(img2);
+	free(img2);
 	return val;
 }
 

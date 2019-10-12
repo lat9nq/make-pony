@@ -43,9 +43,6 @@
 #define MAILCALL	16
 
 #define RACES	3
-#define EARTH	0
-#define PEGASUS	1
-#define UNICORN	2
 
 int at;
 // #define PUSHTARGET(R,X,T)	sprintf((R)[at], "%c%s", (T), (X)); at++
