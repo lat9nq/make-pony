@@ -923,13 +923,13 @@ void mp_pick_colors(mp_data * oc) {
 				hsvcolor.v = sqrtf((rand() & 15) / 15.0f);
 			}
 			else {
-				hsvcolor.s = (rand() % 12 + 3) / 15.0f;
-				hsvcolor.v = sqrtf((rand() % 12 + 3) / 15.0f);
+				hsvcolor.s = (rand() % 10 + 6) / 15.0f;
+				hsvcolor.v = sqrtf((rand() % 10 + 6) / 15.0f);
 			}
 		}
 		else {
 			hsvcolor.v = (oc->desaturated != 1) ? 
-				sqrtf((rand() % 12 + 3) / 15.0f) : 
+				sqrtf((rand() % 10 + 6) / 15.0f) : 
 				sqrtf((rand() & 15) / 15.0f);
 		}
 		oc->any_saturation = (hsvcolor.s > 0.0f) | oc->any_saturation;
