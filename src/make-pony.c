@@ -672,6 +672,19 @@ void on_btn_save_clicked() {
 			return;
 		}
 		
+		snprintf(output, 1023, "%s/%s", directory, thumb_dir);
+#ifdef _WIN64
+		struct _stat stat_out;
+		if (_stat(output, &stat_out)) {
+#else
+		struct stat stat_out;
+		if (stat(output, &stat_out)) {
+#endif
+			fprintf(sterr, "Unable to access %s\n", output);
+			update_txt_log();
+			return;
+		}
+		
 		if (thumb_dir[thumb_dir_len - 1] != '/')
 			strcat(thumb_dir, "/");
 		
