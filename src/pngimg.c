@@ -1,18 +1,14 @@
 /* pngimg.cpp
  */
 
-#include <png.h>
 #include "pngimg.h"
-#include "pixel.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
 
 PNGIMG * pngimg_init() {
 	PNGIMG * img = (PNGIMG *)malloc(sizeof(*img));
 	img->pixels = NULL;
 	img->width = 0;
 	img->height = 0;
+	
 	return img;
 }
 
@@ -275,13 +271,6 @@ int pngimg_merge(PNGIMG *img1, PNGIMG *img2) {
 		}
 	}
 	return 0;
-}
-
-int pngimg_merge_and_free(PNGIMG *img1, PNGIMG *img2) {
-	int val = pngimg_merge(img1, img2);
-	pngimg_free(img2);
-	free(img2);
-	return val;
 }
 
 void pngimg_colorify(PNGIMG *img, const color * c, float val) {

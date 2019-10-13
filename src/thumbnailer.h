@@ -1,6 +1,20 @@
 #ifndef THUMBNAILER_H
 #define THUMBNAILER_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <ctype.h>
+#include <stdint.h>
+
+#include "color.h"
+#include "pngimg.h"
+#include "nbt.h"
+
 /* Define memory management maximums for mane and body details. */
 #define DETAIL_MAX	6
 #define COLOR_MAX	6
@@ -37,6 +51,7 @@ void read_nbt_string(char * s, int fd); /* Read a NBT string from a file */
 int get_nbt_string(char * s, uint8_t * data); /* Extract a NBT string from data */
 
 int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len);
+int thumbnail_add_part(PNGIMG ** img, char * filename, color * c, float value);
 
 /* Read 4 bytes and be able to use it as a different integer, or convert it from little to big endian */
 typedef union {

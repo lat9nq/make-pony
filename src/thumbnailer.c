@@ -8,20 +8,6 @@
  * Requires libpng, and its dependency zlib.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <ctype.h>
-#include <stdint.h>
-
-#include "color.h"
-#include "pngimg.h"
-#include "nbt.h"
-
 #include "thumbnailer.h"
 
 int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
@@ -34,7 +20,8 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 	/* Initialize the base NBT element */
 	nbt.code = NBT_GROUP;
 	nbt.name_length = 4;
-	strncpy(nbt.name, "data", nbt.name_length);
+	//strncpy(nbt.name, "data", nbt.name_length);
+	memcpy(nbt.name, "data", nbt.name_length);
 	nbt.payload = malloc(sizeof(nbt_t) * nbt_len);
 	memset(nbt.payload, 0, sizeof(nbt_t) * nbt_len);
 
@@ -44,7 +31,7 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 	color mane_color[6];
 	color tail_detail[6];
 	color mane_detail[6];
-	uint8_t use_separated_eyes; // boolean
+	uint8_t use_separated_eyes = 0; // boolean
 	/* For eye colors, we use an array of 3 for the both, left, and right colors
 	 * We don't know ahead of time whether we should keep just the both, or left
 	 * and right colors since there is no order in an NBT.
@@ -381,7 +368,8 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 	width = 1024;
 	height = 1024;
 
-	pngimg_alloc(canvas, width, height);
+	if (canvas->pixels == NULL)
+		pngimg_alloc(canvas, width, height);
 
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
@@ -403,447 +391,149 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 				can_col->b = nbt_col->b + 128;
 			}
 		}
+		free(nbt_col);
 	}
 
-	PNGIMG * canvas_body_outline;
-	PNGIMG * canvas_body_fill;
-	PNGIMG * canvas_body_detail[BODY_DETAIL_MAX];
-	PNGIMG * canvas_ear_outline;
-	PNGIMG * canvas_ear_fill;
-	PNGIMG * canvas_uppermane_outline;
-	PNGIMG * canvas_uppermane_fill;
-	PNGIMG * canvas_uppermane_color[COLOR_MAX];
-	PNGIMG * canvas_uppermane_color_outline[COLOR_MAX];
-	PNGIMG * canvas_lowermane_outline;
-	PNGIMG * canvas_lowermane_fill;
-	PNGIMG * canvas_lowermane_color[COLOR_MAX];
-	PNGIMG * canvas_lowermane_color_outline[COLOR_MAX];
-	PNGIMG * canvas_lowermane_detail[DETAIL_MAX];
-	PNGIMG * canvas_tail_outline;
-	PNGIMG * canvas_tail_fill;
-	PNGIMG * canvas_tail_color[COLOR_MAX];
-	PNGIMG * canvas_tail_color_outline[COLOR_MAX];
-	PNGIMG * canvas_tail_detail[DETAIL_MAX];
-	PNGIMG * canvas_uppermane_detail[DETAIL_MAX];
-	PNGIMG * canvas_horn_fill;
-	PNGIMG * canvas_horn_outline;
-	PNGIMG * canvas_wing_fill;
-	PNGIMG * canvas_wing_outline;
-	if (race == UNICORN || race == ALICORN) {
-		canvas_horn_fill = pngimg_init();
-		canvas_horn_outline = pngimg_init();
-	}
-	if (race == PEGASUS || race == ALICORN) {
-		canvas_wing_fill = pngimg_init();
-		canvas_wing_outline = pngimg_init();
-	}
-
-	PNGIMG * canvas_eye_iris = pngimg_init();
-	PNGIMG * canvas_eye_iris_gradient = pngimg_init();
-	PNGIMG * canvas_eye_irisline1 = pngimg_init();
-	PNGIMG * canvas_eye_irisline2 = pngimg_init();
-	PNGIMG * canvas_eye_pupil = pngimg_init();
-	PNGIMG * canvas_eye_reflection = pngimg_init();
-	PNGIMG * canvas_eye_sclera = pngimg_init();
-	PNGIMG * canvas_eye_brows = pngimg_init();
-	PNGIMG * canvas_eye_lashes = pngimg_init();
-
-	PNGIMG * canvas_reye_iris;
-	PNGIMG * canvas_reye_iris_gradient;
-	PNGIMG * canvas_reye_irisline1;
-	PNGIMG * canvas_reye_irisline2;
-	PNGIMG * canvas_reye_pupil;
-	PNGIMG * canvas_reye_reflection;
-	PNGIMG * canvas_reye_sclera;
-	if (use_separated_eyes) {
-		canvas_reye_iris = pngimg_init();
-		canvas_reye_iris_gradient = pngimg_init();
-		canvas_reye_irisline1 = pngimg_init();
-		canvas_reye_irisline2 = pngimg_init();
-		canvas_reye_pupil = pngimg_init();
-		canvas_reye_reflection = pngimg_init();
-		canvas_reye_sclera = pngimg_init();
-	}
-
-	canvas_body_outline = pngimg_init();
-	canvas_body_fill = pngimg_init();
-	canvas_ear_outline = pngimg_init();
-	canvas_ear_fill = pngimg_init();
-	canvas_uppermane_outline = pngimg_init();
-	canvas_uppermane_fill = pngimg_init();
-	canvas_lowermane_outline = pngimg_init();
-	canvas_lowermane_fill = pngimg_init();
-	canvas_tail_outline = pngimg_init();
-	canvas_tail_fill = pngimg_init();
-
-	PNGIMG * canvas_socks_outline = pngimg_init();
-	PNGIMG * canvas_socks_fill = pngimg_init();
-	PNGIMG * canvas_socks_color1 = pngimg_init();
-	PNGIMG * canvas_socks_color2 = pngimg_init();
-
-	int skip = 0;
-	if (pngimg_read(canvas_body_outline, "templates/body_outline.png") < 0) 
-		skip = 1;
-	if (pngimg_read(canvas_body_fill, "templates/body_fill.png") < 0)
-		skip = 1;
-	if (pngimg_read(canvas_ear_outline, "templates/ear_outline.png") < 0)
-		skip = 1;
-	if (pngimg_read(canvas_ear_fill, "templates/ear_fill.png") < 0)
-		skip = 1;
-	if (pngimg_read(canvas_eye_iris, "templates/eye_iris.png") < 0)
-		skip = 1;
-	if (pngimg_read(canvas_eye_iris_gradient, "templates/eye_irisgradient.png") < 0)
-		skip = 1;
-	if (pngimg_read(canvas_eye_irisline1, "templates/eye_irisline1.png") < 0)
-		skip = 1;
-	if (pngimg_read(canvas_eye_irisline2, "templates/eye_irisline2.png") < 0)
-		skip = 1;
-	if (pngimg_read(canvas_eye_pupil, "templates/eye_pupil.png") < 0)
-		skip = 1;
-	if (pngimg_read(canvas_eye_reflection, "templates/eye_reflection.png") < 0)
-		skip = 1;
-	if (pngimg_read(canvas_eye_brows, "templates/eye_brows.png") < 0)
-		skip = 1;
-	if (pngimg_read(canvas_eye_lashes, "templates/eye_lashes.png") < 0)
-		skip = 1;
-	if (pngimg_read(canvas_eye_sclera, "templates/eye_sclera.png") < 0)
-		skip = 1;
-	if (use_separated_eyes) {
-		if (pngimg_read(canvas_reye_iris, "templates/reye_iris.png") < 0)
-			skip = 1;
-		if (pngimg_read(canvas_reye_iris_gradient, "templates/reye_irisgradient.png") < 0)
-			skip = 1;
-		if (pngimg_read(canvas_reye_irisline1, "templates/reye_irisline1.png") < 0)
-			skip = 1;
-		if (pngimg_read(canvas_reye_irisline2, "templates/reye_irisline2.png") < 0)
-			skip = 1;
-		if (pngimg_read(canvas_reye_pupil, "templates/reye_pupil.png") < 0)
-			skip = 1;
-		if (pngimg_read(canvas_reye_reflection, "templates/reye_reflection.png") < 0)
-			skip = 1;
-		if (pngimg_read(canvas_reye_sclera, "templates/reye_sclera.png") < 0)
-			skip = 1;
-	}
-	if (race & (PEGASUS | ALICORN)) {
-		if (pngimg_read(canvas_wing_fill, "templates/wing_fill.png") < 0)
-			skip = 1;
-		if (pngimg_read(canvas_wing_outline, "templates/wing_outline.png") < 0)
-			skip = 1;
-	}
-	if (use_socks) {
-		if (pngimg_read(canvas_socks_outline, "templates/socks_outline.png") < 0)
-			use_socks = 0;
-		if (pngimg_read(canvas_socks_color1, "templates/socks_color1.png") < 0)
-			use_socks = 0;
-		if (pngimg_read(canvas_socks_color2, "templates/socks_color2.png") < 0)
-			use_socks = 0;
-		if (pngimg_read(canvas_socks_fill, "templates/socks_fill.png") < 0)
-			use_socks = 0;
-	}
-
+	PNGIMG ** pony_part;
+	int pony_part_count;
+	pony_part = (PNGIMG**)malloc(sizeof(*pony_part) * 1024);
+	pony_part_count = 0;
+	body_color.r += 128;
+	body_color.g += 128;
+	body_color.b += 128;
+	body_color.a += 128;
+	
 	strtolower(uppermane);
 	strtolower(lowermane);
 	strtolower(tail);
+	
 	char um_loc[255];
 	char lm_loc[255];
 	char t_loc[255];
-	char part_loc[255];
+	char part_loc[512];
 	um_loc[0] = 0;
 	lm_loc[0] = 0;
 	t_loc[0] = 0;
 	part_loc[0] = 0;
+	
+	sprintf(um_loc, "templates/%s", uppermane);
+	sprintf(lm_loc, "templates/%s", lowermane);
+	sprintf(t_loc, "templates/%s", tail);
 
+	sprintf(part_loc, "%s/tail_fill.png", t_loc);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &tail_color[0], 1.0);
+	sprintf(part_loc, "%s/tail_outline.png", t_loc);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &tail_color[0], 0.8);
+	
+	for (int i = 0; i < style_detail_count(tail); i++) {
+		sprintf(part_loc, "%s/tail_detail%d.png", t_loc, i + 1);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &tail_detail[i], 1.0);
+	}
+	for (int i = 0; i < style_color_count(tail); i++) {
+		sprintf(part_loc, "%s/tail_color%d.png", t_loc, i + 1);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &tail_color[i+1], 1.0);
+		
+		sprintf(part_loc, "%s/tail_color%d_outline.png", t_loc, i + 1);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &tail_color[i+1], 0.8);
+	}
+	
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/body_fill.png", &body_color, 1.0);
 	for (int i = 0; i < BODY_DETAIL_MAX; i++) {
-		if (body_detail_s[i] == NULL) {
+		if (body_detail_s[i] == NULL || !strcmp(body_detail_s[i], "none")) {
 			continue;
 		}
 		sprintf(part_loc, "templates/detail/%s.png", body_detail_s[i]);
-		canvas_body_detail[i] = pngimg_init();
-		if (pngimg_read(canvas_body_detail[i], part_loc) < 0) {
-			free(body_detail_s[i]);
-			body_detail_s[i] = NULL;
-		}
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &body_detail[i], 1.0);
+	}
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/body_outline.png", &body_color, 0.8);
+	
+	which_eye = BOTH;
+	if (use_separated_eyes) {
+		which_eye = RIGHT;
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/reye_sclera.png", &eye_sclera[which_eye], 1.0);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/reye_iris.png", &eye_iris[which_eye], 1.0);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/reye_irisgradient.png", &eye_iris_gradient[which_eye], 1.0);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/reye_irisline1.png", &eye_irisline1[which_eye], 1.0);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/reye_irisline2.png", &eye_irisline2[which_eye], 1.0);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/reye_pupil.png", &eye_pupil[which_eye], 1.0);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/reye_reflection.png", &eye_reflection[which_eye], 1.0);
+		which_eye = LEFT;
+	}
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/eye_sclera.png", &eye_sclera[which_eye], 1.0);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/eye_iris.png", &eye_iris[which_eye], 1.0);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/eye_irisgradient.png", &eye_iris_gradient[which_eye], 1.0);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/eye_irisline1.png", &eye_irisline1[which_eye], 1.0);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/eye_irisline2.png", &eye_irisline2[which_eye], 1.0);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/eye_pupil.png", &eye_pupil[which_eye], 1.0);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/eye_reflection.png", &eye_reflection[which_eye], 1.0);
+	
+	if (use_eyelashes)
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/eye_brows.png", &eye_lashes, 1.0);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/eye_lashes.png", &eye_brows, 1.0);
+	
+	if (use_socks == SOCKS_NEW_MODEL) {
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/socks_fill.png", &socks_new[0], 1.0);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/socks_color1.png", &socks_new[1], 1.0);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/socks_outline.png", &socks_new[0], 0.8);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/socks_color2.png", &socks_new[2], 1.0);
+	}
+	else if (use_socks == SOCKS_MODEL) {
+		color black;
+		black.r = 0;
+		black.g = 0;
+		black.b = 0;
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/socks_fill.png", &socks_model, 1.0);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/socks_color1.png", &black, 1.0);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/socks_outline.png", &socks_model, 0.8);
+	}
+	
+	if (race == PEGASUS || race == ALICORN) {
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/wing_fill.png", &body_color, 1.0);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/wing_outline.png", &body_color, 0.8);
 	}
 
-	strcat(um_loc, "templates/");
-	strcat(um_loc, uppermane);
-	strcat(lm_loc, "templates/");
-	strcat(lm_loc, lowermane);
-	strcat(t_loc, "templates/");
-	strcat(t_loc, tail);
+	sprintf(part_loc, "%s/lowermane_fill.png", lm_loc);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_color[0], 1.0);
+	sprintf(part_loc, "%s/lowermane_outline.png", lm_loc);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_color[0], 0.8);
+	for (int i = 0; i < style_color_count(lowermane); i++) {
+		sprintf(part_loc, "%s/lowermane_color%d.png", lm_loc, i + 1);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_color[i+1], 1.0);
+		
+		sprintf(part_loc, "%s/lowermane_color%d_outline.png", lm_loc, i + 1);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_color[i+1], 0.8);
+	}
+	for (int i = 0; i < style_detail_count(lowermane); i++) {
+		sprintf(part_loc, "%s/lowermane_detail%d.png", lm_loc, i + 1);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_detail[i], 1.0);
+	}
 
-	int part_len;
-	char part_part[512];
-	strcpy(part_loc,um_loc);
-	part_len = strlen(part_loc);
-	strcat(part_loc, "/uppermane_outline.png");
-	if (pngimg_read(canvas_uppermane_outline, part_loc) < 0)
-		skip = 1;
-	part_loc[part_len] = 0;
-	strcat(part_loc, "/uppermane_fill.png");
-	if (pngimg_read(canvas_uppermane_fill, part_loc) < 0)
-		skip = 1;
-	part_loc[part_len] = 0;
-	if (race & (UNICORN | ALICORN)) {
-		strcat(part_loc, "/horn_fill.png");
-		if (pngimg_read(canvas_horn_fill, part_loc) < 0)
-			skip = 1;
-		part_loc[part_len] = 0;
-		strcat(part_loc, "/horn_outline.png");
-		if (pngimg_read(canvas_horn_outline, part_loc) < 0)
-			skip = 1;
-		part_loc[part_len] = 0;
+	sprintf(part_loc, "%s/uppermane_fill.png", um_loc);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_color[0], 1.0);
+	sprintf(part_loc, "%s/uppermane_outline.png", um_loc);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_color[0], 0.8);
+	for (int i = 0; i < style_color_count(uppermane); i++) {
+		sprintf(part_loc, "%s/uppermane_color%d.png", um_loc, i + 1);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_color[i+1], 1.0);
+		
+		sprintf(part_loc, "%s/uppermane_color%d_outline.png", um_loc, i + 1);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_color[i+1], 0.8);
 	}
 	for (int i = 0; i < style_detail_count(uppermane); i++) {
-		canvas_uppermane_detail[i] = pngimg_init();
-		sprintf(part_part, "%s/uppermane_detail%d.png",part_loc,i + 1);
-		if (pngimg_read(canvas_uppermane_detail[i], part_part) < 0)
-			skip = 1;
+		sprintf(part_loc, "%s/uppermane_detail%d.png", um_loc, i + 1);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_detail[i], 1.0);
 	}
-	for (int i = 0; i < style_color_count(uppermane); i++) {
-		canvas_uppermane_color[i + 1] = pngimg_init();
-		sprintf(part_part, "%s/uppermane_color%d.png",part_loc,i + 1);
-		if (pngimg_read(canvas_uppermane_color[i + 1], part_part) < 0)
-			skip = 1;
+	
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/ear_fill.png", &body_color, 1.0);
+	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/ear_outline.png", &body_color, 0.8);
+	
+	for (int i = 0; i < pony_part_count; i++) {
+		pngimg_merge(canvas, pony_part[i]);
+		pngimg_free(pony_part[i]);
+		free(pony_part[i]);
 	}
-	for (int i = 0; i < style_color_count(uppermane); i++) {
-		canvas_uppermane_color_outline[i + 1] = pngimg_init();
-		sprintf(part_part, "%s/uppermane_color%d_outline.png",part_loc,i + 1);
-		if (pngimg_read(canvas_uppermane_color_outline[i + 1], part_part) < 0)
-			skip = 1;
-	}
-
-	strcpy(part_loc,lm_loc);
-	part_len = strlen(part_loc);
-	strcat(part_loc, "/lowermane_outline.png");
-	if (pngimg_read(canvas_lowermane_outline, part_loc) < 0)
-		skip = 1;
-	part_loc[part_len] = 0;
-	strcat(part_loc, "/lowermane_fill.png");
-	if (pngimg_read(canvas_lowermane_fill, part_loc) < 0)
-		skip = 1;
-	part_loc[part_len] = 0;
-	for (int i = 0; i < style_detail_count(lowermane); i++) {
-		canvas_lowermane_detail[i] = pngimg_init();
-		sprintf(part_part, "%s/lowermane_detail%d.png",part_loc,i + 1);
-		if (pngimg_read(canvas_lowermane_detail[i], part_part) < 0)
-			skip = 1;
-	}
-	for (int i = 0; i < style_color_count(lowermane); i++) {
-		canvas_lowermane_color[i + 1] = pngimg_init();
-		sprintf(part_part, "%s/lowermane_color%d.png",part_loc,i + 1);
-		if (pngimg_read(canvas_lowermane_color[i + 1], part_part) < 0)
-			skip = 1;
-	}
-	for (int i = 0; i < style_color_count(lowermane); i++) {
-		canvas_lowermane_color_outline[i + 1] = pngimg_init();
-		sprintf(part_part, "%s/lowermane_color%d_outline.png",part_loc,i + 1);
-		if (pngimg_read(canvas_lowermane_color_outline[i + 1], part_part) < 0)
-			skip = 1;
-	}
-
-	strcpy(part_loc,t_loc);
-	part_len = strlen(part_loc);
-	strcat(part_loc, "/tail_outline.png");
-	if (pngimg_read(canvas_tail_outline, part_loc) < 0)
-		skip = 1;
-	part_loc[part_len] = 0;
-	strcat(part_loc, "/tail_fill.png");
-	if (pngimg_read(canvas_tail_fill, part_loc) < 0)
-		skip = 1;
-	part_loc[part_len] = 0;
-	for (int i = 0; i < style_detail_count(tail); i++) {
-		canvas_tail_detail[i] = pngimg_init();
-		sprintf(part_part, "%s/tail_detail%d.png",part_loc,i + 1);
-		if (pngimg_read(canvas_tail_detail[i], part_part) < 0)
-			skip = 1;
-	}
-	for (int i = 0; i < style_color_count(tail); i++) {
-		canvas_tail_color[i + 1] = pngimg_init();
-		sprintf(part_part, "%s/tail_color%d.png",part_loc,i + 1);
-		if (pngimg_read(canvas_tail_color[i + 1], part_part) < 0)
-			skip = 1;
-	}
-	for (int i = 0; i < style_color_count(tail); i++) {
-		canvas_tail_color_outline[i + 1] = pngimg_init();
-		sprintf(part_part, "%s/tail_color%d_outline.png",part_loc,i + 1);
-		if (pngimg_read(canvas_tail_color_outline[i + 1], part_part) < 0)
-			skip = 1;
-	}
-
-
-	if (!skip) {
-		body_color.r += 128;
-		body_color.g += 128;
-		body_color.b += 128;
-		body_color.a += 128;
-		
-		pngimg_colorify(canvas_body_outline, &body_color, 0.8);
-		pngimg_colorify(canvas_body_fill, &body_color, 1.0);
-		pngimg_colorify(canvas_ear_outline, &body_color, 0.8);
-		pngimg_colorify(canvas_ear_fill, &body_color, 1.0);
-
-		pngimg_colorify(canvas_uppermane_outline, &mane_color[0], 0.8);
-		pngimg_colorify(canvas_uppermane_fill, &mane_color[0], 1.0);
-		for (int i = 0; i < style_color_count(uppermane); i++) {
-			pngimg_colorify(canvas_uppermane_color[i+1], &mane_color[i+1], 1.0);
-			pngimg_colorify(canvas_uppermane_color_outline[i+1], &mane_color[i+1], 0.8);
-		}
-		for (int i = 0; i < style_detail_count(uppermane); i++)
-			pngimg_colorify(canvas_uppermane_detail[i], &mane_detail[i], 1.0);
-		if (race & (UNICORN | ALICORN)) {
-			pngimg_colorify(canvas_horn_outline, &body_color, 0.8);
-			pngimg_colorify(canvas_horn_fill, &body_color, 1.0);
-		}
-
-		pngimg_colorify(canvas_lowermane_outline, &mane_color[0], 0.8);
-		pngimg_colorify(canvas_lowermane_fill, &mane_color[0], 1.0);
-		for (int i = 0; i < style_color_count(lowermane); i++) {
-			pngimg_colorify(canvas_lowermane_color[i+1], &mane_color[i+1], 1.0);
-			pngimg_colorify(canvas_lowermane_color_outline[i+1], &mane_color[i+1], 0.8);
-		}
-		for (int i = 0; i < style_detail_count(lowermane); i++)
-			pngimg_colorify(canvas_lowermane_detail[i], &mane_detail[i], 1.0);
-
-		pngimg_colorify(canvas_tail_outline, &tail_color[0], 0.8);
-		pngimg_colorify(canvas_tail_fill, &tail_color[0], 1.0);
-		for (int i = 0; i < style_color_count(tail); i++) {
-			pngimg_colorify(canvas_tail_color[i+1], &tail_color[i+1], 1.0);
-			pngimg_colorify(canvas_tail_color_outline[i+1], &tail_color[i+1], 0.8);
-		}
-		for (int i = 0; i < style_detail_count(tail); i++)
-			pngimg_colorify(canvas_tail_detail[i], &tail_detail[i], 1.0);
-
-		which_eye = BOTH;
-		if (use_separated_eyes) {
-			which_eye = RIGHT;
-			pngimg_colorify(canvas_reye_sclera, &eye_sclera[which_eye], 1.0);
-			pngimg_colorify(canvas_reye_iris, &eye_iris[which_eye], 1.0);
-			pngimg_colorify(canvas_reye_iris_gradient, &eye_iris_gradient[which_eye], 1.0);
-			pngimg_colorify(canvas_reye_irisline1, &eye_irisline1[which_eye], 1.0);
-			pngimg_colorify(canvas_reye_irisline2, &eye_irisline2[which_eye], 1.0);
-			pngimg_colorify(canvas_reye_pupil, &eye_pupil[which_eye], 1.0);
-			pngimg_colorify(canvas_reye_reflection, &eye_reflection[which_eye], 1.0);
-			which_eye = LEFT;
-		}
-		pngimg_colorify(canvas_eye_sclera, &eye_sclera[which_eye], 1.0);
-		pngimg_colorify(canvas_eye_iris, &eye_iris[which_eye], 1.0);
-		pngimg_colorify(canvas_eye_iris_gradient, &eye_iris_gradient[which_eye], 1.0);
-		pngimg_colorify(canvas_eye_irisline1, &eye_irisline1[which_eye], 1.0);
-		pngimg_colorify(canvas_eye_irisline2, &eye_irisline2[which_eye], 1.0);
-		pngimg_colorify(canvas_eye_pupil, &eye_pupil[which_eye], 1.0);
-		pngimg_colorify(canvas_eye_reflection, &eye_reflection[which_eye], 1.0);
-		pngimg_colorify(canvas_eye_lashes, &eye_lashes, 1.0);
-		pngimg_colorify(canvas_eye_brows, &eye_brows, 1.0);
-
-		if (race == PEGASUS || race == ALICORN) {
-			pngimg_colorify(canvas_wing_outline, &body_color, 0.8);
-			pngimg_colorify(canvas_wing_fill, &body_color, 1.0);
-		}
-
-		for (int i = 0; i < BODY_DETAIL_MAX; i++) {
-			if (body_detail_s[i] == NULL)
-				continue;
-			pngimg_colorify(canvas_body_detail[i], &body_detail[i], 1.0);
-		}
-
-		color black;
-		color_init(&black);
-		black.a = 255;
-		switch (use_socks) {
-			case SOCKS_NEW_MODEL:
-				pngimg_colorify(canvas_socks_outline, &socks_new[0], 0.8);
-				pngimg_colorify(canvas_socks_color1, &socks_new[1], 1.0);
-				pngimg_colorify(canvas_socks_color2, &socks_new[2], 1.0);
-				pngimg_colorify(canvas_socks_fill, &socks_new[0], 1.0);
-				break;
-			case SOCKS_MODEL:
-				pngimg_colorify(canvas_socks_outline, &socks_model, 0.8);
-				pngimg_colorify(canvas_socks_color1, &black, 1.0);
-				pngimg_colorify(canvas_socks_color2, &socks_model, 0.8);
-				pngimg_colorify(canvas_socks_fill, &socks_model, 1.0);
-				break;
-		}
-		if (use_socks) {
-			//puts("Colored socks");
-			if (use_socks == SOCKS_NEW_MODEL) {
-			}
-			else if (use_socks == SOCKS_MODEL) {
-			}
-		}
-
-
-		pngimg_merge_and_free(canvas, canvas_tail_fill);
-		for (int i = 0; i < style_detail_count(tail); i++) {
-			pngimg_merge_and_free(canvas, canvas_tail_detail[i]);
-		}
-		pngimg_merge_and_free(canvas, canvas_tail_outline);
-		for (int i = 0; i < style_color_count(tail); i++) {
-			pngimg_merge_and_free(canvas, canvas_tail_color[i + 1]);
-			pngimg_merge_and_free(canvas, canvas_tail_color_outline[i + 1]);
-		}
-		pngimg_merge_and_free(canvas, canvas_body_fill);
-		for (int i = 0; i < BODY_DETAIL_MAX; i++) {
-			if (body_detail_s[i] == NULL)
-				continue;
-			pngimg_merge_and_free(canvas, canvas_body_detail[i]);
-		}
-		if (use_eyelashes)
-			pngimg_merge_and_free(canvas, canvas_eye_lashes);
-		pngimg_merge_and_free(canvas, canvas_eye_sclera);
-		pngimg_merge_and_free(canvas, canvas_eye_iris);
-		pngimg_merge_and_free(canvas, canvas_eye_iris_gradient);
-		pngimg_merge_and_free(canvas, canvas_eye_irisline2);
-		pngimg_merge_and_free(canvas, canvas_eye_irisline1);
-		pngimg_merge_and_free(canvas, canvas_eye_pupil);
-		pngimg_merge_and_free(canvas, canvas_eye_reflection);
-		if (use_separated_eyes) {
-			pngimg_merge_and_free(canvas, canvas_reye_sclera);
-			pngimg_merge_and_free(canvas, canvas_reye_iris);
-			pngimg_merge_and_free(canvas, canvas_reye_iris_gradient);
-			pngimg_merge_and_free(canvas, canvas_reye_irisline2);
-			pngimg_merge_and_free(canvas, canvas_reye_irisline1);
-			pngimg_merge_and_free(canvas, canvas_reye_pupil);
-			pngimg_merge_and_free(canvas, canvas_reye_reflection);
-		}
-		pngimg_merge_and_free(canvas, canvas_eye_brows);
-		pngimg_merge_and_free(canvas, canvas_body_outline);
-		if (use_socks) {
-			//puts("Merged socks");
-			pngimg_merge_and_free(canvas, canvas_socks_fill);
-			pngimg_merge_and_free(canvas, canvas_socks_color1);
-			pngimg_merge_and_free(canvas, canvas_socks_outline);
-			pngimg_merge_and_free(canvas, canvas_socks_color2);
-		}
-		if (race & (PEGASUS | ALICORN)) {
-			pngimg_merge_and_free(canvas, canvas_wing_fill);
-			pngimg_merge_and_free(canvas, canvas_wing_outline);
-		}
-		pngimg_merge_and_free(canvas, canvas_lowermane_fill);
-		pngimg_merge_and_free(canvas, canvas_lowermane_outline);
-		for (int i = 0; i < style_color_count(lowermane); i++) {
-			pngimg_merge_and_free(canvas, canvas_lowermane_color[i + 1]);
-			pngimg_merge_and_free(canvas, canvas_lowermane_color_outline[i + 1]);
-		}
-		for (int i = 0; i < style_detail_count(lowermane); i++) {
-			pngimg_merge_and_free(canvas, canvas_lowermane_detail[i]);
-		}
-		pngimg_merge_and_free(canvas, canvas_uppermane_fill);
-		for (int i = 0; i < style_detail_count(uppermane); i++) {
-			pngimg_merge_and_free(canvas, canvas_uppermane_detail[i]);
-		}
-		pngimg_merge_and_free(canvas, canvas_uppermane_outline);
-		for (int i = 0; i < style_color_count(uppermane); i++) {
-			pngimg_merge_and_free(canvas, canvas_uppermane_color[i + 1]);
-			pngimg_merge_and_free(canvas, canvas_uppermane_color_outline[i + 1]);
-		}
-		if (race & (UNICORN | ALICORN)) {
-			pngimg_merge_and_free(canvas, canvas_horn_fill);
-			pngimg_merge_and_free(canvas, canvas_horn_outline);
-		}
-		pngimg_merge_and_free(canvas, canvas_ear_fill);
-		pngimg_merge_and_free(canvas, canvas_ear_outline);//*/
-	}
+	free(pony_part);
+	
 	
 	void * payload;
 	for (int i = 0; i < nbt_at; i++) {
@@ -958,5 +648,15 @@ int style_color_count(char * style) {
 	else if (!strcmp(style, "mechanic")) {
 		return 1;
 	}
+	return 0;
+}
+
+int thumbnail_add_part(PNGIMG ** img, char * filename, color * c, float value) {
+	*img = pngimg_init();
+	if (!pngimg_read(*img, filename)) {
+		pngimg_colorify(*img, c, value);
+		return 1;
+	}
+	free(*img);
 	return 0;
 }
