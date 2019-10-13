@@ -633,7 +633,11 @@ void on_btn_save_clicked() {
 	snprintf(output, 1023, "%s/%s.dat", directory, filename);
 	
 	int fd;
+#ifdef _WIN64
+	fd = _open(output, _O_WRONLY | _O_CREAT | _O_BINARY, 0664);
+#else
 	fd = open(output, O_WRONLY | O_CREAT, 0664);
+#endif
 	if (data == NULL) {
 		fprintf(sterr, "You must generate an OC before clicking save.\n");
 		update_txt_log();

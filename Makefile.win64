@@ -1,6 +1,10 @@
 CC=gcc
 CCFLAGS=-Wall -O3 -pipe -pthread
 LIBFLAGS=-lm `pkg-config --cflags --libs gtk+-3.0 libpng16`
+CP=cp
+CPFLAGS=-u
+7Z=7z
+7ZFLAGS=a
 
 SRC=./src/
 BUILD=./build/
@@ -25,12 +29,13 @@ thumbnailer.exe:build/ $(THUMB_OFILES)
 	$(CC) $(CCFLAGS) $(THUMB_OFILES) -o$@ $(LIBFLAGS)
 
 .PHONY:dist
-CP=cp
-CPFLAGS=-u
 dist:make-pony.exe thumbnailer.exe
 	$(CP) $(CPFLAGS) make-pony.exe thumbnailer.exe dist/bin/
+	strip dist/bin/make-pony.exe
+	strip dist/bin/thumbnailer.exe
 	$(CP) $(CPFLAGS) src/make-pony.glade dist/bin/src/
 	$(CP) $(CPFLAGS) -r templates/* dist/bin/templates/
+	$(7Z) $(7ZFLAGS) $@.7z dist/*
 
 $(BUILD)color.o: $(SRC)color.c $(SRC)color.h
 $(BUILD)make-pony.o: $(SRC)make-pony.c $(SRC)color.h $(SRC)target.h $(SRC)make-pony.h \
@@ -46,4 +51,4 @@ $(BUILD)thumbnailer_main.o: $(SRC)thumbnailer_main.c $(SRC)color.h src/pngimg.h 
 
 .PHONY:clean
 clean:
-	-rm -rvf build/ thumbnailer thumbnailer.exe make-pony make-pony.exe
+	-rm -rvf build/ thumbnailer thumbnailer.exe make-pony make-pony.exe dist.7z
