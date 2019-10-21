@@ -65,6 +65,7 @@ int log_pipe[2];
 PNGIMG * preview;
 int preview_seed;
 GdkPixbuf * preview_buf;
+GdkRGBA * clrbtn_hue_color;
 
 typedef struct {
 	int seed;
@@ -114,6 +115,7 @@ typedef struct {
 	GtkWidget * g_entry_thumbnail_dir;
 	GtkWidget * g_btn_save;
 	GtkWidget * g_scrl_log;
+	GtkWidget * g_clrbtn_hue;
 	
 	GtkBuilder * builder;
 	GtkWidget * window;

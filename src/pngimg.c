@@ -92,7 +92,7 @@ int pngimg_height(PNGIMG * img) {
 	return img->height;
 }
 
-Pixel * pngimg_at(PNGIMG * img, int x, int y) {
+inline Pixel * pngimg_at(PNGIMG * img, int x, int y) {
 	return &(img->pixels[y][x]);
 }
 
@@ -221,16 +221,20 @@ int pngimg_read_fp(PNGIMG * img, FILE * f) {
 		data[y] = (png_byte*) malloc(png_get_rowbytes(png_ptr,info_ptr));
 	}
 	png_read_image(png_ptr, data);
+	Pixel *p, *r;
 	for (int y = 0; y < height; y++) {
+		r = img->pixels[y];
 		for (int x = 0; x < width; x++) {
-			img->pixels[y][x].r = (float)(data[y][4*x+0]);
-			img->pixels[y][x].g = (float)(data[y][4*x+1]);
-			img->pixels[y][x].b = (float)(data[y][4*x+2]);
-			img->pixels[y][x].a = (float)(data[y][4*x+3]);
+			p = &r[x];
+			p->r = data[y][4*x+0];
+			p->g = data[y][4*x+1];
+			p->b = data[y][4*x+2];
+			p->a = data[y][4*x+3];
 		}
 		free(data[y]);
 	}
 	free(data);
+	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 	
 	return 0;
 }
@@ -239,21 +243,32 @@ int pngimg_merge(PNGIMG *img1, PNGIMG *img2) {
 	if (img1->width != img2->width || img1->height != img2 -> height) {
 		return -1;
 	}
-	for (int i = 0; i < img1->width; i++) {
-		for (int j = 0; j < img1->height; j++) {
+	float diva;
+	for (int j = 0; j < img1->height; j++) {
+		for (int i = 0; i < img1->width; i++) {
 			Pixel * p2 = &img1->pixels[j][i];//pngimg_at(img1, j, i);
 			Pixel * p1 = &img2->pixels[j][i];//pngimg_at(img2, j, i);
-			if (p1->a == 0)
-				continue;
-			p2->r = (p1->r * p1->a + p2->r * p2->a * (255.0f - p1->a) / 255.0f)
-				/(p1->a + p2->a * (255.0f - p1->a) / 255.0f);
-			p2->g = (p1->g * p1->a + p2->g * p2->a * (255.0f - p1->a) / 255.0f)
-				/(p1->a + p2->a * (255.0f - p1->a) / 255.0f);
-			p2->b = (p1->b * p1->a + p2->b * p2->a * (255.0f - p1->a) / 255.0f)
-				/(p1->a + p2->a * (255.0f - p1->a) / 255.0f);
-			p2->a = p1->a + p2->a * (255.0f - p1->a) / 255.0f;
+			
+			switch (p1->a) {
+				case 255:
+					p2->r = p1->r;
+					p2->g = p1->g;
+					p2->b = p1->b;
+					p2->a = 255;
+				case 0:
+					continue;
+				default:
+					diva = p1->a + p2->a * (255.0f - p1->a) / 255.0f;
+					p2->r = (p1->r * p1->a + p2->r * p2->a * (255.0f - p1->a) / 255.0f)
+						/diva;
+					p2->g = (p1->g * p1->a + p2->g * p2->a * (255.0f - p1->a) / 255.0f)
+						/diva;
+					p2->b = (p1->b * p1->a + p2->b * p2->a * (255.0f - p1->a) / 255.0f)
+						/diva;
+					p2->a = diva;
+			}
 
-			if (p2->r > 255.0f)
+			/*if (p2->r > 255.0f)
 				p2->r = 255.0f;
 			if (p2->g > 255.0f)
 				p2->g = 255.0f;
@@ -267,25 +282,29 @@ int pngimg_merge(PNGIMG *img1, PNGIMG *img2) {
 			if (p2->b < 0)
 				p2->b = 0;
 			if (p2->a > 255.0f)
-				p2->a = 255.0f;
+				p2->a = 255.0f;*/
 		}
 	}
 	return 0;
 }
 
 void pngimg_colorify(PNGIMG *img, const color * c, float val) {
+	hsv hsvcolor;
 	color col;
-	col.r = c->r * val;
-	col.g = c->g * val;
-	col.b = c->b * val;
-	col.a = c->a;
+	if (val != 1.0) {
+		hsvcolor.h = hue(c);
+		hsvcolor.s = saturation(c);
+		hsvcolor.v = val * value(c);
+		hsvToRGB(&hsvcolor, &col);
+		col.a = c->a;
+	}
+	else
+		col = *c;
 	float alpha = c->a / 255.0f;
 	Pixel * p;
 	for (int i = 0; i < img->height; i++) {
 		for (int j = 0; j < img->width; j++) {
-			p = &img->pixels[j][i];
-			if (p->a == 0)
-				continue;
+			p = &img->pixels[i][j];
 			p->r = col.r;
 			p->g = col.g;
 			p->b = col.b;

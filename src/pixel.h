@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-typedef struct Pixel_t {
+typedef struct __attribute__((__packed__)) Pixel_t {
 	uint8_t r,g,b,a;
 } Pixel;
 

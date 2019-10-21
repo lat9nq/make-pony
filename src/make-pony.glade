@@ -109,7 +109,7 @@
         <child>
           <object class="GtkCheckButton" id="chk_preview">
             <property name="label" translatable="yes">Preview</property>
-            <property name="width_request">100</property>
+            <property name="width_request">60</property>
             <property name="height_request">30</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -118,7 +118,7 @@
             <property name="draw_indicator">True</property>
           </object>
           <packing>
-            <property name="x">340</property>
+            <property name="x">360</property>
             <property name="y">256</property>
           </packing>
         </child>
@@ -419,7 +419,7 @@
             <signal name="changed" handler="on_entry_hue_changed" swapped="no"/>
           </object>
           <packing>
-            <property name="x">170</property>
+            <property name="x">110</property>
             <property name="y">270</property>
           </packing>
         </child>
@@ -447,6 +447,21 @@
           </object>
           <packing>
             <property name="x">184</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkColorButton" id="clrbtn_hue">
+            <property name="width_request">40</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="sensitive">False</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="title" translatable="yes"/>
+          </object>
+          <packing>
+            <property name="x">280</property>
+            <property name="y">270</property>
           </packing>
         </child>
       </object>

@@ -417,7 +417,10 @@ int main(int argc, char * argv[]) {
 		preview = pngimg_init();
 		preview_seed = 0;
 		
+		clrbtn_hue_color = (GdkRGBA*)malloc(sizeof(*clrbtn_hue_color));
+		
 		main_oc = (mp_data *)malloc(sizeof(*main_oc));
+		memset(main_oc, 0, sizeof(*main_oc));
 		mp_data_init(main_oc);
 		
 #ifdef _WIN64
@@ -465,6 +468,7 @@ void mp_gtk_build(int *argc, char ** argv[], mp_gtk_widgets ** w) {
 	widgets->g_fch_outdir = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "fch_outdir"));
 	widgets->g_txt_log = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "txt_log"));
 	widgets->g_scrl_log = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "scrl_log"));
+	widgets->g_clrbtn_hue = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "clrbtn_hue"));
 	
 
     g_object_unref(widgets->builder);
@@ -575,7 +579,7 @@ void on_btn_generate_clicked() {
 		int preview_rowstride = gdk_pixbuf_get_rowstride(preview_buf);
 		
 		int x, x_2;
-		for (int i = 0; i < height; i+=height / p_height) {
+		/*for (int i = 0; i < height; i+=height / p_height) {
 			x = i / (height / p_height) * preview_rowstride;
 			for (int j = 0; j < width; j+=width / p_width) {
 				x_2 = x + j / (width / p_width) * 4;
@@ -584,8 +588,30 @@ void on_btn_generate_clicked() {
 				preview_pix[x_2 + 2] = preview->pixels[i][j].b;
 				preview_pix[x_2 + 3] = preview->pixels[i][j].a;
 			}
+		}*/
+		float * preview_scl;
+		preview_scl = (float *)malloc(sizeof(*preview_scl) * preview_rowstride * p_height);
+		memset(preview_scl, 0, sizeof(*preview_scl) * preview_rowstride * p_height);
+		
+		memset(preview_pix, 0, preview_rowstride * p_height);
+		float avg = (float) p_height / (float) height * ((float) p_width / (float) width);
+		for (int i = 0; i < height; i++) {
+			x = i * p_height / height * preview_rowstride;
+			for (int j = 0; j < width; j++) {
+				x_2 = x + j * p_width / width * 4;
+				preview_scl[x_2 + 0] += preview->pixels[i][j].r * avg;
+				preview_scl[x_2 + 1] += preview->pixels[i][j].g * avg;
+				preview_scl[x_2 + 2] += preview->pixels[i][j].b * avg;
+				preview_scl[x_2 + 3] = 255;//preview->pixels[i][j].a * avg;
+				
+				preview_pix[x_2+0] = preview_scl[x_2 + 0];
+				preview_pix[x_2+1] = preview_scl[x_2 + 1];
+				preview_pix[x_2+2] = preview_scl[x_2 + 2];
+				preview_pix[x_2+3] = preview_scl[x_2 + 3];
+			}
 		}
 		gtk_image_set_from_pixbuf((GtkImage*)main_widgets->g_img_preview, preview_buf);
+		free(preview_scl);
 	}
 	
 	update_txt_log();
@@ -762,6 +788,13 @@ void on_scl_hue_value_changed() {
 	sprintf(text, "#%02X%02X%02X", c.r, c.g, c.b);
 	
 	gtk_entry_set_text((GtkEntry*)main_widgets->g_entry_hue, text);
+	
+	clrbtn_hue_color->red = c.r / 256.0;
+	clrbtn_hue_color->green = c.g / 256.0;
+	clrbtn_hue_color->blue = c.b / 256.0;
+	clrbtn_hue_color->alpha = 1.0;
+	
+	gtk_color_chooser_set_rgba((GtkColorChooser *)main_widgets->g_clrbtn_hue, clrbtn_hue_color);
 }
 
 void on_window_main_destroy() {
@@ -801,6 +834,8 @@ void mp_pick_colors(mp_data * oc) {
 
 
 	//color * colors;
+	if (oc->colors != NULL)
+		free(oc->colors);
 	oc->colors = malloc(sizeof(*oc->colors)*7);
 	
 	color color1;
@@ -878,26 +913,26 @@ void mp_pick_colors(mp_data * oc) {
 
 		if (oc->wheel) {
 			if (oc->wheel == 1 || oc->wheel == -1) { // analogous (1/4 if set, 1/8 if not)
-				if (!(r & 7)) {
+				if (!(r & 7) || (oc->wheel == 1 && (r & 1))) {
 					hsvcolor.h += 360/12;
 				}
-				else if (!((r & 7) - 1)) {
+				else if (!((r & 7) - 1) || oc->wheel == 1) {
 					hsvcolor.h += 360*11/12;
 				}
 			}
 			else if (oc->wheel == 2) { // rectangular
 				if (r2 & 1) {
-					if (!(r & 7)) {
+					//if (!(r & 7)) {
 						hsvcolor.h += 360/12*2;
-					}
+					//}
 					/*else if (!((r & 7) - 1)) {
 						hsvcolor.h += 8*360/12;
 					}*/
 				}
 				else { // reverse rectangular
-					if (!((r & 7) - 1)) {
+					//if (!((r & 7) - 1)) {
 						hsvcolor.h += 4*360/12;
-					}
+					//}
 					/*else if (!(r & 7)) {
 						hsvcolor.h += 10*360/12;
 					}*/
@@ -967,7 +1002,7 @@ void mp_pick_colors(mp_data * oc) {
 		// hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + 0.6f * fmodf(fabs(-std_dev*1.5f + 1.25f), 1.0f))) : 0.0f;// * !(!(rand()&7));
 		// hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + std_dev * 0.6f)) : 0.0f;// * !(!(rand()&7));
 		hsvcolor.s = (!oc->desaturated) ? (avg_sat * sqrt(std_dev)) : 0.0f;// * !(!(rand()&7));
-		hsvcolor.v = (oc->desaturated) ? (avg_sat * sqrtf(0.3f + std_dev*0.7f)) : 1.0f;//((rand() % 12) + 4) / 15.0f : 1.0f;
+		hsvcolor.v = (oc->desaturated) ? (1.0 - avg_sat * sqrtf(0.3f + std_dev*0.7f)) : 1.0f;//((rand() % 12) + 4) / 15.0f : 1.0f;
 		// c = color1;
 		// if (!desaturated) {
 		// hsvToRGB(&hsvcolor, &bodycolor);
@@ -987,6 +1022,11 @@ void mp_pick_colors(mp_data * oc) {
 
 	int details_in_use = 0;
 
+	if (oc->details != NULL) {
+		for (int i = 0; i < 8; i++) 
+			free(oc->details[i]);
+		free(oc->details);
+	}
 	oc->details = malloc(sizeof(*oc->details)*8);
 	for (int i = 0; i < 8; i++) {
 		oc->details[i] = malloc(sizeof(**oc->details)*16);
@@ -999,6 +1039,8 @@ void mp_pick_colors(mp_data * oc) {
 		available_details[i][0] = 0;
 	}
 
+	if (oc->detail_color != NULL)
+		free(oc->detail_color);
 	oc->detail_color = malloc(sizeof(*oc->detail_color)*8);
 	for (int i = 0; i < 8; i++) {
 		oc->detail_color[i].r = 255;
@@ -1038,7 +1080,7 @@ void mp_pick_colors(mp_data * oc) {
 		}
 
 		// generate colors for other details
-		for (int i = 0 + 2 * oc->use_floofers; i < DETAILCOUNT; i++) {
+		for (int i = 0 + 2 * oc->use_floofers; i < at; i++) {
 			if (!(rand() % DETAILCHANCE)) {
 				strcpy(oc->details[details_in_use], available_details[i]);
 				oc->detail_color[details_in_use] = oc->colors[rand() % clrcount];
@@ -1056,6 +1098,11 @@ void mp_pick_colors(mp_data * oc) {
 		}
 
 	}
+	
+	for (int i = 0; i < 16; i++) {
+		free(available_details[i]);
+	}
+	free(available_details);
 }
 
 	// -- BEGIN SYNTHESIZNIG DATA --
@@ -1084,6 +1131,10 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 	data_len++;
 	strcpy((char *)(data+data_len), "data");
 	data_len += strlen("data");
+	
+	color eye_color;
+	hsvcolor.h = (oc->hue + 0) % 360;
+	hsvToRGB(&hsvcolor, &eye_color);
 
 	for (int i = 0; i < TARGETCOUNT; i++) {
 		char * cur = target[i];
@@ -1094,6 +1145,9 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 		}
 		else if (cur[0] == COL) {
 			color c;
+			c.r = 0;
+			c.g = 0;
+			c.b = 0;
 
 			if (!strcmp(cur+1,"body")) {
 				// hsvcolor.h = static_hue;
@@ -1189,21 +1243,25 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 						hsvToRGB(&hsvcolor, &c);
 					}
 					else {
-						c = color1;
+						c = eye_color;
 					}
 				}
 				else if (strstr(cur+1, "iris2")) {
 					c = oc->body_color;
+					hsvcolor.h = hue(&eye_color);
+					hsvcolor.s = saturation(&oc->body_color);
+					hsvcolor.v = value(&oc->body_color);
+					hsvToRGB(&hsvcolor, &c);
 				}
 				else if (strstr(cur+1, "irisline2")) {
-					c = color1;
+					c = eye_color;
 					hsvcolor.h = hue(&c);
 					hsvcolor.s = 0.1f * oc->any_saturation;
 					hsvcolor.v = 0.9f + 0.1 * oc->any_saturation;
 					hsvToRGB(&hsvcolor, &c);
 				}
 				else if (strstr(cur+1, "irisline1")) {
-					c = color1;
+					c = eye_color;
 					hsvcolor.h = hue(&c);
 					hsvcolor.s = 0.5f * oc->any_saturation;
 					hsvcolor.v = 0.5f + 0.5f * oc->any_saturation;

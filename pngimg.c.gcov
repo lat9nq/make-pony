@@ -1,0 +1,324 @@
+        -:    0:Source:src/pngimg.c
+        -:    0:Graph:build/pngimg.gcno
+        -:    0:Data:build/pngimg.gcda
+        -:    0:Runs:1
+        -:    1:/* pngimg.cpp
+        -:    2: */
+        -:    3:
+        -:    4:#include "pngimg.h"
+        -:    5:
+      131:    6:PNGIMG * pngimg_init() {
+      131:    7:	PNGIMG * img = (PNGIMG *)malloc(sizeof(*img));
+      131:    8:	img->pixels = NULL;
+      131:    9:	img->width = 0;
+      131:   10:	img->height = 0;
+        -:   11:	
+      131:   12:	return img;
+        -:   13:}
+        -:   14:
+      131:   15:void pngimg_alloc(PNGIMG * img, int w, int h) {
+      131:   16:	img->width = w;
+      131:   17:	img->height = h;
+      131:   18:	img->pixels = (Pixel**)malloc(sizeof(*(img->pixels)) * h);
+      131:   19:	if (img->pixels == NULL) {
+    #####:   20:		fprintf(stderr, "error: malloc could not allocate more memory\n");
+    #####:   21:		return;
+        -:   22:	}
+   134275:   23:	for (int i = 0; i < h; i++) {
+   134144:   24:		img->pixels[i] = (Pixel*)malloc(sizeof(*(img->pixels[i]))*w);
+   134144:   25:		if (img->pixels[i] == NULL) {
+    #####:   26:			fprintf(stderr, "error: malloc could not allocate more memory\n");
+    #####:   27:			return;
+        -:   28:		}
+        -:   29:	}
+        -:   30:}
+        -:   31:
+      260:   32:void pngimg_free(PNGIMG * img) {
+      260:   33:	if (img->pixels != NULL) {
+   133250:   34:		for (int i = 0; i < img->height; i++) 
+   133120:   35:			free(img->pixels[i]);
+      130:   36:		free(img->pixels);
+        -:   37:	}
+      260:   38:	img->pixels = NULL;
+      260:   39:	img->width = 0;
+      260:   40:	img->height = 0;
+      260:   41:}
+        -:   42:
+    #####:   43:void pngimg_destroy_data(png_byte * data, void * _) {
+    #####:   44:	free(data);
+    #####:   45:}
+        -:   46:
+    #####:   47:void pngimg_destroy_datap(png_bytep * data) {
+    #####:   48:	for (int i = 0; data[i]; i++) {
+    #####:   49:		free(data[i]);
+        -:   50:	}
+    #####:   51:	free(data);
+    #####:   52:}
+        -:   53:
+    #####:   54:png_byte ** pngimg_getData(PNGIMG * img) {
+    #####:   55:	png_bytep * data = (png_bytep*)malloc(sizeof(*data)*(img->height + 1));
+    #####:   56:	for (int i = 0; i < img->height; i++) {
+    #####:   57:		data[i] = (png_byte*)malloc(sizeof(*data[i])*img->width*4);
+    #####:   58:		for (int j = 0; j < img->width; j++) {
+    #####:   59:			data[i][4*j+0] = (uint8_t)img->pixels[i][j].r;
+    #####:   60:			data[i][4*j+1] = (uint8_t)img->pixels[i][j].g;
+    #####:   61:			data[i][4*j+2] = (uint8_t)img->pixels[i][j].b;
+    #####:   62:			data[i][4*j+3] = (uint8_t)img->pixels[i][j].a;
+        -:   63:		}
+    #####:   64:		data[i + 1] = NULL;
+        -:   65:	}
+    #####:   66:	return data;
+        -:   67:}
+        -:   68:
+    #####:   69:png_byte * pngimg_get_data_array(PNGIMG * img) {
+        -:   70:	int x;
+        -:   71:	png_byte * data;
+        -:   72:	
+    #####:   73:	data = (png_byte *)malloc(sizeof(*data)*img->height * img->width * 4);
+    #####:   74:	for (int i = 0; i < img->height; i++) {
+    #####:   75:		x = i * img->width;
+    #####:   76:		for (int j = 0; j < img->width; j++) {
+    #####:   77:			data[x + 0] = (uint8_t)img->pixels[i][j].r;
+    #####:   78:			data[x + 1] = (uint8_t)img->pixels[i][j].g;
+    #####:   79:			data[x + 2] = (uint8_t)img->pixels[i][j].b;
+    #####:   80:			data[x + 3] = (uint8_t)img->pixels[i][j].a;
+    #####:   81:			x += 4;
+        -:   82:		}
+        -:   83:	}
+    #####:   84:	return data;
+        -:   85:}
+        -:   86:
+    #####:   87:int pngimg_width(PNGIMG * img) {
+    #####:   88:	return img->width;
+        -:   89:}
+        -:   90:
+    #####:   91:int pngimg_height(PNGIMG * img) {
+    #####:   92:	return img->height;
+        -:   93:}
+        -:   94:
+ 17743872:   95:inline Pixel * pngimg_at(PNGIMG * img, int x, int y) {
+ 17743872:   96:	return &(img->pixels[y][x]);
+        -:   97:}
+        -:   98:
+    #####:   99:int pngimg_write(PNGIMG * img, FILE * f) {
+    #####:  100:	png_bytep * rows = pngimg_getData(img);
+    #####:  101:	if (f == NULL) {
+    #####:  102:		fprintf(stderr,"error: file refused binary write access\n");
+    #####:  103:		return -1;
+        -:  104:	}
+    #####:  105:	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    #####:  106:	if (!png_ptr) {
+    #####:  107:		fprintf(stderr, "error: Write struct creation failed.\n");
+    #####:  108:		return -1;
+        -:  109:	}
+    #####:  110:	png_infop info_ptr = png_create_info_struct(png_ptr);
+    #####:  111:	if (!info_ptr) {
+    #####:  112:		fprintf(stderr, "error: Info struct creation failed.\n");
+    #####:  113:		return -1;
+        -:  114:	}
+    #####:  115:	if (setjmp(png_jmpbuf(png_ptr))) {
+    #####:  116:		png_destroy_write_struct(&png_ptr, &info_ptr);
+    #####:  117:		fprintf(stderr,"error: failure on write initialize\n");
+    #####:  118:		return -2;
+        -:  119:	}
+    #####:  120:	png_init_io(png_ptr, f);
+    #####:  121:	if (setjmp(png_jmpbuf(png_ptr))) {
+    #####:  122:		png_destroy_write_struct(&png_ptr, &info_ptr);
+    #####:  123:		fprintf(stderr,"error: failure writing header\n");
+    #####:  124:		return -3;
+        -:  125:	}
+    #####:  126:	png_set_IHDR(png_ptr, info_ptr, img->width, img->height,
+        -:  127:		8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
+        -:  128:		PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+    #####:  129:	png_write_info(png_ptr, info_ptr);
+    #####:  130:	if (setjmp(png_jmpbuf(png_ptr))) {
+    #####:  131:		png_destroy_write_struct(&png_ptr, &info_ptr);
+    #####:  132:		fprintf(stderr,"error: failure writing bytes\n");
+    #####:  133:		return -4;
+        -:  134:	}
+    #####:  135:	png_write_image(png_ptr, rows);
+    #####:  136:	if (setjmp(png_jmpbuf(png_ptr))) {
+    #####:  137:		png_destroy_write_struct(&png_ptr, &info_ptr);
+    #####:  138:		fprintf(stderr,"error: failure finishing image\n");
+    #####:  139:		return -5;
+        -:  140:	}
+    #####:  141:	png_write_end(png_ptr, NULL);
+        -:  142:	
+    #####:  143:	for (int i = 0; i < img->height; i++) 
+    #####:  144:		free(rows[i]);
+    #####:  145:	free(rows);
+        -:  146:	
+    #####:  147:	return 0;
+        -:  148:}
+        -:  149:
+      130:  150:int pngimg_read(PNGIMG * img, char * filename) {
+        -:  151:	FILE * f;
+        -:  152:#ifdef _WIN64
+        -:  153:	f = fopen(filename, "rb");
+        -:  154:#else
+      130:  155:	f = fopen(filename, "r");
+        -:  156:#endif
+        -:  157:	
+        -:  158:	int val;
+      130:  159:	val = pngimg_read_fp(img, f);
+      130:  160:	if (val == 0)
+      130:  161:		fclose(f);
+        -:  162:	
+      130:  163:	return val;
+        -:  164:}
+        -:  165:
+        -:  166:/* Credits to Guillaume Cottenceau
+        -:  167: */
+      130:  168:int pngimg_read_fp(PNGIMG * img, FILE * f) {
+        -:  169:	unsigned char header[8];
+        -:  170:	int width, height;
+        -:  171:	
+      130:  172:	if (f == NULL) {
+    #####:  173:		fprintf(stderr, "error: file refused read access\n");
+    #####:  174:		return -1;
+        -:  175:	}
+      130:  176:	fread(header, 1, 8, f);
+      130:  177:	if (png_sig_cmp(header, 0, 8)) {
+    #####:  178:		fprintf(stderr, "error: file is not a well-formed PNG file\n");
+    #####:  179:		return -2;
+        -:  180:	}
+      130:  181:	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+      130:  182:	if (png_ptr == NULL){
+    #####:  183:		fprintf(stderr, "error: png_create_read_struct failed\n");
+    #####:  184:		return -3;
+        -:  185:	}
+      130:  186:	png_infop info_ptr = png_create_info_struct(png_ptr);
+      130:  187:	if (png_ptr == NULL){
+    #####:  188:		fprintf(stderr, "error: png_create_info_struct failed\n");
+    #####:  189:		return -4;
+        -:  190:	}
+      130:  191:	if (setjmp(png_jmpbuf(png_ptr))) {
+    #####:  192:		fprintf(stderr,"error: failure initializing i/o\n");
+    #####:  193:		return -5;
+        -:  194:	}
+        -:  195:	
+      130:  196:	png_init_io(png_ptr, f);
+      130:  197:	png_set_sig_bytes(png_ptr, 8);
+        -:  198:	
+      130:  199:	png_read_info(png_ptr, info_ptr);
+        -:  200:	
+      130:  201:	width = png_get_image_width(png_ptr, info_ptr);
+      130:  202:	height = png_get_image_height(png_ptr, info_ptr);
+        -:  203:	//~ int color_type = png_get_color_type(png_ptr, info_ptr);
+        -:  204:	//~ int bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+        -:  205:	//~ printf("%d,%d\n",color_type, bit_depth);
+        -:  206:	
+        -:  207:	//~ number_of_passes = png_set_interlace_handling(png_ptr);
+      130:  208:	png_read_update_info(png_ptr, info_ptr);
+        -:  209:	
+        -:  210:	/* read file */
+      130:  211:	if (setjmp(png_jmpbuf(png_ptr))) {
+    #####:  212:		fprintf(stderr,"error: failure reading image\n");
+    #####:  213:		return -6;
+        -:  214:	}
+        -:  215:
+      130:  216:	pngimg_free(img);
+      130:  217:	pngimg_alloc(img, width, height);
+        -:  218:
+      130:  219:	png_bytep* data = (png_bytep*) malloc(sizeof(png_bytep) * height);
+   133250:  220:	for (int y = 0; y < height; y++) {
+   133120:  221:		data[y] = (png_byte*) malloc(png_get_rowbytes(png_ptr,info_ptr));
+        -:  222:	}
+      130:  223:	png_read_image(png_ptr, data);
+        -:  224:	Pixel *p, *r;
+   133250:  225:	for (int y = 0; y < height; y++) {
+   133120:  226:		r = img->pixels[y];
+136448000:  227:		for (int x = 0; x < width; x++) {
+136314880:  228:			p = &r[x];
+136314880:  229:			p->r = data[y][4*x+0];
+136314880:  230:			p->g = data[y][4*x+1];
+136314880:  231:			p->b = data[y][4*x+2];
+136314880:  232:			p->a = data[y][4*x+3];
+        -:  233:		}
+   133120:  234:		free(data[y]);
+        -:  235:	}
+      130:  236:	free(data);
+      130:  237:	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+        -:  238:	
+      130:  239:	return 0;
+        -:  240:}
+        -:  241:
+      130:  242:int pngimg_merge(PNGIMG *img1, PNGIMG *img2) {
+      130:  243:	if (img1->width != img2->width || img1->height != img2 -> height) {
+    #####:  244:		return -1;
+        -:  245:	}
+        -:  246:	float diva;
+   133250:  247:	for (int i = 0; i < img1->width; i++) {
+136448000:  248:		for (int j = 0; j < img1->height; j++) {
+136314880:  249:			Pixel * p2 = &img1->pixels[j][i];//pngimg_at(img1, j, i);
+136314880:  250:			Pixel * p1 = &img2->pixels[j][i];//pngimg_at(img2, j, i);
+        -:  251:			
+136314880:  252:			switch (p1->a) {
+134097141:  253:				case 0:
+134097141:  254:					continue;
+        -:  255:				break;
+  2015860:  256:				case 255:
+  2015860:  257:					p2->r = p1->r;
+  2015860:  258:					p2->g = p1->g;
+  2015860:  259:					p2->b = p1->b;
+  2015860:  260:					p2->a = 255;
+  2015860:  261:				break;
+   201879:  262:				default:
+   201879:  263:					diva = p1->a + p2->a * (255.0f - p1->a) / 255.0f;
+   201879:  264:					p2->r = (p1->r * p1->a + p2->r * p2->a * (255.0f - p1->a) / 255.0f)
+   201879:  265:						/diva;
+   201879:  266:					p2->g = (p1->g * p1->a + p2->g * p2->a * (255.0f - p1->a) / 255.0f)
+   201879:  267:						/diva;
+   201879:  268:					p2->b = (p1->b * p1->a + p2->b * p2->a * (255.0f - p1->a) / 255.0f)
+   201879:  269:						/diva;
+   201879:  270:					p2->a = diva;
+   201879:  271:				break;
+        -:  272:			}
+        -:  273:
+        -:  274:			/*if (p2->r > 255.0f)
+        -:  275:				p2->r = 255.0f;
+        -:  276:			if (p2->g > 255.0f)
+        -:  277:				p2->g = 255.0f;
+        -:  278:			if (p2->b > 255.0f)
+        -:  279:				p2->b = 255.0f;
+        -:  280:
+        -:  281:			if (p2->r < 0)
+        -:  282:				p2->r = 0;
+        -:  283:			if (p2->g < 0)
+        -:  284:				p2->g = 0;
+        -:  285:			if (p2->b < 0)
+        -:  286:				p2->b = 0;
+        -:  287:			if (p2->a > 255.0f)
+        -:  288:				p2->a = 255.0f;*/
+        -:  289:		}
+        -:  290:	}
+      130:  291:	return 0;
+        -:  292:}
+        -:  293:
+      130:  294:void pngimg_colorify(PNGIMG *img, const color * c, float val) {
+        -:  295:	hsv hsvcolor;
+        -:  296:	color col;
+      130:  297:	if (val != 1.0) {
+       34:  298:		hsvcolor.h = hue(c);
+       34:  299:		hsvcolor.s = saturation(c);
+       34:  300:		hsvcolor.v = val * value(c);
+       34:  301:		hsvToRGB(&hsvcolor, &col);
+       34:  302:		col.a = c->a;
+        -:  303:	}
+        -:  304:	else
+       96:  305:		col = *c;
+      130:  306:	float alpha = c->a / 255.0f;
+        -:  307:	Pixel * p;
+   133250:  308:	for (int i = 0; i < img->height; i++) {
+136448000:  309:		for (int j = 0; j < img->width; j++) {
+136314880:  310:			p = &img->pixels[j][i];
+136314880:  311:			if (p->a == 0)
+134097141:  312:				continue;
+  2217739:  313:			p->r = col.r;
+  2217739:  314:			p->g = col.g;
+  2217739:  315:			p->b = col.b;
+  2217739:  316:			p->a *= alpha;
+        -:  317:		}
+        -:  318:	}
+      130:  319:}
+        -:  320:
