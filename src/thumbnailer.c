@@ -527,6 +527,13 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_detail[i], 1.0);
 	}
 	
+	if (race & (UNICORN | ALICORN)) {
+		sprintf(part_loc, "%s/horn_fill.png", um_loc);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &body_color, 1.0);
+		sprintf(part_loc, "%s/horn_outline.png", um_loc);
+		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &body_color, 0.8);
+	}
+	
 	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/ear_fill.png", &body_color, 1.0);
 	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/ear_outline.png", &body_color, 0.8);
 	
@@ -621,6 +628,9 @@ int style_detail_count(char * style) {
 		return 5;
 	}
 	else if (!strcmp(style, "assertive")) {
+		return 1;
+	}
+	else if (!strcmp(style, "instructor")) {
 		return 1;
 	}
 	return 0;
