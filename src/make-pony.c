@@ -363,7 +363,7 @@ int main(int argc, char * argv[]) {
 	ADDSTYLE(styles, 3, "SPEEDSTER", "SPEEDSTER", "SPEEDSTER", 7);
 	ADDSTYLE(styles, 4, "ASSERTIVE", "ASSERTIVE", "ASSERTIVE", 2);
 	ADDSTYLE(styles, 5, "RADICAL", "NONE", "RADICAL", 7);
-	ADDSTYLE(styles, 6, "BUMPKIN", "BUMPKIN", "BUMPKIN", 3);
+	ADDSTYLE(styles, 6, "TIMID", "TIMID", "RADICAL", 2);
 	ADDSTYLE(styles, 7, "FLOOFEH", "FLOOFEH", "FLOOFEH", 2);
 	ADDSTYLE(styles, 8, "CLOUD", "SHOWBOAT", "BOLD", 1);
 	ADDSTYLE(styles, 9, "FILLY", "ADVENTUROUS", "SHOWBOAT", 2);
@@ -1210,7 +1210,6 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 					switch (oc->key) {
 						case BOOKWORM:
 						case ASSERTIVE:
-						case BUMPKIN:
 							c = oc->colors[0];
 						break;
 					}
