@@ -256,14 +256,14 @@ int main(int argc, char * argv[]) {
 		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 3, "SPEEDSTER", "SPEEDSTER", "SPEEDSTER");
 		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 4, "ASSERTIVE", "ASSERTIVE", "ASSERTIVE");
 		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 5, "RADICAL", "NONE", "RADICAL");
-		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 6, "BUMPKIN", "BUMPKIN", "BUMPKIN");
+		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 6, "TIMID", "TIMID", "RADICAL");
 		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 7, "FLOOFEH", "FLOOFEH", "FLOOFEH");
-		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 8, "INSTRUCTOR", "NONE", "RADICAL");
+		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 8, "CLOUD", "SHOWBOAT", "BOLD");
 		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 9, "FILLY", "ADVENTUROUS", "SHOWBOAT");
 		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 10, "ADVENTUROUS", "MOON", "SHOWBOAT");
 		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 11, "BOOKWORM", "TIMID", "SHOWBOAT");
-		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 12, "ADVENTUROUS", "ADVENTUROUS", "RADICAL");
-		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 13, "BOLD", "BOLD", "RADICAL");
+		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 12, "INSTRUCTOR", "NONE", "RADICAL");
+		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 13, "FLOOFEH", "SHOWBOAT", "ADVENTUROUS");
 		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 14, "MECHANIC", "MOON", "ADVENTUROUS");
 		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 15, "SHOWBOAT", "BOOKWORM", "SHOWBOAT");
 		fprintf(sterr, "\t\t\t%d -- %s, %s, %s\n", 16, "MAILCALL", "MAILCALL", "MAILCALL");

@@ -1,16 +1,31 @@
 # make-pony
 A generator for Pony Player Models Second Generation
 
-![Linux usage](https://i.imgur.com/ov8LUnw.png)
+![Linux screenshot](https://i.imgur.com/ov8LUnw.png)
 
 Credits for [PPM/2](https://git.dbot.serealia.ca/Ponyscape-open/PPM2) goes to DBot
 
-The thumbnailer isn't possible without:
-- [GTK+](https://www.gtk.org/)
-- [libpng](http://www.libpng.org/pub/png/libpng.html) and
-- [zlib](https://www.zlib.net/)
+This project is made possibly by:
+- [MSYS2](https://www.msys2.org/) (for Windows support),
+- [GTK+](https://www.gtk.org/), and
+- [libpng](http://www.libpng.org/pub/png/libpng.html)
 
 Changelog:
+
+v2.0-rc4
+- Fixes additional memory leaks (remaining leaks are out of my control) 
+- Missing manes/tails for make-pony styles are installed
+- Changed style list
+- PNGs are optimised for speed mostly
+- Down-scaled preview in GUI now averages pixels rather than sampling
+- Other optimizations
+
+v2.0-rc3
+- Fixes a really nasty memory leak in the thumbnailer
+
+v2.0-rc2
+- Windows compatibility issue with generated files
+- Adds error message when trying to use non-existant directories
 
 v2.0-rc1
 - Adds GTK+ support to Make-pony in both Linux and Windows
