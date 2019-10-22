@@ -5,7 +5,7 @@ A generator for Pony Player Models Second Generation
 
 Credits for [PPM/2](https://git.dbot.serealia.ca/Ponyscape-open/PPM2) goes to DBot
 
-This project is made possibly by:
+This project is made possible by:
 - [MSYS2](https://www.msys2.org/) (for Windows support),
 - [GTK+](https://www.gtk.org/), and
 - [libpng](http://www.libpng.org/pub/png/libpng.html)
