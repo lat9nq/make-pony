@@ -56,14 +56,15 @@
         </child>
         <child>
           <object class="GtkEntry" id="entry_seed">
-            <property name="width_request">270</property>
+            <property name="width_request">200</property>
             <property name="height_request">40</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="tooltip_text" translatable="yes">Enter a number, nothing, or "random"</property>
-            <property name="placeholder_text" translatable="yes">Enter a number, nothing, or write 'random'</property>
+            <property name="placeholder_text" translatable="yes">Blank for current time</property>
           </object>
           <packing>
+            <property name="x">70</property>
             <property name="y">440</property>
           </packing>
         </child>
@@ -103,7 +104,7 @@
             <property name="label" translatable="yes">Seed:</property>
           </object>
           <packing>
-            <property name="y">410</property>
+            <property name="y">440</property>
           </packing>
         </child>
         <child>
@@ -210,12 +211,12 @@
             <property name="label" translatable="yes">Hair style:</property>
           </object>
           <packing>
-            <property name="y">340</property>
+            <property name="y">390</property>
           </packing>
         </child>
         <child>
           <object class="GtkComboBoxText" id="cmb_style">
-            <property name="width_request">440</property>
+            <property name="width_request">370</property>
             <property name="height_request">40</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -242,7 +243,8 @@
             </items>
           </object>
           <packing>
-            <property name="y">370</property>
+            <property name="x">70</property>
+            <property name="y">390</property>
           </packing>
         </child>
         <child>
@@ -257,7 +259,7 @@
             <signal name="toggled" handler="on_chk_hue_toggled" swapped="no"/>
           </object>
           <packing>
-            <property name="y">270</property>
+            <property name="y">310</property>
           </packing>
         </child>
         <child>
@@ -273,7 +275,7 @@
             <signal name="value-changed" handler="on_scl_hue_value_changed" swapped="no"/>
           </object>
           <packing>
-            <property name="y">300</property>
+            <property name="y">340</property>
           </packing>
         </child>
         <child>
@@ -420,7 +422,7 @@
           </object>
           <packing>
             <property name="x">110</property>
-            <property name="y">270</property>
+            <property name="y">310</property>
           </packing>
         </child>
         <child>
@@ -461,6 +463,21 @@
           </object>
           <packing>
             <property name="x">280</property>
+            <property name="y">310</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="chk_old_colors">
+            <property name="label" translatable="yes">Only hue-sat mane colors</property>
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="tooltip_text" translatable="yes">The generator will full value for mane color calculations. Works similar to older versions of make-pony (i.e. 1.4).</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
             <property name="y">270</property>
           </packing>
         </child>

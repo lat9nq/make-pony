@@ -456,6 +456,7 @@ void mp_gtk_build(int *argc, char ** argv[], mp_gtk_widgets ** w) {
 	widgets->g_chk_traditional = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_traditional"));
 	widgets->g_chk_verbose = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_verbose"));
 	widgets->g_chk_hue = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_hue"));
+	widgets->g_chk_old_colors = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_old_colors"));
 	widgets->g_chk_preview = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_preview"));
 	widgets->g_chk_thumbnail = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_thumbnail"));
 	widgets->g_cmb_saturation = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "cmb_saturation"));
@@ -537,6 +538,7 @@ void on_btn_generate_clicked() {
 	main_oc->use_socks = atoi(gtk_combo_box_get_active_id((GtkComboBox*)main_widgets->g_cmb_socks));
 	main_oc->male = atoi(gtk_combo_box_get_active_id((GtkComboBox*)main_widgets->g_cmb_male));
 	main_oc->traditional = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_traditional);
+	main_oc->use_old_colors = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_old_colors);
 	main_oc->verbose = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_verbose);
 	if (gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_hue))
 		main_oc->hue = gtk_range_get_value((GtkRange*)main_widgets->g_scl_hue);
@@ -806,6 +808,7 @@ void mp_data_init(mp_data * oc) {
 	oc->key = -1;
 	oc->use_floofers = -1;
 	oc->use_socks = -1;
+	oc->use_old_colors = 0;
 	oc->male = 0;
 	oc->desaturated = -1;
 	oc->white = -1;
@@ -873,32 +876,31 @@ void mp_pick_colors(mp_data * oc) {
 	float avg_sat = 0.0f;
 	float std_dev = 0.0f;
 
+	int r = rand();
+	int r2 = rand();
+
 	if (oc->desaturated == -1) {
-		oc->desaturated = !(rand() & 15);
-		oc->white = !(rand() & 3) && oc->desaturated;
+		oc->desaturated = !(r & 15);
+		oc->white = !(r2 & 3) && oc->desaturated;
 		oc->desaturated = oc->desaturated + oc->white;
 		if (oc->traditional) {
 			oc->desaturated = 0;
 		}
 	}
-	else {
-		rand();
-		rand();
-	}
+	
 	oc->any_saturation = 0;
 
 	if (oc->verbose) {
 		fprintf(sterr, "body is %ssaturated\n", (oc->desaturated) ? "de" : "");
 	}
-
-	int r;
-	int r2;
+	
 	if (oc->use_socks == -1) {
 		oc->use_socks = !(rand() % 6);
 	}
 	else {
 		rand();
 	}
+	
 	if (oc->use_socks && clrcount < 2) {
 		clrcount = 2;
 	}
@@ -952,20 +954,24 @@ void mp_pick_colors(mp_data * oc) {
 		if (oc->key == BOOKWORM && i == 1) {
 			oc->colors[i] = oc->colors[0];
 		}
-		else if (!(r2 & 3)) {
+		else if (!(r2 & 3) || (oc->use_old_colors && oc->desaturated != 1)) {
 			if (oc->desaturated == 1) {
 				hsvcolor.s = 0.0f; rand();
 				hsvcolor.v = sqrtf((rand() & 15) / 15.0f);
 			}
 			else {
-				hsvcolor.s = (rand() % 10 + 6) / 15.0f;
+				hsvcolor.s = (rand() % 12 + 4) / 15.0f;
 				hsvcolor.v = sqrtf((rand() % 10 + 6) / 15.0f);
+				if (oc->use_old_colors) {
+					hsvcolor.v = 1;
+				}
 			}
 		}
 		else {
 			hsvcolor.v = (oc->desaturated != 1) ? 
-				sqrtf((rand() % 10 + 6) / 15.0f) : 
+				sqrtf((rand() % 12 + 4) / 15.0f) : 
 				sqrtf((rand() & 15) / 15.0f);
+				rand();
 		}
 		oc->any_saturation = (hsvcolor.s > 0.0f) | oc->any_saturation;
 
@@ -1002,7 +1008,7 @@ void mp_pick_colors(mp_data * oc) {
 		// hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + 0.6f * fmodf(fabs(-std_dev*1.5f + 1.25f), 1.0f))) : 0.0f;// * !(!(rand()&7));
 		// hsvcolor.s = (!desaturated) ? (avg_sat * 0.8f * (0.4f + std_dev * 0.6f)) : 0.0f;// * !(!(rand()&7));
 		hsvcolor.s = (!oc->desaturated) ? (avg_sat * sqrt(std_dev)) : 0.0f;// * !(!(rand()&7));
-		hsvcolor.v = (oc->desaturated) ? (1.0 - avg_sat * sqrtf(0.3f + std_dev*0.7f)) : 1.0f;//((rand() % 12) + 4) / 15.0f : 1.0f;
+		hsvcolor.v = (oc->desaturated) ? sqrtf(avg_sat * sqrtf(0.3f + std_dev*0.7f)) : 1.0f;//((rand() % 12) + 4) / 15.0f : 1.0f;
 		// c = color1;
 		// if (!desaturated) {
 		// hsvToRGB(&hsvcolor, &bodycolor);
@@ -1069,7 +1075,7 @@ void mp_pick_colors(mp_data * oc) {
 			}
 			details_in_use += 1;
 			strcpy(oc->details[details_in_use], "HOOF_SMALL");
-			oc->detail_color[details_in_use] = oc->colors[1 + (oc->key == BOOKWORM || oc->key == SPEEDSTER)];
+			oc->detail_color[details_in_use] = oc->colors[(1 + (oc->key == BOOKWORM || oc->key == SPEEDSTER)) % clrcount];
 			details_in_use += 1;
 		}
 		else {
