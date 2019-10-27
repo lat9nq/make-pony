@@ -524,7 +524,14 @@ void on_btn_generate_clicked() {
 		seed = time(NULL);
 	}
 	else if (!strcmp(text, "random")) {
+#ifndef _WIN64
+		struct timespec spec;
+		clock_gettime(CLOCK_REALTIME, &spec);
+		seed = spec.tv_nsec;
+		
+#else
 		seed = rand();
+#endif
 	}
 	else {
 		seed = atoi(text);
@@ -840,6 +847,7 @@ void mp_pick_colors(mp_data * oc) {
 	if (oc->colors != NULL)
 		free(oc->colors);
 	oc->colors = malloc(sizeof(*oc->colors)*7);
+	memset(oc->colors, 0, sizeof(*oc->colors)*7);
 	
 	color color1;
 	
@@ -1154,6 +1162,10 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 			c.r = 0;
 			c.g = 0;
 			c.b = 0;
+			
+			hsvcolor.h = 0;
+			hsvcolor.s = 0;
+			hsvcolor.v = 0;
 
 			if (!strcmp(cur+1,"body")) {
 				// hsvcolor.h = static_hue;

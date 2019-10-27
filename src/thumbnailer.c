@@ -354,6 +354,7 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 					col->g = f.a[1];
 					col->b = f.a[2];
 					col->a = f.a[3];
+					//printf("%d : %02X %02X %02X\t%s\n", nbt_at, f.a[0] + 128, f.a[1] + 128, f.a[2] + 128, s);
 					((nbt_t *)(nbt.payload))[nbt_at].payload = col;
 					nbt_at++;
 				}
