@@ -459,6 +459,7 @@ void mp_gtk_build(int *argc, char ** argv[], mp_gtk_widgets ** w) {
 	widgets->g_chk_old_colors = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_old_colors"));
 	widgets->g_chk_preview = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_preview"));
 	widgets->g_chk_thumbnail = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_thumbnail"));
+	widgets->g_chk_invert = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_invert"));
 	widgets->g_chk_eyes_always_color = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_eyes_always_color"));
 	widgets->g_cmb_saturation = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "cmb_saturation"));
 	widgets->g_cmb_wheel = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "cmb_wheel"));
@@ -546,6 +547,7 @@ void on_btn_generate_clicked() {
 	main_oc->use_socks = atoi(gtk_combo_box_get_active_id((GtkComboBox*)main_widgets->g_cmb_socks));
 	main_oc->male = atoi(gtk_combo_box_get_active_id((GtkComboBox*)main_widgets->g_cmb_male));
 	main_oc->traditional = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_traditional);
+	main_oc->invert = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_invert);
 	main_oc->use_old_colors = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_old_colors);
 	main_oc->eyes_always_color = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_eyes_always_color);
 	main_oc->verbose = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_verbose);
@@ -827,6 +829,7 @@ void mp_data_init(mp_data * oc) {
 	oc->verbose = 0;
 	oc->hue = -1;
 	oc->eyes_always_color = 0;
+	oc->invert = 0;
 }
 
 void mp_pick_colors(mp_data * oc) {
@@ -1027,6 +1030,13 @@ void mp_pick_colors(mp_data * oc) {
 		// l *= l;
 		// hsvcolor.s = avg_sat - 0.3f*l;
 		// }
+		
+		if (oc->invert) {
+			if (oc->desaturated)
+				hsvcolor.v = 1.0 - hsvcolor.v;
+			else
+				hsvcolor.s = 1.0 - hsvcolor.s;
+		}
 		hsvcolor.s = ((float)(hsvcolor.s >= 0)) * hsvcolor.s;
 	}
 	else {
