@@ -459,6 +459,7 @@ void mp_gtk_build(int *argc, char ** argv[], mp_gtk_widgets ** w) {
 	widgets->g_chk_old_colors = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_old_colors"));
 	widgets->g_chk_preview = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_preview"));
 	widgets->g_chk_thumbnail = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_thumbnail"));
+	widgets->g_chk_eyes_always_color = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "chk_eyes_always_color"));
 	widgets->g_cmb_saturation = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "cmb_saturation"));
 	widgets->g_cmb_wheel = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "cmb_wheel"));
 	widgets->g_cmb_socks = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "cmb_socks"));
@@ -546,6 +547,7 @@ void on_btn_generate_clicked() {
 	main_oc->male = atoi(gtk_combo_box_get_active_id((GtkComboBox*)main_widgets->g_cmb_male));
 	main_oc->traditional = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_traditional);
 	main_oc->use_old_colors = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_old_colors);
+	main_oc->eyes_always_color = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_eyes_always_color);
 	main_oc->verbose = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_verbose);
 	if (gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_hue))
 		main_oc->hue = gtk_range_get_value((GtkRange*)main_widgets->g_scl_hue);
@@ -824,6 +826,7 @@ void mp_data_init(mp_data * oc) {
 	oc->traditional = 0;
 	oc->verbose = 0;
 	oc->hue = -1;
+	oc->eyes_always_color = 0;
 }
 
 void mp_pick_colors(mp_data * oc) {
@@ -1242,6 +1245,7 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 				hsvToRGB(&hsvcolor, &c);
 			}
 			else if (strstr(cur+1, "eye_") == cur + 1) {
+				int use_color = (oc->any_saturation || oc->eyes_always_color);
 				if (strstr(cur+1, "effect") || strstr(cur+1, "hole")) {
 					c.r = 0;
 					c.g = 0;
@@ -1253,7 +1257,7 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 				// c.b = 255;
 				// }
 				else if (strstr(cur+1, "iris1")) {
-					if (!oc->any_saturation) {
+					if (!use_color) {
 						hsvcolor.h = 0;
 						hsvcolor.s = 0.0f;
 						hsvcolor.v = 0.5f * (1.0f-value(&oc->body_color));
@@ -1273,15 +1277,15 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 				else if (strstr(cur+1, "irisline2")) {
 					c = eye_color;
 					hsvcolor.h = hue(&c);
-					hsvcolor.s = 0.1f * oc->any_saturation;
-					hsvcolor.v = 0.9f + 0.1 * oc->any_saturation;
+					hsvcolor.s = 0.1f * use_color;
+					hsvcolor.v = 0.9f + 0.1 * use_color;
 					hsvToRGB(&hsvcolor, &c);
 				}
 				else if (strstr(cur+1, "irisline1")) {
 					c = eye_color;
 					hsvcolor.h = hue(&c);
-					hsvcolor.s = 0.5f * oc->any_saturation;
-					hsvcolor.v = 0.5f + 0.5f * oc->any_saturation;
+					hsvcolor.s = 0.5f * use_color;
+					hsvcolor.v = 0.5f + 0.5f * use_color;
 					hsvToRGB(&hsvcolor, &c);
 				}
 				else {

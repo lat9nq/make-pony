@@ -72,6 +72,7 @@ typedef struct {
 	int use_floofers;
 	int use_socks;
 	int use_old_colors;
+	int eyes_always_color;
 	int male;
 	int desaturated;
 	int white;
@@ -110,6 +111,7 @@ typedef struct {
 	GtkWidget * g_cmb_male;
 	GtkWidget * g_chk_hue;
 	GtkWidget * g_chk_old_colors;
+	GtkWidget * g_chk_eyes_always_color;
 	GtkWidget * g_scl_hue;
 	GtkWidget * g_entry_hue;
 	GtkWidget * g_chk_verbose;
