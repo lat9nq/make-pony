@@ -533,8 +533,12 @@ void on_btn_generate_clicked() {
 		seed = spec.tv_nsec;
 		
 #else
-		if (!QueryPerformanceCounter(&seed)) {
+		LARGE_INTEGER long_seed;
+		if (!QueryPerformanceCounter(&long_seed)) {
 			seed = rand();
+		}
+		else {
+			seed = long_seed.QuadPart;
 		}
 #endif
 	}
