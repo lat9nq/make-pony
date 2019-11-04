@@ -21,6 +21,7 @@
 
 #ifdef _WIN64
 #include <process.h>
+#include <profileapi.h>
 #else
 #include <unistd.h>
 #endif
@@ -532,7 +533,9 @@ void on_btn_generate_clicked() {
 		seed = spec.tv_nsec;
 		
 #else
-		seed = rand();
+		if (!QueryPerformanceCounter(&seed)) {
+			seed = rand();
+		}
 #endif
 	}
 	else {
