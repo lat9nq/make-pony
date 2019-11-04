@@ -19,17 +19,17 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "color.h"
+#include "target.h"
+#include "make-pony.h"
+#include "thumbnailer.h"
+
 #ifdef _WIN64
 #include <process.h>
 #include <profileapi.h>
 #else
 #include <unistd.h>
 #endif
-
-#include "color.h"
-#include "target.h"
-#include "make-pony.h"
-#include "thumbnailer.h"
 
 int main(int argc, char * argv[]) {
 
