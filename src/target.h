@@ -9,7 +9,7 @@
 #define BOOL	4
 #define GRUP	5
 #define SEP		6
-#define INT		7
+#define TARGET_INT		7
 
 #define TARGETCOUNT 735
 #define TARGETCOUNTSIMPLE 70

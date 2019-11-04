@@ -1381,7 +1381,7 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 
 			s_len = addBool(cur+1, x, 1, s);
 		}
-		else if (target[i][0] == VAL || target[i][0] == INT) {
+		else if (target[i][0] == VAL || target[i][0] == TARGET_INT) {
 			float x = 1.0f;
 
 			if (!strcmp(cur+1, "hoof_fluffers_strength")) {
