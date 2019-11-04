@@ -520,7 +520,7 @@ void mp_gtk_destroy(mp_gtk_widgets * widgets) {
 
 void on_btn_generate_clicked() {
 	char text[256];
-	int seed;
+	uint64_t seed;
 	
 	strncpy(text, gtk_entry_get_text((GtkEntry*)main_widgets->g_entry_seed), 255);
 	if (text[0] == '\0') {
