@@ -16,7 +16,9 @@ add_executable(make-pony
     thumbnailer.h)
 
 target_compile_options(make-pony BEFORE PUBLIC
-    -pipe)
+    -pipe
+    -Wall
+    -Wextra)
 
 target_include_directories(make-pony PRIVATE ${GTK_INCLUDE_DIRS})
 
