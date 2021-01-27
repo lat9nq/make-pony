@@ -14,7 +14,6 @@
 #define TARGETCOUNT 735
 #define TARGETCOUNTSIMPLE 70
 #define PUSHTARGET(R,X,T)	sprintf((R)[target_at], "%c%s", (T), (X)); target_at++
-int target_at;
 
 void importTargets(char ** target);
 void importTargetsSimple(char ** target);

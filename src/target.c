@@ -1,5 +1,7 @@
 #include "target.h"
 
+int target_at = 0;
+
 /* We assume targets is initialized */
 void importTargets(char ** target) {
 	target_at = 0;
