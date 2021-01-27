@@ -1,6 +1,6 @@
 #include "nbt.h"
 
-nbt_t * nbt_read(int fd) {
+nbt_t * nbt_read() {
 	nbt_t * nbt;
 	int nbt_len;
 
@@ -38,7 +38,7 @@ int addString(char * key, char * data, int t, char * buffer) {
 	return i;
 }
 
-int addValue(char * key, float data, int t, char * buffer) {
+int addValue(char * key, float data, char * buffer) {
 	int i, length;
 	i = 0;
 	length = strlen(key);
@@ -61,7 +61,7 @@ int addValue(char * key, float data, int t, char * buffer) {
 	return i;
 }
 
-int addBool(char * key, int data, int t, char * buffer) {
+int addBool(char * key, int data, char * buffer) {
 	int i, length;
 	i = 0;
 	length = strlen(key);
@@ -84,7 +84,7 @@ int addBool(char * key, int data, int t, char * buffer) {
 	return i;
 }
 
-int addColor(char * key, color * data, int t, char * buffer) {
+int addColor(char * key, color * data, char * buffer) {
 	int i, length;
 	i = 0;
 	length = strlen(key);
@@ -140,7 +140,7 @@ int addSeparator(char * key, char * buffer) {
 	return i;
 }
 
-int addInt(char * key, int data, int t, char * buffer) {
+int addInt(char * key, int data, char * buffer) {
 	int i, length;
 	i = 0;
 	length = strlen(key);

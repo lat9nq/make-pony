@@ -1,10 +1,10 @@
 /* thumbnailer.c
- * 
+ *
  * A thumbnailer for Pony Player Models Second Generation (by dbotthepone).
- * 
+ *
  * Supports any hairstyle defined at style_{color,detail}_count, and any body
  * detail. Also supports socks (old and new models only).
- * 
+ *
  * Requires libpng, and its dependency zlib.
  */
 
@@ -48,7 +48,7 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 	/* We initialize brow and eyelash colors since older OCs don't have a
 	 * color setting for these elements.
 	 */
-	color_init(&eye_brows); 
+	color_init(&eye_brows);
 	color_init(&eye_lashes);
 	eye_lashes.a = 255;
 	eye_brows.a = 255;
@@ -71,7 +71,7 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 
 	uint8_t c; // temporary character
 	char s[256]; // temporary string
-	uint32_t l; // temporary place to store 4 bytes
+	//~ uint32_t l; // temporary place to store 4 bytes
 	float_bin f; // converts endianess and extracts colors
 	//int print_c = 0;
 
@@ -82,10 +82,10 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 
 	/* Read input as long as there is data left in the file */
 	//while (read(fd, &c, 1)) {
-	for (int i = 0; i < data_len; ) {
+	for (uint32_t i = 0; i < data_len; ) {
 		c = data[i];
 		i++;
-		l = 0;
+		//~ l = 0;
 		s[0] = 0;
 		switch (c) {
 			case NBT_GROUP:
@@ -97,6 +97,7 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 				i += get_nbt_string(s, data+i);
 				if (PRINT_TARGETS)
 					printf("\tPUSHTARGET(target, \"%s\", INT);\n", s);
+                /* fall through */
 			case NBT_FLOAT:
 				if (c == NBT_FLOAT)
 					i += get_nbt_string(s, data+i);
@@ -195,7 +196,8 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 				i += get_nbt_string(s, data+i);
 				if (PRINT_TARGETS)
 					printf("\tPUSHTARGET(target, \"%s\", COL);\n", s);
-				l = *(int*)(data + i); i += 4;
+				//~ l = *(int*)(data + i); i += 4;
+                i += 4;
 				f = *(float_bin*)(data + i); i += 4;
 
 				if (!strcmp(s,"body")) {
@@ -361,7 +363,7 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 			break;
 		}
 	}
-	
+
 	if (PRINT_TARGETS)
 			exit(0);
 
@@ -403,11 +405,11 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 	body_color.g += 128;
 	body_color.b += 128;
 	body_color.a += 128;
-	
+
 	strtolower(uppermane);
 	strtolower(lowermane);
 	strtolower(tail);
-	
+
 	char um_loc[255];
 	char lm_loc[255];
 	char t_loc[255];
@@ -416,14 +418,14 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 	lm_loc[0] = 0;
 	t_loc[0] = 0;
 	part_loc[0] = 0;
-	
+
 	sprintf(um_loc, "templates/%s", uppermane);
 	sprintf(lm_loc, "templates/%s", lowermane);
 	sprintf(t_loc, "templates/%s", tail);
 
 	sprintf(part_loc, "%s/tail_fill.png", t_loc);
 	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &tail_color[0], 1.0);
-	
+
 	for (int i = 0; i < style_detail_count(tail); i++) {
 		sprintf(part_loc, "%s/tail_detail%d.png", t_loc, i + 1);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &tail_detail[i], 1.0);
@@ -431,13 +433,13 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 	for (int i = 0; i < style_color_count(tail); i++) {
 		sprintf(part_loc, "%s/tail_color%d.png", t_loc, i + 1);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &tail_color[i+1], 1.0);
-		
+
 		sprintf(part_loc, "%s/tail_color%d_outline.png", t_loc, i + 1);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &tail_color[i+1], 0.8);
 	}
 	sprintf(part_loc, "%s/tail_outline.png", t_loc);
 	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &tail_color[0], 0.8);
-	
+
 	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/body_fill.png", &body_color, 1.0);
 	for (int i = 0; i < BODY_DETAIL_MAX; i++) {
 		if (body_detail_s[i] == NULL || !strcmp(body_detail_s[i], "none")) {
@@ -447,7 +449,7 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &body_detail[i], 1.0);
 	}
 	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/body_outline.png", &body_color, 0.8);
-	
+
 	which_eye = BOTH;
 	if (use_separated_eyes) {
 		which_eye = LEFT;
@@ -469,11 +471,11 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/reye_pupil.png", &eye_pupil[which_eye], 1.0);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/reye_reflection.png", &eye_reflection[which_eye], 1.0);
 	}
-	
+
 	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/eye_brows.png", &eye_lashes, 1.0);
 	if (use_eyelashes)
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/eye_lashes.png", &eye_brows, 1.0);
-	
+
 	if (use_socks == SOCKS_NEW_MODEL) {
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/socks_fill.png", &socks_new[0], 1.0);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/socks_color1.png", &socks_new[1], 1.0);
@@ -490,7 +492,7 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/socks_color1.png", &black, 1.0);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/socks_outline.png", &socks_model, 0.8);
 	}
-	
+
 	if (race == PEGASUS || race == ALICORN) {
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/wing_fill.png", &body_color, 1.0);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/wing_outline.png", &body_color, 0.8);
@@ -503,7 +505,7 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 	for (int i = 0; i < style_color_count(lowermane); i++) {
 		sprintf(part_loc, "%s/lowermane_color%d.png", lm_loc, i + 1);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_color[i+1], 1.0);
-		
+
 		sprintf(part_loc, "%s/lowermane_color%d_outline.png", lm_loc, i + 1);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_color[i+1], 0.8);
 	}
@@ -519,7 +521,7 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 	for (int i = 0; i < style_color_count(uppermane); i++) {
 		sprintf(part_loc, "%s/uppermane_color%d.png", um_loc, i + 1);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_color[i+1], 1.0);
-		
+
 		sprintf(part_loc, "%s/uppermane_color%d_outline.png", um_loc, i + 1);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_color[i+1], 0.8);
 	}
@@ -527,25 +529,25 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 		sprintf(part_loc, "%s/uppermane_detail%d.png", um_loc, i + 1);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &mane_detail[i], 1.0);
 	}
-	
+
 	if (race & (UNICORN | ALICORN)) {
 		sprintf(part_loc, "%s/horn_fill.png", um_loc);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &body_color, 1.0);
 		sprintf(part_loc, "%s/horn_outline.png", um_loc);
 		pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], part_loc, &body_color, 0.8);
 	}
-	
+
 	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/ear_fill.png", &body_color, 1.0);
 	pony_part_count += thumbnail_add_part(&pony_part[pony_part_count], "templates/ear_outline.png", &body_color, 0.8);
-	
+
 	for (int i = 0; i < pony_part_count; i++) {
 		pngimg_merge(canvas, pony_part[i]);
 		pngimg_free(pony_part[i]);
 		free(pony_part[i]);
 	}
 	free(pony_part);
-	
-	
+
+
 	void * payload;
 	for (int i = 0; i < nbt_at; i++) {
 		payload = ((nbt_t *)(nbt.payload))[nbt_at].payload;
@@ -558,7 +560,7 @@ int thumbnail(PNGIMG * canvas, uint8_t * data, uint32_t data_len) {
 		if (body_detail_s[i] != NULL)
 			free(body_detail_s[i]);
 	}
-	
+
 	return 0;
 }
 
@@ -596,11 +598,11 @@ int get_nbt_string(char * s, uint8_t * data) {
 		return 2;
 	}
 	//printf("%d\n", l);
-	for (int j = 0; j < l; j++)
+	for (uint8_t j = 0; j < l; j++)
 		s[j] = (data + i)[j];
 	i += l;
 	s[l] = 0;
-	
+
 	return i;
 }
 

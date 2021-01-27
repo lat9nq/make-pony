@@ -30,10 +30,10 @@ typedef struct {
 } nbt_t;
 
 int addString(char * key, char * data, int t, char * buffer);
-int addValue(char * key, float data, int t, char * buffer);
-int addInt(char * key, int data, int t, char * buffer);
-int addColor(char * key, color * data, int t, char * buffer);
-int addBool(char * key, int data, int t, char * buffer);
+int addValue(char * key, float data, char * buffer);
+int addInt(char * key, int data, char * buffer);
+int addColor(char * key, color * data, char * buffer);
+int addBool(char * key, int data, char * buffer);
 int addSeparator(char * key, char * buffer);
 
 #endif

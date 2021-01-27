@@ -26,7 +26,7 @@ PNGIMG * pngimg_init();
 void pngimg_alloc(PNGIMG * img, int w, int h);
 void pngimg_free(PNGIMG * img);
 
-void pngimg_destroy_data(png_byte * data, void * _);
+void pngimg_destroy_data(png_byte * data);
 void pngimg_destroy_datap(png_bytep * data);
 png_byte ** pngimg_getData(PNGIMG * img);
 png_byte * pngimg_get_data_array(PNGIMG * img);
@@ -60,4 +60,4 @@ class PNGIMG {
 		int width, height;
 }; */
 
-#endif /* PNGIMG_H */ 
+#endif /* PNGIMG_H */

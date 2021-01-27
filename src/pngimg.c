@@ -8,7 +8,7 @@ PNGIMG * pngimg_init() {
 	img->pixels = NULL;
 	img->width = 0;
 	img->height = 0;
-	
+
 	return img;
 }
 
@@ -31,7 +31,7 @@ void pngimg_alloc(PNGIMG * img, int w, int h) {
 
 void pngimg_free(PNGIMG * img) {
 	if (img->pixels != NULL) {
-		for (int i = 0; i < img->height; i++) 
+		for (int i = 0; i < img->height; i++)
 			free(img->pixels[i]);
 		free(img->pixels);
 	}
@@ -40,7 +40,7 @@ void pngimg_free(PNGIMG * img) {
 	img->height = 0;
 }
 
-void pngimg_destroy_data(png_byte * data, void * _) {
+void pngimg_destroy_data(png_byte * data) {
 	free(data);
 }
 
@@ -69,7 +69,7 @@ png_byte ** pngimg_getData(PNGIMG * img) {
 png_byte * pngimg_get_data_array(PNGIMG * img) {
 	int x;
 	png_byte * data;
-	
+
 	data = (png_byte *)malloc(sizeof(*data)*img->height * img->width * 4);
 	for (int i = 0; i < img->height; i++) {
 		x = i * img->width;
@@ -139,11 +139,11 @@ int pngimg_write(PNGIMG * img, FILE * f) {
 		return -5;
 	}
 	png_write_end(png_ptr, NULL);
-	
-	for (int i = 0; i < img->height; i++) 
+
+	for (int i = 0; i < img->height; i++)
 		free(rows[i]);
 	free(rows);
-	
+
 	return 0;
 }
 
@@ -154,12 +154,12 @@ int pngimg_read(PNGIMG * img, char * filename) {
 #else
 	f = fopen(filename, "r");
 #endif
-	
+
 	int val;
 	val = pngimg_read_fp(img, f);
 	if (val == 0)
 		fclose(f);
-	
+
 	return val;
 }
 
@@ -168,7 +168,7 @@ int pngimg_read(PNGIMG * img, char * filename) {
 int pngimg_read_fp(PNGIMG * img, FILE * f) {
 	unsigned char header[8];
 	int width, height;
-	
+
 	if (f == NULL) {
 		fprintf(stderr, "error: file refused read access\n");
 		return -1;
@@ -192,21 +192,21 @@ int pngimg_read_fp(PNGIMG * img, FILE * f) {
 		fprintf(stderr,"error: failure initializing i/o\n");
 		return -5;
 	}
-	
+
 	png_init_io(png_ptr, f);
 	png_set_sig_bytes(png_ptr, 8);
-	
+
 	png_read_info(png_ptr, info_ptr);
-	
+
 	width = png_get_image_width(png_ptr, info_ptr);
 	height = png_get_image_height(png_ptr, info_ptr);
 	//~ int color_type = png_get_color_type(png_ptr, info_ptr);
 	//~ int bit_depth = png_get_bit_depth(png_ptr, info_ptr);
 	//~ printf("%d,%d\n",color_type, bit_depth);
-	
+
 	//~ number_of_passes = png_set_interlace_handling(png_ptr);
 	png_read_update_info(png_ptr, info_ptr);
-	
+
 	/* read file */
 	if (setjmp(png_jmpbuf(png_ptr))) {
 		fprintf(stderr,"error: failure reading image\n");
@@ -235,7 +235,7 @@ int pngimg_read_fp(PNGIMG * img, FILE * f) {
 	}
 	free(data);
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-	
+
 	return 0;
 }
 
@@ -248,7 +248,7 @@ int pngimg_merge(PNGIMG *img1, PNGIMG *img2) {
 		for (int i = 0; i < img1->width; i++) {
 			Pixel * p2 = &img1->pixels[j][i];//pngimg_at(img1, j, i);
 			Pixel * p1 = &img2->pixels[j][i];//pngimg_at(img2, j, i);
-			
+
 			switch (p1->a) {
 				case 255:
 					p2->r = p1->r;

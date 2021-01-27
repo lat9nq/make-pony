@@ -47,11 +47,11 @@ int main(int argc, char * argv[]) {
 	char ** fargv = NULL;
 	int stdo = 0;
 	sterr = stderr;
-	
+
 	data = NULL;
 	preview = NULL;
 	preview_buf = NULL;
-	
+
 	mp_data *oc;
 	oc = malloc(sizeof(*oc));
 	oc->key = -1;
@@ -120,7 +120,7 @@ int main(int argc, char * argv[]) {
 							times = atoi(args[i]);
 						}
 						break;
-					case 'c': 
+					case 'c':
 						stdo = 1;
 						break;
 					case 'x': { //color specify
@@ -203,7 +203,7 @@ int main(int argc, char * argv[]) {
 						fargv[j] = NULL;
 					}
 					j = 0;
-					while (fgets(s,256,arg_in)) {
+					while (fgets(s,255,arg_in)) {
 						fargv[j] = malloc(sizeof(**fargv)*256);
 						strcpy(fargv[j], s);
 						printf("%s",fargv[j]);
@@ -384,12 +384,12 @@ int main(int argc, char * argv[]) {
 	}
 	memset(data, 0, sizeof(*data)*32768);
 	int data_len;
-	
-	
+
+
 	if (nogui) {
 		mp_pick_colors(oc);
 		data_len = mp_construct_nbt(oc, data);
-		
+
 		if (!stdo) {
 			FILE * f = fopen(filename, "wb");
 /*	#ifdef _WIN32
@@ -414,26 +414,26 @@ int main(int argc, char * argv[]) {
 	}
 	else {
 		srand(time(NULL));
-		
+
 		preview = pngimg_init();
 		preview_seed = 0;
-		
+
 		clrbtn_hue_color = (GdkRGBA*)malloc(sizeof(*clrbtn_hue_color));
-		
+
 		main_oc = (mp_data *)malloc(sizeof(*main_oc));
 		memset(main_oc, 0, sizeof(*main_oc));
 		mp_data_init(main_oc);
-		
+
 #ifdef _WIN64
 		_pipe(log_pipe, 4096, _O_BINARY);
 #else
 		pipe(log_pipe);
 #endif
 		sterr = fdopen(log_pipe[1], "w");
-		
+
 		mp_gtk_build(&argc, &argv, &main_widgets);
 	}
-	
+
 	return 0;
 }
 
@@ -441,16 +441,16 @@ void mp_gtk_build(int *argc, char ** argv[], mp_gtk_widgets ** w) {
 	mp_gtk_widgets * widgets;
 	widgets = (mp_gtk_widgets *)malloc(sizeof(*widgets));
 	*w = widgets;
-	
+
 	gtk_init(argc, argv);
-	
+
 	widgets->builder = gtk_builder_new();
 	gtk_builder_add_from_file(widgets->builder, "src/make-pony.glade", NULL);
-	
+
 	widgets->window = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "window_main"));
 	gtk_builder_connect_signals(widgets->builder, NULL);
-	
-	
+
+
 	widgets->g_entry_seed = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "entry_seed"));
 	widgets->g_entry_hue = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "entry_hue"));
 	widgets->g_entry_thumbnail_dir = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "entry_thumbnail_dir"));
@@ -473,7 +473,7 @@ void mp_gtk_build(int *argc, char ** argv[], mp_gtk_widgets ** w) {
 	widgets->g_txt_log = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "txt_log"));
 	widgets->g_scrl_log = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "scrl_log"));
 	widgets->g_clrbtn_hue = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "clrbtn_hue"));
-	
+
 
     g_object_unref(widgets->builder);
 
@@ -485,7 +485,7 @@ void update_txt_log() {
 	char *s;
 	s = malloc(sizeof(*s) * 4096);
 	int i;
-	
+
 	char c;
 	c = 0;
 	i = 0;
@@ -494,18 +494,18 @@ void update_txt_log() {
 	while (read(log_pipe[0], &c, 1)) {
 		if (c == 0)
 			break;
-		
+
 		s[i] = c;
 		i++;
 		s[i] = 0;
 	}
-	
+
 	GtkTextBuffer * buf = gtk_text_view_get_buffer((GtkTextView*)main_widgets->g_txt_log);
 	GtkTextIter iter;
 	gtk_text_buffer_get_end_iter(buf, &iter);
 	gtk_text_buffer_insert(buf, &iter, s, -1);
-	
-	
+
+
 	free(s);
 }
 
@@ -514,14 +514,14 @@ void on_txt_log_size_allocate() {
 	gtk_adjustment_set_value(vadj, gtk_adjustment_get_upper(vadj));
 }
 
-void mp_gtk_destroy(mp_gtk_widgets * widgets) {
-	
+void mp_gtk_destroy() {
+
 }
 
 void on_btn_generate_clicked() {
 	char text[256];
 	uint64_t seed;
-	
+
 	strncpy(text, gtk_entry_get_text((GtkEntry*)main_widgets->g_entry_seed), 255);
 	if (text[0] == '\0') {
 		seed = time(NULL);
@@ -531,7 +531,7 @@ void on_btn_generate_clicked() {
 		struct timespec spec;
 		clock_gettime(CLOCK_REALTIME, &spec);
 		seed = spec.tv_nsec;
-		
+
 #else
 		LARGE_INTEGER long_seed;
 		if (!QueryPerformanceCounter(&long_seed)) {
@@ -545,7 +545,7 @@ void on_btn_generate_clicked() {
 	else {
 		seed = atoi(text);
 	}
-	
+
 	mp_data_init(main_oc);
 	main_oc->seed = seed;
 	main_oc->desaturated = atoi(gtk_combo_box_get_active_id((GtkComboBox*)main_widgets->g_cmb_saturation));
@@ -561,18 +561,18 @@ void on_btn_generate_clicked() {
 	if (gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_hue))
 		main_oc->hue = gtk_range_get_value((GtkRange*)main_widgets->g_scl_hue);
 	main_oc->key = atoi(gtk_combo_box_get_active_id((GtkComboBox*)main_widgets->g_cmb_style));
-	
+
 	if (data == NULL) {
 		data = (uint8_t *)malloc(sizeof(*data)*32768);
 	}
 	memset(data, 0, 32768);
-	
+
 	mp_pick_colors(main_oc);
 	gtk_data_len = mp_construct_nbt(main_oc, data);
-	
+
 	int show_preview;
 	show_preview = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_preview);
-	
+
 	if (show_preview) {
 		if (preview == NULL) {
 			preview = pngimg_init();
@@ -582,22 +582,22 @@ void on_btn_generate_clicked() {
 			update_txt_log();
 			return;
 		}
-		
+
 		int p_width, p_height;
 		int width, height;
 		p_width = gtk_widget_get_allocated_width(main_widgets->g_img_preview);
 		p_height = gtk_widget_get_allocated_height(main_widgets->g_img_preview);
 		width = preview->width;
 		height = preview->height;
-		
+
 		if (preview_buf == NULL) {
 			preview_buf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 1, 8, p_width, p_height);
 		}
-		
-		
+
+
 		uint8_t * preview_pix = gdk_pixbuf_get_pixels(preview_buf);
 		int preview_rowstride = gdk_pixbuf_get_rowstride(preview_buf);
-		
+
 		int x, x_2;
 		/*for (int i = 0; i < height; i+=height / p_height) {
 			x = i / (height / p_height) * preview_rowstride;
@@ -612,7 +612,7 @@ void on_btn_generate_clicked() {
 		float * preview_scl;
 		preview_scl = (float *)malloc(sizeof(*preview_scl) * preview_rowstride * p_height);
 		memset(preview_scl, 0, sizeof(*preview_scl) * preview_rowstride * p_height);
-		
+
 		memset(preview_pix, 0, preview_rowstride * p_height);
 		float avg = (float) p_height / (float) height * ((float) p_width / (float) width);
 		for (int i = 0; i < height; i++) {
@@ -623,7 +623,7 @@ void on_btn_generate_clicked() {
 				preview_scl[x_2 + 1] += preview->pixels[i][j].g * avg;
 				preview_scl[x_2 + 2] += preview->pixels[i][j].b * avg;
 				preview_scl[x_2 + 3] = 255;//preview->pixels[i][j].a * avg;
-				
+
 				preview_pix[x_2+0] = preview_scl[x_2 + 0];
 				preview_pix[x_2+1] = preview_scl[x_2 + 1];
 				preview_pix[x_2+2] = preview_scl[x_2 + 2];
@@ -633,7 +633,7 @@ void on_btn_generate_clicked() {
 		gtk_image_set_from_pixbuf((GtkImage*)main_widgets->g_img_preview, preview_buf);
 		free(preview_scl);
 	}
-	
+
 	update_txt_log();
 }
 
@@ -664,20 +664,20 @@ void on_btn_save_clicked() {
 		return;
 	}
 	strncpy(directory, chooser_dir, 255);
-	
+
 	int length = strlen(directory);
 	if (length == 255) {
 		fprintf(sterr, "Directory is too long. Pick a different one.\n");
 		update_txt_log();
 		return;
 	}
-	
+
 	char filename[256];
 	sprintf(filename, "%ld_%d_makepony", (long)time(NULL), main_oc->seed);
-	
+
 	char output[1024];
 	snprintf(output, 1023, "%s/%s.dat", directory, filename);
-	
+
 	int fd;
 #ifdef _WIN64
 	fd = _open(output, _O_WRONLY | _O_CREAT | _O_BINARY, 0664);
@@ -696,28 +696,28 @@ void on_btn_save_clicked() {
 	}
 	write(fd, data, gtk_data_len);
 	close(fd);
-	
+
 	fprintf(sterr, "Wrote to %s successfully.\n", output);
-	
+
 	if (gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_thumbnail)) {
 		if (preview_seed != main_oc->seed) {
 			fprintf(sterr, "Cannot save thumbnail. None generated...\n");
 			update_txt_log();
 			return;
 		}
-		
+
 		char thumb_dir[256];
 		int thumb_dir_len;
-		
+
 		strncpy(thumb_dir, gtk_entry_get_text((GtkEntry*)main_widgets->g_entry_thumbnail_dir), 255);
 		thumb_dir_len = strlen(thumb_dir);
-		
+
 		if (thumb_dir_len == 255) {
 			fprintf(sterr, "error: thumbnail output is inaccessible\n");
 			update_txt_log();
 			return;
 		}
-		
+
 		snprintf(output, 1023, "%s/%s", directory, thumb_dir);
 #ifdef _WIN64
 		struct _stat stat_out;
@@ -730,12 +730,12 @@ void on_btn_save_clicked() {
 			update_txt_log();
 			return;
 		}
-		
+
 		if (thumb_dir[thumb_dir_len - 1] != '/')
 			strcat(thumb_dir, "/");
-		
+
 		snprintf(output, 1023, "%s/%s%s.png", directory, thumb_dir, filename);
-		
+
 		FILE * f;
 #ifdef _WIN64
 		f = fopen(output, "wb");
@@ -755,7 +755,7 @@ void on_btn_save_clicked() {
 		}
 		fclose(f);
 	}
-	
+
 	update_txt_log();
 }
 
@@ -769,24 +769,24 @@ void on_entry_hue_changed() {
 	char text[256];
 	int length, valid;
 	color c;
-	
+
 	strncpy(text, gtk_entry_get_text((GtkEntry*)main_widgets->g_entry_hue), 255);
 	length = strlen(text);
 	valid = 1;
-	
+
 	if (gtk_widget_has_focus(main_widgets->g_entry_hue) && length < 7)
 		return;
 	else if (!gtk_widget_has_focus(main_widgets->g_entry_hue))
 		return;
-	
+
 	if (length > 7)
 		text[7] = 0;
-	
+
 	for (int i = 0; text[i] && i < 7; i++) {
 		if (!(isxdigit(text[i]) || text[i] == '#'))
 			valid = 0;
 	}
-	
+
 	if (valid) {
 		int r, g, b;
 		sscanf(text, "#%02x%02x%02x", &r, &g, &b);
@@ -806,14 +806,14 @@ void on_scl_hue_value_changed() {
 	hsvcolor.h = gtk_range_get_value((GtkRange*)main_widgets->g_scl_hue);
 	hsvToRGB(&hsvcolor, &c);
 	sprintf(text, "#%02X%02X%02X", c.r, c.g, c.b);
-	
+
 	gtk_entry_set_text((GtkEntry*)main_widgets->g_entry_hue, text);
-	
+
 	clrbtn_hue_color->red = c.r / 256.0;
 	clrbtn_hue_color->green = c.g / 256.0;
 	clrbtn_hue_color->blue = c.b / 256.0;
 	clrbtn_hue_color->alpha = 1.0;
-	
+
 	gtk_color_chooser_set_rgba((GtkColorChooser *)main_widgets->g_clrbtn_hue, clrbtn_hue_color);
 }
 
@@ -841,7 +841,7 @@ void mp_data_init(mp_data * oc) {
 
 void mp_pick_colors(mp_data * oc) {
 	srand(oc->seed);
-	
+
 	int clrcount;
 	if (oc->key == -1) {
 		oc->key = rand() % STYLECOUNT;
@@ -852,7 +852,7 @@ void mp_pick_colors(mp_data * oc) {
 		rand();
 	}
 	clrcount = COLOR(styles[oc->key]);
-	
+
 	fprintf(sterr, "%d: %s\n", oc->seed, UMANE(styles[oc->key]));
 
 
@@ -861,9 +861,9 @@ void mp_pick_colors(mp_data * oc) {
 		free(oc->colors);
 	oc->colors = malloc(sizeof(*oc->colors)*7);
 	memset(oc->colors, 0, sizeof(*oc->colors)*7);
-	
+
 	color color1;
-	
+
 	hsv hsvcolor;
 
 	if (oc->hue == -1) {
@@ -877,7 +877,7 @@ void mp_pick_colors(mp_data * oc) {
 		rand();
 	}
 
-	if (oc->male == -1) 
+	if (oc->male == -1)
 		oc->male = ((oc->hue % 180 < 60) && ((oc->key == BIGMAC) || ((oc->key == ADVENTUROUS) && (rand() & 3))));
 
 	if (oc->verbose) {
@@ -908,20 +908,20 @@ void mp_pick_colors(mp_data * oc) {
 			oc->desaturated = 0;
 		}
 	}
-	
+
 	oc->any_saturation = 0;
 
 	if (oc->verbose) {
 		fprintf(sterr, "body is %ssaturated\n", (oc->desaturated) ? "de" : "");
 	}
-	
+
 	if (oc->use_socks == -1) {
 		oc->use_socks = !(rand() % 6);
 	}
 	else {
 		rand();
 	}
-	
+
 	if (oc->use_socks && clrcount < 2) {
 		clrcount = 2;
 	}
@@ -989,8 +989,8 @@ void mp_pick_colors(mp_data * oc) {
 			}
 		}
 		else {
-			hsvcolor.v = (oc->desaturated != 1) ? 
-				sqrtf((rand() % 12 + 4) / 15.0f) : 
+			hsvcolor.v = (oc->desaturated != 1) ?
+				sqrtf((rand() % 12 + 4) / 15.0f) :
 				sqrtf((rand() & 15) / 15.0f);
 				rand();
 		}
@@ -1000,7 +1000,7 @@ void mp_pick_colors(mp_data * oc) {
 		hsvToRGB(&hsvcolor,&oc->colors[i]);
 
 		if (oc->verbose) {
-			fprintf(sterr, "\tcolors[%d]: 0x%02X%02X%02X\t HSV(%d,%g,%g)\n", i, oc->colors[i].r, oc->colors[i].g, oc->colors[i].b, hsvcolor.h, hsvcolor.s, hsvcolor.v); 
+			fprintf(sterr, "\tcolors[%d]: 0x%02X%02X%02X\t HSV(%d,%g,%g)\n", i, oc->colors[i].r, oc->colors[i].g, oc->colors[i].b, hsvcolor.h, hsvcolor.s, hsvcolor.v);
 		}
 	}
 
@@ -1037,7 +1037,7 @@ void mp_pick_colors(mp_data * oc) {
 		// l *= l;
 		// hsvcolor.s = avg_sat - 0.3f*l;
 		// }
-		
+
 		if (oc->invert) {
 			if (oc->desaturated)
 				hsvcolor.v = 1.0 - hsvcolor.v;
@@ -1057,7 +1057,7 @@ void mp_pick_colors(mp_data * oc) {
 	int details_in_use = 0;
 
 	if (oc->details != NULL) {
-		for (int i = 0; i < 8; i++) 
+		for (int i = 0; i < 8; i++)
 			free(oc->details[i]);
 		free(oc->details);
 	}
@@ -1119,12 +1119,12 @@ void mp_pick_colors(mp_data * oc) {
 				strcpy(oc->details[details_in_use], available_details[i]);
 				oc->detail_color[details_in_use] = oc->colors[rand() % clrcount];
 				if (oc->verbose) {
-					fprintf(sterr, "detail_color[%d]: 0x%02X%02X%02X\tdetails[%d]: %s\n", 
-						details_in_use, 
-						oc->detail_color[details_in_use].r, 
-						oc->detail_color[details_in_use].g, 
-						oc->detail_color[details_in_use].b, 
-						details_in_use, 
+					fprintf(sterr, "detail_color[%d]: 0x%02X%02X%02X\tdetails[%d]: %s\n",
+						details_in_use,
+						oc->detail_color[details_in_use].r,
+						oc->detail_color[details_in_use].g,
+						oc->detail_color[details_in_use].b,
+						details_in_use,
 						oc->details[details_in_use]);
 				}
 				details_in_use += 1;
@@ -1132,7 +1132,7 @@ void mp_pick_colors(mp_data * oc) {
 		}
 
 	}
-	
+
 	for (int i = 0; i < 16; i++) {
 		free(available_details[i]);
 	}
@@ -1147,8 +1147,8 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 	hsvcolor.s = 1;
 	hsvcolor.v = 1;
 	hsvToRGB(&hsvcolor, &color1);
-	
-	
+
+
 	int data_len;
 	data_len = 0;
 
@@ -1165,7 +1165,7 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 	data_len++;
 	strcpy((char *)(data+data_len), "data");
 	data_len += strlen("data");
-	
+
 	color eye_color;
 	hsvcolor.h = (oc->hue + 0) % 360;
 	hsvToRGB(&hsvcolor, &eye_color);
@@ -1182,7 +1182,7 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 			c.r = 0;
 			c.g = 0;
 			c.b = 0;
-			
+
 			hsvcolor.h = 0;
 			hsvcolor.s = 0;
 			hsvcolor.v = 0;
@@ -1337,7 +1337,7 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 				c.b = 255;
 			}
 
-			s_len = addColor(cur+1, &c, 1, s);
+			s_len = addColor(cur+1, &c, s);
 		}
 		else if (target[i][0] == STR) {
 			strcpy(temp, "NONE");
@@ -1383,7 +1383,7 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 			x = (strstr(cur+1, "new_male_muzzle")) || x;
 			x = (strstr(cur+1, "socks_model_new") && oc->use_socks) || x;
 
-			s_len = addBool(cur+1, x, 1, s);
+			s_len = addBool(cur+1, x, s);
 		}
 		else if (target[i][0] == VAL || target[i][0] == TARGET_INT) {
 			float x = 1.0f;
@@ -1437,9 +1437,9 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 			}
 
 			if (target[i][0] == VAL)
-				s_len = addValue(cur+1, x, 1, s);
+				s_len = addValue(cur+1, x, s);
 			else
-				s_len = addInt(cur+1, (int)x, 1, s);
+				s_len = addInt(cur+1, (int)x, s);
 		}
 		memcpy(data + data_len, s, s_len);
 		data_len += s_len;
@@ -1450,6 +1450,6 @@ int mp_construct_nbt(mp_data * oc, unsigned char * data) {
 	data_len++;
 	*(data + data_len) = 0x0a;
 	data_len++;
-	
+
 	return data_len;
 }

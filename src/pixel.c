@@ -50,7 +50,7 @@ uint8_t pixel_s(Pixel *p) {
 uint8_t pixel_sl(Pixel *p) {
 	if (pixel_l(p) >= 255)
 		return 0;
-	return pixel_d(p)/(1-fabs(2*pixel_l(p)/255-1))*255;
+	return pixel_d(p)/(1-abs(2*pixel_l(p)/255-1))*255;
 }
 
 uint8_t pixel_l(Pixel * p) {
@@ -69,8 +69,6 @@ uint8_t pixel_c(uint8_t v, uint8_t s) {
 uint8_t mod(uint8_t x, uint8_t y) {
 	while (x >= y)
 		x -= y;
-	while (x < 0)
-		x += y;
 	return x;
 }
 
@@ -78,7 +76,7 @@ void pixel_sethsv(Pixel * p, uint8_t hue, uint8_t sat, uint8_t val) {
 	hue = mod(hue,255);
 	uint8_t hp = hue*6/255;
 	uint8_t c = val / 255 * sat;
-	uint8_t x = c*(1-fabs(mod(hp,2)-1));
+	uint8_t x = c*(1-abs(mod(hp,2)-1));
 	val /= 255;
 	if (1 >= hp) { p->r = c; p->g = x; p->b = 0; }
 	else if (2 >= hp) { p->r = x; p->g = c; p->b = 0; }

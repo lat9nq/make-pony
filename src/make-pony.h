@@ -122,7 +122,7 @@ typedef struct {
 	GtkWidget * g_entry_thumbnail_dir;
 	GtkWidget * g_scrl_log;
 	GtkWidget * g_clrbtn_hue;
-	
+
 	GtkBuilder * builder;
 	GtkWidget * window;
 } mp_gtk_widgets;
@@ -131,7 +131,7 @@ mp_gtk_widgets * main_widgets;
 mp_data * main_oc;
 
 void mp_gtk_build(int * argc, char ** argv[], mp_gtk_widgets ** widgets);
-void mp_gtk_destroy(mp_gtk_widgets * widgets);
+void mp_gtk_destroy();
 void mp_data_init(mp_data * oc);
 int render_oc(PNGIMG * img, uint8_t * nbt, int nbt_len, mp_data * oc);
 

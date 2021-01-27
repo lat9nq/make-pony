@@ -107,9 +107,3 @@ float lightness(const color * c) {
 	// return ((*c).r * 0.299f + (*c).g * 0.587f + (*c).b * 0.114f) / 255.0f;
 	return 0.3f * ((*c).r + (*c).g + (*c).b) / 255.0f;
 }
-
-void analogous1(const color * c1, color * c2) {
-}
-
-void analogous2(const color * c1, color * c2) {
-}
