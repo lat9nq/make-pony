@@ -22,6 +22,7 @@
 #include "color.h"
 #include "target.h"
 #include "make-pony.h"
+#include "make-pony.glade.h"
 #include "thumbnailer.h"
 
 #ifdef _WIN64
@@ -444,8 +445,7 @@ void mp_gtk_build(int *argc, char ** argv[], mp_gtk_widgets ** w) {
 
 	gtk_init(argc, argv);
 
-	widgets->builder = gtk_builder_new();
-	gtk_builder_add_from_file(widgets->builder, "src/make-pony.glade", NULL);
+	widgets->builder = gtk_builder_new_from_string(make_pony_glade, strlen(make_pony_glade));
 
 	widgets->window = GTK_WIDGET(gtk_builder_get_object(widgets->builder, "window_main"));
 	gtk_builder_connect_signals(widgets->builder, NULL);

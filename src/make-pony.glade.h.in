@@ -1,0 +1,6 @@
+#ifndef MAKE_PONY_GLADE_H
+#define MAKE_PONY_GLADE_H
+
+const char * make_pony_glade = "@MAKE_PONY_GLADE@";
+
+#endif
