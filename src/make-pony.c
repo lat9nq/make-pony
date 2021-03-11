@@ -509,7 +509,7 @@ void update_txt_log() {
 	free(s);
 }
 
-void on_txt_log_size_allocate() {
+G_MODULE_EXPORT void on_txt_log_size_allocate() {
 	GtkAdjustment * vadj = gtk_scrolled_window_get_vadjustment((GtkScrolledWindow*)main_widgets->g_scrl_log);
 	gtk_adjustment_set_value(vadj, gtk_adjustment_get_upper(vadj));
 }
@@ -518,7 +518,7 @@ void mp_gtk_destroy() {
 
 }
 
-void on_btn_generate_clicked() {
+G_MODULE_EXPORT void on_btn_generate_clicked() {
 	char text[256];
 	uint64_t seed;
 
@@ -644,17 +644,17 @@ int render_oc(PNGIMG * img, uint8_t * nbt, int nbt_len, mp_data * oc) {
 	return preview_seed;
 }
 
-void on_btn_seed_now_clicked() {
+G_MODULE_EXPORT void on_btn_seed_now_clicked() {
 	char blank[1] = {0};
 	gtk_entry_set_text((GtkEntry*)main_widgets->g_entry_seed, blank);
 }
 
-void on_btn_seed_random_clicked() {
+G_MODULE_EXPORT void on_btn_seed_random_clicked() {
 	const char * s = "random";
 	gtk_entry_set_text((GtkEntry*)main_widgets->g_entry_seed, s);
 }
 
-void on_btn_save_clicked() {
+G_MODULE_EXPORT void on_btn_save_clicked() {
 	char directory[256];
 	char * chooser_dir;
 	chooser_dir = gtk_file_chooser_get_filename((GtkFileChooser*)main_widgets->g_fch_outdir);
@@ -759,13 +759,13 @@ void on_btn_save_clicked() {
 	update_txt_log();
 }
 
-void on_chk_hue_toggled() {
+G_MODULE_EXPORT void on_chk_hue_toggled() {
 	int active = gtk_toggle_button_get_active((GtkToggleButton*)main_widgets->g_chk_hue);
 	gtk_widget_set_sensitive(main_widgets->g_entry_hue, active);
 	gtk_widget_set_sensitive(main_widgets->g_scl_hue, active);
 }
 
-void on_entry_hue_changed() {
+G_MODULE_EXPORT void on_entry_hue_changed() {
 	char text[256];
 	int length, valid;
 	color c;
@@ -797,7 +797,7 @@ void on_entry_hue_changed() {
 	}
 }
 
-void on_scl_hue_value_changed() {
+G_MODULE_EXPORT void on_scl_hue_value_changed() {
 	hsv hsvcolor;
 	color c;
 	char text[255];
@@ -817,7 +817,7 @@ void on_scl_hue_value_changed() {
 	gtk_color_chooser_set_rgba((GtkColorChooser *)main_widgets->g_clrbtn_hue, clrbtn_hue_color);
 }
 
-void on_window_main_destroy() {
+G_MODULE_EXPORT void on_window_main_destroy() {
 	gtk_main_quit();
 	exit(0);
 }

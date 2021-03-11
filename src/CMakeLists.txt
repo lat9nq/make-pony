@@ -37,6 +37,12 @@ include_directories(.)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(make-pony PRIVATE ${GTK3_INCLUDE_DIRS})
 
-target_link_options(make-pony PUBLIC -export-dynamic)
+if (NOT WIN32)
+    target_link_options(make-pony PUBLIC -export-dynamic)
+else()
+    message(STATUS "Using Windows compile options")
+    #~ target_link_options(make-pony PRIVATE -export-all-symbols)
+    target_compile_options(make-pony PRIVATE -mwindows)
+endif()
 
 target_link_libraries(make-pony PRIVATE m PNG::PNG ${GTK3_LIBRARIES} Threads::Threads)
