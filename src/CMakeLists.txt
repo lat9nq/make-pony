@@ -35,8 +35,8 @@ target_compile_options(make-pony BEFORE PUBLIC
 
 include_directories(.)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(make-pony PRIVATE ${GTK_INCLUDE_DIRS})
+target_include_directories(make-pony PRIVATE ${GTK3_INCLUDE_DIRS})
 
 target_link_options(make-pony PUBLIC -export-dynamic)
 
-target_link_libraries(make-pony PRIVATE m PNG::PNG ${GTK_LIBRARIES} Threads::Threads)
+target_link_libraries(make-pony PRIVATE m PNG::PNG ${GTK3_LIBRARIES} Threads::Threads)
